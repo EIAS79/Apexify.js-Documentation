@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "name": "Hero composition",
+  "width": 1280,
+  "height": 720,
+  "background": {
+    "mode": "image",
+    "color": "#030916",
+    "startColor": "#221160",
+    "endColor": "#006ca8",
+    "image": "/workspace/assets/crystal-lake.webp",
+    "transparent": false
+  },
+  "layers": [
+    {
+      "id": "title",
+      "name": "Apexify",
+      "x": 90,
+      "y": 180,
+      "width": 425,
+      "height": 120,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "kind": "text",
+      "text": "Apexify",
+      "fontSize": 100,
+      "weight": 800,
+      "color": "#ffffff",
+      "textSettings": {
+        "properties": {
+          "font": {
+            "family": "DejaVu Sans",
+            "weight": 350
+          },
+          "layout": {
+            "letterSpacing": 3.25
+          },
+          "textOnCurve": {
+            "sweepAngle": 120
+          },
+          "measurementCanvas": {
+            "width": 256
+          }
+        }
+      }
+    },
+    {
+      "id": "suffix",
+      "name": "Brand accent",
+      "x": 510,
+      "y": 180,
+      "width": 150,
+      "height": 120,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "kind": "text",
+      "text": ".js",
+      "fontSize": 100,
+      "weight": 800,
+      "color": "#eaff00"
+    },
+    {
+      "id": "subtitle",
+      "name": "Description",
+      "x": 94,
+      "y": 295,
+      "width": 560,
+      "height": 44,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "kind": "text",
+      "text": "Programmatic media for the web",
+      "fontSize": 26,
+      "weight": 400,
+      "color": "#ced9f2"
+    },
+    {
+      "id": "button",
+      "name": "Call to action",
+      "x": 94,
+      "y": 354,
+      "width": 282,
+      "height": 60,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "kind": "shape",
+      "shape": "rectangle",
+      "color": "#090d20",
+      "radius": 30,
+      "strokeColor": "#b04dff",
+      "strokeWidth": 2
+    },
+    {
+      "id": "button-label",
+      "name": "Button label",
+      "x": 126,
+      "y": 371,
+      "width": 215,
+      "height": 36,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "kind": "text",
+      "text": "Create with Code  →",
+      "fontSize": 20,
+      "weight": 700,
+      "color": "#ffffff"
+    }
+  ],
+  "canvasExtras": {},
+  "assets": []
+}

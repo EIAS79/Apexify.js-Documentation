@@ -1,0 +1,328 @@
+{
+  "nativeSource": "browser-live /api/workspace/text-metrics JSON",
+  "nativeKeys": [
+    "width",
+    "actualBoundingBoxAscent",
+    "actualBoundingBoxDescent",
+    "actualBoundingBoxLeft",
+    "actualBoundingBoxRight",
+    "fontBoundingBoxAscent",
+    "fontBoundingBoxDescent",
+    "height",
+    "lineHeight",
+    "baseline",
+    "top",
+    "bottom",
+    "centerX",
+    "centerY",
+    "alphabeticBaseline",
+    "emHeightAscent",
+    "emHeightDescent",
+    "totalHeight",
+    "lineCount",
+    "lines",
+    "charWidths",
+    "charPositions"
+  ],
+  "records": [
+    {
+      "id": "UI-METRIC-001",
+      "api": "measureText.TextMetrics.width",
+      "present": true,
+      "valueType": "number",
+      "sample": 1117.9000244140625
+    },
+    {
+      "id": "UI-METRIC-002",
+      "api": "measureText.TextMetrics.actualBoundingBoxAscent",
+      "present": true,
+      "valueType": "number",
+      "sample": 49
+    },
+    {
+      "id": "UI-METRIC-003",
+      "api": "measureText.TextMetrics.actualBoundingBoxDescent",
+      "present": true,
+      "valueType": "number",
+      "sample": 311.9375
+    },
+    {
+      "id": "UI-METRIC-004",
+      "api": "measureText.TextMetrics.actualBoundingBoxLeft",
+      "present": true,
+      "valueType": "number",
+      "sample": 8.71875
+    },
+    {
+      "id": "UI-METRIC-005",
+      "api": "measureText.TextMetrics.actualBoundingBoxRight",
+      "present": true,
+      "valueType": "number",
+      "sample": 1124.4859619140625
+    },
+    {
+      "id": "UI-METRIC-006",
+      "api": "measureText.TextMetrics.fontBoundingBoxAscent",
+      "present": true,
+      "valueType": "number",
+      "sample": 43.75
+    },
+    {
+      "id": "UI-METRIC-007",
+      "api": "measureText.TextMetrics.fontBoundingBoxDescent",
+      "present": true,
+      "valueType": "number",
+      "sample": 306.25
+    },
+    {
+      "id": "UI-METRIC-008",
+      "api": "measureText.TextMetrics.alphabeticBaseline",
+      "present": true,
+      "valueType": "number",
+      "sample": 43.75
+    },
+    {
+      "id": "UI-METRIC-009",
+      "api": "measureText.TextMetrics.emHeightAscent",
+      "present": true,
+      "valueType": "number",
+      "sample": 43.75
+    },
+    {
+      "id": "UI-METRIC-010",
+      "api": "measureText.TextMetrics.emHeightDescent",
+      "present": true,
+      "valueType": "number",
+      "sample": 306.25
+    },
+    {
+      "id": "UI-METRIC-011",
+      "api": "measureText.TextMetrics.hangingBaseline",
+      "present": false,
+      "valueType": "undefined"
+    },
+    {
+      "id": "UI-METRIC-012",
+      "api": "measureText.TextMetrics.ideographicBaseline",
+      "present": false,
+      "valueType": "undefined"
+    },
+    {
+      "id": "UI-METRIC-013",
+      "api": "measureText.TextMetrics.height",
+      "present": true,
+      "valueType": "number",
+      "sample": 140
+    },
+    {
+      "id": "UI-METRIC-014",
+      "api": "measureText.TextMetrics.lineHeight",
+      "present": true,
+      "valueType": "number",
+      "sample": 140
+    },
+    {
+      "id": "UI-METRIC-015",
+      "api": "measureText.TextMetrics.baseline",
+      "present": true,
+      "valueType": "number",
+      "sample": 49
+    },
+    {
+      "id": "UI-METRIC-016",
+      "api": "measureText.TextMetrics.top",
+      "present": true,
+      "valueType": "number",
+      "sample": -49
+    },
+    {
+      "id": "UI-METRIC-017",
+      "api": "measureText.TextMetrics.bottom",
+      "present": true,
+      "valueType": "number",
+      "sample": 311.9375
+    },
+    {
+      "id": "UI-METRIC-018",
+      "api": "measureText.TextMetrics.centerX",
+      "present": true,
+      "valueType": "number",
+      "sample": 558.9500122070312
+    },
+    {
+      "id": "UI-METRIC-019",
+      "api": "measureText.TextMetrics.centerY",
+      "present": true,
+      "valueType": "number",
+      "sample": 70
+    },
+    {
+      "id": "UI-METRIC-020",
+      "api": "measureText.TextMetrics.lines[]",
+      "present": true,
+      "valueType": "object",
+      "sample": "{\"text\":\"Apexify\",\"width\":1117.9000244140625,\"height\":360.9375,\"metrics\":{\"width\":1117.9000244140625,\"actualBoundingBoxAscent\":49,\"actualBoundingBoxDescent\":311.9375,\"actualBoundin"
+    },
+    {
+      "id": "UI-METRIC-021",
+      "api": "measureText.TextMetrics.totalHeight",
+      "present": true,
+      "valueType": "number",
+      "sample": 140
+    },
+    {
+      "id": "UI-METRIC-022",
+      "api": "measureText.TextMetrics.lineCount",
+      "present": true,
+      "valueType": "number",
+      "sample": 1
+    },
+    {
+      "id": "UI-METRIC-023",
+      "api": "measureText.TextMetrics.charWidths[]",
+      "present": true,
+      "valueType": "number",
+      "sample": 263.29998779296875
+    },
+    {
+      "id": "UI-METRIC-024",
+      "api": "measureText.TextMetrics.charPositions[]",
+      "present": true,
+      "valueType": "object",
+      "sample": "{\"x\":0,\"width\":263.29998779296875}"
+    },
+    {
+      "id": "UI-METRIC-025",
+      "api": "measureText.TextMetrics.lines[].text",
+      "present": true,
+      "valueType": "string",
+      "sample": "Apexify"
+    },
+    {
+      "id": "UI-METRIC-026",
+      "api": "measureText.TextMetrics.lines[].width",
+      "present": true,
+      "valueType": "number",
+      "sample": 1117.9000244140625
+    },
+    {
+      "id": "UI-METRIC-027",
+      "api": "measureText.TextMetrics.lines[].height",
+      "present": true,
+      "valueType": "number",
+      "sample": 360.9375
+    },
+    {
+      "id": "UI-METRIC-028",
+      "api": "measureText.TextMetrics.lines[].metrics.width",
+      "present": true,
+      "valueType": "number",
+      "sample": 1117.9000244140625
+    },
+    {
+      "id": "UI-METRIC-029",
+      "api": "measureText.TextMetrics.lines[].metrics.height",
+      "present": true,
+      "valueType": "number",
+      "sample": 360.9375
+    },
+    {
+      "id": "UI-METRIC-030",
+      "api": "measureText.TextMetrics.lines[].metrics.lineHeight",
+      "present": true,
+      "valueType": "number",
+      "sample": 140
+    },
+    {
+      "id": "UI-METRIC-031",
+      "api": "measureText.TextMetrics.lines[].metrics.actualBoundingBoxAscent",
+      "present": true,
+      "valueType": "number",
+      "sample": 49
+    },
+    {
+      "id": "UI-METRIC-032",
+      "api": "measureText.TextMetrics.lines[].metrics.actualBoundingBoxDescent",
+      "present": true,
+      "valueType": "number",
+      "sample": 311.9375
+    },
+    {
+      "id": "UI-METRIC-033",
+      "api": "measureText.TextMetrics.lines[].metrics.actualBoundingBoxLeft",
+      "present": true,
+      "valueType": "number",
+      "sample": 8.71875
+    },
+    {
+      "id": "UI-METRIC-034",
+      "api": "measureText.TextMetrics.lines[].metrics.actualBoundingBoxRight",
+      "present": true,
+      "valueType": "number",
+      "sample": 1124.4859619140625
+    },
+    {
+      "id": "UI-METRIC-035",
+      "api": "measureText.TextMetrics.lines[].metrics.fontBoundingBoxAscent",
+      "present": true,
+      "valueType": "number",
+      "sample": 43.75
+    },
+    {
+      "id": "UI-METRIC-036",
+      "api": "measureText.TextMetrics.lines[].metrics.fontBoundingBoxDescent",
+      "present": true,
+      "valueType": "number",
+      "sample": 306.25
+    },
+    {
+      "id": "UI-METRIC-037",
+      "api": "measureText.TextMetrics.lines[].metrics.baseline",
+      "present": true,
+      "valueType": "number",
+      "sample": 49
+    },
+    {
+      "id": "UI-METRIC-038",
+      "api": "measureText.TextMetrics.lines[].metrics.top",
+      "present": true,
+      "valueType": "number",
+      "sample": -49
+    },
+    {
+      "id": "UI-METRIC-039",
+      "api": "measureText.TextMetrics.lines[].metrics.bottom",
+      "present": true,
+      "valueType": "number",
+      "sample": 311.9375
+    },
+    {
+      "id": "UI-METRIC-040",
+      "api": "measureText.TextMetrics.lines[].metrics.centerX",
+      "present": true,
+      "valueType": "number",
+      "sample": 558.9500122070312
+    },
+    {
+      "id": "UI-METRIC-041",
+      "api": "measureText.TextMetrics.lines[].metrics.centerY",
+      "present": true,
+      "valueType": "number",
+      "sample": 131.46875
+    },
+    {
+      "id": "UI-METRIC-042",
+      "api": "measureText.TextMetrics.charPositions[].x",
+      "present": true,
+      "valueType": "number",
+      "sample": 0
+    },
+    {
+      "id": "UI-METRIC-043",
+      "api": "measureText.TextMetrics.charPositions[].width",
+      "present": true,
+      "valueType": "number",
+      "sample": 263.29998779296875
+    }
+  ]
+}

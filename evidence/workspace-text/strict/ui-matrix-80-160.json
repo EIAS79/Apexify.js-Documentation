@@ -1,0 +1,1126 @@
+{
+  "start": 80,
+  "count": 80,
+  "results": [
+    {
+      "id": "UI-0081",
+      "api": "createText.TextProperties.effects.highlight.gradient.colors[].color",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "#ff8800",
+        "inspectorCurrent": "#ff8800",
+        "graphValue": "#aa33ff",
+        "graphModel": "#aa33ff",
+        "undo": "#ff8800",
+        "redo": "#aa33ff",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0082",
+      "api": "createText.TextProperties.effects.highlight.opacity",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 0.7,
+        "inspectorCurrent": 0.7,
+        "graphValue": 0.5,
+        "graphModel": 0.5,
+        "undo": 0.7,
+        "redo": 0.5,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0083",
+      "api": "createText.TextProperties.effects.glow.color",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "#ff8800",
+        "inspectorCurrent": "#ff8800",
+        "graphValue": "#aa33ff",
+        "graphModel": "#aa33ff",
+        "undo": "#ff8800",
+        "redo": "#aa33ff",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0084",
+      "api": "createText.TextProperties.effects.glow.gradient.type",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "radial",
+        "inspectorCurrent": "radial",
+        "graphValue": "radial",
+        "graphModel": "radial",
+        "undo": "radial",
+        "redo": "radial",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0085",
+      "api": "createText.TextProperties.effects.glow.gradient.startX",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0086",
+      "api": "createText.TextProperties.effects.glow.gradient.startY",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0087",
+      "api": "createText.TextProperties.effects.glow.gradient.endX",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0088",
+      "api": "createText.TextProperties.effects.glow.gradient.endY",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0089",
+      "api": "createText.TextProperties.effects.glow.gradient.startRadius",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 80,
+        "inspectorCurrent": 80,
+        "graphValue": 90,
+        "graphModel": 90,
+        "undo": 80,
+        "redo": 90,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0090",
+      "api": "createText.TextProperties.effects.glow.gradient.endRadius",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 80,
+        "inspectorCurrent": 80,
+        "graphValue": 90,
+        "graphModel": 90,
+        "undo": 80,
+        "redo": 90,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0091",
+      "api": "createText.TextProperties.effects.glow.gradient.centerX",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0092",
+      "api": "createText.TextProperties.effects.glow.gradient.centerY",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0093",
+      "api": "createText.TextProperties.effects.glow.gradient.startAngle",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0094",
+      "api": "createText.TextProperties.effects.glow.gradient.rotate",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0095",
+      "api": "createText.TextProperties.effects.glow.gradient.pivotX",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0096",
+      "api": "createText.TextProperties.effects.glow.gradient.pivotY",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0097",
+      "api": "createText.TextProperties.effects.glow.gradient.repeat",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "repeat",
+        "inspectorCurrent": "repeat",
+        "graphValue": "no-repeat",
+        "graphModel": "no-repeat",
+        "undo": "repeat",
+        "redo": "no-repeat",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0098",
+      "api": "createText.TextProperties.effects.glow.gradient.colors[].stop",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 0.15,
+        "inspectorCurrent": 0.15,
+        "graphValue": 0.3,
+        "graphModel": 0.3,
+        "undo": 0.15,
+        "redo": 0.3,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0099",
+      "api": "createText.TextProperties.effects.glow.gradient.colors[].color",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "#ff8800",
+        "inspectorCurrent": "#ff8800",
+        "graphValue": "#aa33ff",
+        "graphModel": "#aa33ff",
+        "undo": "#ff8800",
+        "redo": "#aa33ff",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0100",
+      "api": "createText.TextProperties.effects.glow.intensity",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0101",
+      "api": "createText.TextProperties.effects.glow.opacity",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 0.7,
+        "inspectorCurrent": 0.7,
+        "graphValue": 0.5,
+        "graphModel": 0.5,
+        "undo": 0.7,
+        "redo": 0.5,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0102",
+      "api": "createText.TextProperties.effects.shadow.color",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "#ff8800",
+        "inspectorCurrent": "#ff8800",
+        "graphValue": "#aa33ff",
+        "graphModel": "#aa33ff",
+        "undo": "#ff8800",
+        "redo": "#aa33ff",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0103",
+      "api": "createText.TextProperties.effects.shadow.gradient.type",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "radial",
+        "inspectorCurrent": "radial",
+        "graphValue": "radial",
+        "graphModel": "radial",
+        "undo": "radial",
+        "redo": "radial",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0104",
+      "api": "createText.TextProperties.effects.shadow.gradient.startX",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0105",
+      "api": "createText.TextProperties.effects.shadow.gradient.startY",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0106",
+      "api": "createText.TextProperties.effects.shadow.gradient.endX",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0107",
+      "api": "createText.TextProperties.effects.shadow.gradient.endY",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0108",
+      "api": "createText.TextProperties.effects.shadow.gradient.startRadius",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 80,
+        "inspectorCurrent": 80,
+        "graphValue": 90,
+        "graphModel": 90,
+        "undo": 80,
+        "redo": 90,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0109",
+      "api": "createText.TextProperties.effects.shadow.gradient.endRadius",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 80,
+        "inspectorCurrent": 80,
+        "graphValue": 90,
+        "graphModel": 90,
+        "undo": 80,
+        "redo": 90,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0110",
+      "api": "createText.TextProperties.effects.shadow.gradient.centerX",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0111",
+      "api": "createText.TextProperties.effects.shadow.gradient.centerY",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0112",
+      "api": "createText.TextProperties.effects.shadow.gradient.startAngle",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0113",
+      "api": "createText.TextProperties.effects.shadow.gradient.rotate",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0114",
+      "api": "createText.TextProperties.effects.shadow.gradient.pivotX",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0115",
+      "api": "createText.TextProperties.effects.shadow.gradient.pivotY",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0116",
+      "api": "createText.TextProperties.effects.shadow.gradient.repeat",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "repeat",
+        "inspectorCurrent": "repeat",
+        "graphValue": "no-repeat",
+        "graphModel": "no-repeat",
+        "undo": "repeat",
+        "redo": "no-repeat",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0117",
+      "api": "createText.TextProperties.effects.shadow.gradient.colors[].stop",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 0.15,
+        "inspectorCurrent": 0.15,
+        "graphValue": 0.3,
+        "graphModel": 0.3,
+        "undo": 0.15,
+        "redo": 0.3,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0118",
+      "api": "createText.TextProperties.effects.shadow.gradient.colors[].color",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "#ff8800",
+        "inspectorCurrent": "#ff8800",
+        "graphValue": "#aa33ff",
+        "graphModel": "#aa33ff",
+        "undo": "#ff8800",
+        "redo": "#aa33ff",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0119",
+      "api": "createText.TextProperties.effects.shadow.offsetX",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0120",
+      "api": "createText.TextProperties.effects.shadow.offsetY",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0121",
+      "api": "createText.TextProperties.effects.shadow.blur",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0122",
+      "api": "createText.TextProperties.effects.shadow.opacity",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 0.7,
+        "inspectorCurrent": 0.7,
+        "graphValue": 0.5,
+        "graphModel": 0.5,
+        "undo": 0.7,
+        "redo": 0.5,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0123",
+      "api": "createText.TextProperties.layout.lineHeight",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 1.2,
+        "inspectorCurrent": 1.2,
+        "graphValue": 1.4,
+        "graphModel": 1.4,
+        "undo": 1.2,
+        "redo": 1.4,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0124",
+      "api": "createText.TextProperties.layout.letterSpacing",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0125",
+      "api": "createText.TextProperties.layout.wordSpacing",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0126",
+      "api": "createText.TextProperties.layout.maxWidth",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0127",
+      "api": "createText.TextProperties.layout.maxHeight",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0128",
+      "api": "createText.TextProperties.placement.textAlign",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "center",
+        "inspectorCurrent": "center",
+        "graphValue": "left",
+        "graphModel": "left",
+        "undo": "center",
+        "redo": "left",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0129",
+      "api": "createText.TextProperties.placement.textBaseline",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "bottom",
+        "inspectorCurrent": "bottom",
+        "graphValue": "alphabetic",
+        "graphModel": "alphabetic",
+        "undo": "bottom",
+        "redo": "alphabetic",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0130",
+      "api": "createText.TextProperties.placement.rotation",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0131",
+      "api": "createText.TextProperties.placement.scaleX",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 1.2,
+        "inspectorCurrent": 1.2,
+        "graphValue": 1.3,
+        "graphModel": 1.3,
+        "undo": 1.2,
+        "redo": 1.3,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0132",
+      "api": "createText.TextProperties.placement.scaleY",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 1.2,
+        "inspectorCurrent": 1.2,
+        "graphValue": 1.3,
+        "graphModel": 1.3,
+        "undo": 1.2,
+        "redo": 1.3,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0133",
+      "api": "createText.TextProperties.placement.skewX",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0134",
+      "api": "createText.TextProperties.placement.skewY",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0135",
+      "api": "createText.TextProperties.placement.perspective.points[].x",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0136",
+      "api": "createText.TextProperties.placement.perspective.points[].y",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0137",
+      "api": "createText.TextProperties.placement.perspective.interpolation",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "bilinear",
+        "inspectorCurrent": "bilinear",
+        "graphValue": "nearest",
+        "graphModel": "nearest",
+        "undo": "bilinear",
+        "redo": "nearest",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0138",
+      "api": "createText.TextProperties.placement.perspective.edgeMode",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "clamp",
+        "inspectorCurrent": "clamp",
+        "graphValue": "transparent",
+        "graphModel": "transparent",
+        "undo": "clamp",
+        "redo": "transparent",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0139",
+      "api": "createText.TextProperties.fill.color",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "#ff8800",
+        "inspectorCurrent": "#ff8800",
+        "graphValue": "#aa33ff",
+        "graphModel": "#aa33ff",
+        "undo": "#ff8800",
+        "redo": "#aa33ff",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0140",
+      "api": "createText.TextProperties.fill.gradient.type",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "radial",
+        "inspectorCurrent": "radial",
+        "graphValue": "radial",
+        "graphModel": "radial",
+        "undo": "radial",
+        "redo": "radial",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0141",
+      "api": "createText.TextProperties.fill.gradient.startX",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0142",
+      "api": "createText.TextProperties.fill.gradient.startY",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0143",
+      "api": "createText.TextProperties.fill.gradient.endX",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0144",
+      "api": "createText.TextProperties.fill.gradient.endY",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0145",
+      "api": "createText.TextProperties.fill.gradient.startRadius",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 80,
+        "inspectorCurrent": 80,
+        "graphValue": 90,
+        "graphModel": 90,
+        "undo": 80,
+        "redo": 90,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0146",
+      "api": "createText.TextProperties.fill.gradient.endRadius",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 80,
+        "inspectorCurrent": 80,
+        "graphValue": 90,
+        "graphModel": 90,
+        "undo": 80,
+        "redo": 90,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0147",
+      "api": "createText.TextProperties.fill.gradient.centerX",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0148",
+      "api": "createText.TextProperties.fill.gradient.centerY",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0149",
+      "api": "createText.TextProperties.fill.gradient.startAngle",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0150",
+      "api": "createText.TextProperties.fill.gradient.rotate",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0151",
+      "api": "createText.TextProperties.fill.gradient.pivotX",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0152",
+      "api": "createText.TextProperties.fill.gradient.pivotY",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0153",
+      "api": "createText.TextProperties.fill.gradient.repeat",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "repeat",
+        "inspectorCurrent": "repeat",
+        "graphValue": "no-repeat",
+        "graphModel": "no-repeat",
+        "undo": "repeat",
+        "redo": "no-repeat",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0154",
+      "api": "createText.TextProperties.fill.gradient.colors[].stop",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 0.15,
+        "inspectorCurrent": 0.15,
+        "graphValue": 0.3,
+        "graphModel": 0.3,
+        "undo": 0.15,
+        "redo": 0.3,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0155",
+      "api": "createText.TextProperties.fill.gradient.colors[].color",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "#ff8800",
+        "inspectorCurrent": "#ff8800",
+        "graphValue": "#aa33ff",
+        "graphModel": "#aa33ff",
+        "undo": "#ff8800",
+        "redo": "#aa33ff",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0156",
+      "api": "createText.TextProperties.fill.opacity",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 0.7,
+        "inspectorCurrent": 0.7,
+        "graphValue": 0.5,
+        "graphModel": 0.5,
+        "undo": 0.7,
+        "redo": 0.5,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0157",
+      "api": "createText.TextProperties.stroke.color",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "#ff8800",
+        "inspectorCurrent": "#ff8800",
+        "graphValue": "#aa33ff",
+        "graphModel": "#aa33ff",
+        "undo": "#ff8800",
+        "redo": "#aa33ff",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0158",
+      "api": "createText.TextProperties.stroke.width",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 30,
+        "inspectorCurrent": 30,
+        "graphValue": 40,
+        "graphModel": 40,
+        "undo": 30,
+        "redo": 40,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0159",
+      "api": "createText.TextProperties.stroke.gradient.type",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "radial",
+        "inspectorCurrent": "radial",
+        "graphValue": "radial",
+        "graphModel": "radial",
+        "undo": "radial",
+        "redo": "radial",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0160",
+      "api": "createText.TextProperties.stroke.gradient.startX",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 5,
+        "inspectorCurrent": 5,
+        "graphValue": 7,
+        "graphModel": 7,
+        "undo": 5,
+        "redo": 7,
+        "graphMounted": true
+      }
+    }
+  ]
+}

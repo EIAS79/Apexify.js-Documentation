@@ -1,0 +1,28 @@
+{
+  "file": "D:\\ApexifyWorkspaceParallel\\text-strict-20261023\\docs\\workspace\\TEXT01_STRICT_CERTIFICATION_444.json",
+  "count": {
+    "FULL": 0,
+    "PARTIAL": 442,
+    "BLOCKED": 1,
+    "EXCLUDED": 1
+  },
+  "sourceSha": "85e806402af2ae72184c460866e785fba5a04c275bfe0f5f09daac9cdceeaec7",
+  "triples": "cb57070d8656f1556b63214555e24ba8bbe8b2b8a3a9fdb5b919965e7e63f2ca",
+  "nativeAuthoring": 399,
+  "codeParityPaths": 399,
+  "measuredResults": 43,
+  "historicalFailedProbeAttempts": 43,
+  "supersededFailedProbeAttempts": 43,
+  "unresolvedProbeFailures": 0,
+  "invalidValueValidationPaths": 389,
+  "observedMetricPaths": 41,
+  "unobservedMetricPaths": [
+    "measureText.TextMetrics.hangingBaseline",
+    "measureText.TextMetrics.ideographicBaseline"
+  ],
+  "visualDeltaPaths": 381,
+  "screenshotCount": 3,
+  "ledgerSha": "3ccec02f730c02fcfeb19a1a4e9fe03ec527615ee759ab8c6b881db47f4b6fa7",
+  "chromiumLog": "STRICT_NUMERIC_WEIGHT_350_PASS\nSTRICT_CURVE_REQUIRED_120_PASS\nSTRICT_MEASUREMENT_CANVAS_INTEGER_256_PASS\nNATIVE_METRICS Width: 924.50 px\nHeight: 627.82 px\nLine count: 1\nAscent: 49.00 px\nDescent: 311.94 px\nBaseline: 49.00 px\nUse measured selection bounds\nPer-line measured data\nComplete native TextMetrics result\nSCREENSHOT D:\\ApexifyWorkspaceParallel\\text-strict-20261023\\evidence\\workspace-text\\strict\\01-native-typography-inspector.png\nEDITOR_INPUT_COMMITTED 3.25\nGRAPH_TO_INSPECTOR_SYNC true\nUNDO_REDO_PASS\nSCREENSHOT D:\\ApexifyWorkspaceParallel\\text-strict-20261023\\evidence\\workspace-text\\strict\\02-typed-graph-with-text-editor.png\nPERSISTED_AFTER_RELOAD 3.25\nSCREENSHOT D:\\ApexifyWorkspaceParallel\\text-strict-20261023\\evidence\\workspace-text\\strict\\03-persisted-text-after-reload.png\nBROWSER_PASS\n",
+  "apiPass": true
+}

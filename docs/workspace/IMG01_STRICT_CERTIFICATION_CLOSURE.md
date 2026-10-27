@@ -1,0 +1,49 @@
+# IMG-01 strict createImage certification closure — Stage C
+
+## Authority, exact scope, and status
+
+Repository `EIAS79/Apexify.js-Documentation`; isolated branch `codex/workspace-parallel-image`. Starting accepted HEAD `6f8bb3c056af1539a1cd0b4aa0d8e97805b83102`. **Executable engine remains pinned to `379a5248f09ed39c1b1734fe104b6bd73a77857f`.** This audit follows STUDIO-PARITY-2/14/15/16/17. The published `Apexify.js-API's/02_createImage.md`, `03_shared_styles_gradients_patterns.md`, `18_assets_references.md`, and `33_runtime_security_limits.md` are secondary static references, not executable authority.
+
+Exactly 560 originally inventoried identities, unchanged in name and order: **330 `WORKSPACE_READY` Image paths; 16 `WORKSPACE_PARTIAL` Image paths; 4 upstream-blocked Image paths; 1 security-restricted painter-level boolean; 209 Canvas-owned paths explicitly excluded.**
+
+**Strict certification:** **0 FULL, 346 PARTIAL, 5 BLOCKED; 351 total in scope.** Stage A READY is an implementation-completeness classification, not a strict per-leaf FULL assertion. This result is deliberately not promoted solely for accepted JSON, graph projection or valid native calls. The strict acceptance gate remains **OPEN**; the functional Stage A/B implementation remains eligible for *controlled* cross-lane integration under the documented shared-file ordering, codegen and asset restrictions.
+
+## Exhaustive READY-path native/Code matrix
+
+Source-backed machine ledger: `docs/workspace/IMG01_STRICT_CERTIFICATION_LEDGER.json`. Exact 330-row execution matrix: `docs/workspace/IMG01_READY_OPTION_MATRIX.json`. Runner: `tests/workspace/image-strict-ready-matrix.test.ts`.
+
+The ledger's 330 exact READY identities were each executed, in bounded progress batches of fifteen; the five initial *invalid fixture construction* cases were repaired (solid/gradient discriminant and group-transform root), then independently rerun. **Final 330/330 passed; 0 native/model/Code failures.** Each row records immutable source identity, per-path proof IDs `READY-MODEL-<index>` and `READY-CODEPNG-<index>`, validated semantic document, canonical generated Code-to-Visual round trip, projected Graph representation, native `ApexPainter.createImage()` PNG hash, generated executable public-v6 Code with byte-identical native PNG, and a comparison with a baseline option configuration.
+
+**296/330 baseline comparisons changed PNG bytes; 34/330 remained identical in the tested geometry.** The 34 are tagged `NO_EFFECT_IN_TESTED_GEOMETRY` and **must not** be reported as inert pinned options: examples include full-coverage opaque image hiding `boxBackground`, `fit/align` without discriminating aspect ratios, `filterOrder` without contrasting pipeline effects, and `pivotX/Y` without appropriate transforms. Likewise, a raster difference from an empty/default configuration does *not necessarily isolate an individual nested leaf*; it is source-backed family/path fixture evidence, not unconditional per-leaf pixel certification.
+
+Existing pinned native fixture evidence `IMG01_STRICT_NATIVE_PROBES.json` (**121/121**) and combined 33-variant image Code/native parity are *reused*, not unnecessarily repeated. The remaining exact per-path criteria are included in each `outstandingCriteria` array. No FULL path lacks proof IDs because **no FULL path is claimed**.
+
+## Production Chromium / verified assets / Graph / persistence
+
+Real-browser acceptance script `tests/workspace/browser-image-strict-acceptance.cjs`, production evidence `D:\ApexifyWorkspaceParallel\IMG01CertEvidence\chromium-production\real-asset-acceptance.json`, screenshot images `00-real-assets-tab.png` through `05-graph-edit-reloaded.png`. Chrome 155, **12 workflow steps PASSED; 6 screenshots**.
+
+Verified actions: normal Inspector **Assets** tab selected via its visible button; hidden file input populated using Chrome DevTools' actual file-picker input protocol (not a fabricated DOM `change` event); immutable `asset:<sha256>` accepted; Image Inspector selected; actual Node-native preview loaded at **1280px**; mask enabled; restored image source and mask verified after IndexedDB reload; actual keyboard control edited `Image fit` in the **Graph** panel; Inspector reflected the new value; Undo then Redo returned to the selected fit; a read-only IndexedDB query confirmed the debounced save *before* browser reload; Graph edit survived reload with nonzero preview; visible **Save project** button downloaded project JSON containing matching SHA-256 image bytes, mask reference and Graph fit. Independent `tests/workspace/image-strict-project-recovery.test.ts` passed re-import validation, SHA-256 recomputation, mask and fit recovery, Graph projection, canonical Code round-trip.
+
+Original browser failure: test incorrectly queried `.aw-assets input[type=file]` *without opening Assets*, then attempted a synthetic upload workaround. Corrected UI sequence has **no synthetic upload events**. Zero-width native preview on a fresh Next.js development page corresponded to a Chromium `SyntaxError` in a served `main-app.js` asset leaving React unhydrated (`aria-busy=true`); a clean bundle/page restored 1280px rendering. A later Graph edit test reloaded *before* the 350 ms IndexedDB save debounce; waiting for the committed value resolved the timing failure. **The final complete browser run used the controlled production build**, avoiding development HMR artifacts. No unrelated engine or persistence logic was modified to mask the tests.
+
+## 16 partials / four upstream / security
+
+Detailed source-backed fixture mapping is in `docs/workspace/IMG01_STRICT_LIMITATIONS_CLOSURE.json` (21 records and native probe IDs).
+
+- **Seven `*.gradient.startAngle` conic paths:** pinned runtime accepts angles in the examined contexts, but 0° vs 180° produced identical pixels in those cases. No native-inert control is FULL.
+- **Seven `*.gradient.repeat` paths:** linear/radial union-specific; repeat/reflect may depend on geometry and paint context; conic does not have equivalent semantics. Mixed native effect evidence cannot support blanket FULL.
+- **Two `*.filters.radius` paths:** radius applies to only gaussianBlur, motionBlur and radialBlur, not to the other fourteen filter variants. Flattened field inventory is not an unconditional UI capability.
+- **Four upstream shadow side/corner paths:** tested individual-image shadow comparisons can differ while grouped-transform `shadow.borderPosition/roundedCorners` comparisons do not. Group and individual semantics must not be conflated. Shared controls remain fail-closed/disabled pending complete native+authoring justification; all four stay BLOCKED.
+- **Painter-level `resolveAssetRefs?: boolean`:** remains blocked as a user-exposed permission switch. No callback, untrusted file/URL, remote fetch, or privileged asset resolver is introduced. Verified local SHA-256 image/mask content remains required.
+
+## Tests, build and recovery
+
+New proof commands, with bounded per-path test loop: `node node_modules/tsx/dist/cli.mjs --test tests/workspace/image-strict-ready-matrix.test.ts` and `node node_modules/tsx/dist/cli.mjs --test tests/workspace/image-strict-project-recovery.test.ts`; **330/330 matrix and project-recovery test PASS**. Full direct `node node_modules/typescript/bin/tsc --noEmit` passes with the new tests. The production build was run against the same isolated checkout with a **temporary single-worker `experimental.cpus:1`** due previous Windows worker OOM; it **completed 482 pages and included `/workspace`**, with original Next.js config and DOC-4 inputs independently restored. Logs at `D:\ApexifyWorkspaceParallel\IMG01CertEvidence\`: `typecheck-direct.log`, `production-build-final.log`, `doc4-generation.log`, browser report/screenshots, per-batch and serial Workspace regression logs.
+
+The **25 existing Workspace test files** were exercised in seven bounded batches; several concurrent test processes hit Windows spawn/virtual-space failures. All twelve affected files were rerun individually: **11 passed**, while **`contracts.test.ts` failed one pre-existing regex assertion** expecting `/outside composition/` although the deliberately fail-closed parser says `Edits outside the canonical composition ... cannot be reconciled.` Both wording and expectation already existed at accepted commit `6f8bb3c`; neither application behavior nor the shared test was changed in IMG-01. Therefore final **24/25 existing Workspace test files passed**, **one pre-existing test-expectation failure**, and no claim is made that the entire broad suite is green. IMG-scoped independent project-recovery/Code-rejection regression passed. Logs and exact exits: `workspace-regression-summary.json`, `workspace-serial-results.json`, and `project-recovery-test-final.log` in the external evidence directory.
+
+Original Stage A, Stage B and reconciliation commits/artifacts are preserved. The post-commit recovery file list, full baseline-to-final patch, ZIP CRC and SHA-256 manifests are verified **outside the checkout** under `D:\ApexifyWorkspaceParallel\IMG01CertEvidence\`. They are not a merge or deployment.
+
+## Recommendation and what remains
+
+**Stage A/B functional acceptance remains in force; Stage C native/Code matrix and representative production Chromium acceptance are now complete.** The STUDIO-PARITY-17 **strict per-leaf FULL gate is not completed**: option-specific Inspector and applicable Graph editing, direct native defaults and invalid boundaries, discriminating leaf-level raster assertions, undo/redo, IndexedDB, recovery import/export and real Chromium evidence must be individually traceable for each eligible leaf before FULL. The 330 paths have real per-row native/Code evidence, but no misrepresented generic browser assertion is reused to certify 330 distinct UI controls. Combined Workspace acceptance belongs to the integration lane; do not repin, push, merge or deploy.

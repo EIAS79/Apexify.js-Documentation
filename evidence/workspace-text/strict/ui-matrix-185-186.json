@@ -1,0 +1,20 @@
+{
+  "start": 185,
+  "count": 1,
+  "results": [
+    {
+      "id": "UI-0186",
+      "api": "createText.TextProperties[].text",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": "Browser path value",
+        "inspectorCurrent": "Browser path value",
+        "graphValue": "Browser graph value",
+        "graphModel": "Browser graph value",
+        "undo": "Browser path value",
+        "redo": "Browser graph value",
+        "graphMounted": true
+      }
+    }
+  ]
+}

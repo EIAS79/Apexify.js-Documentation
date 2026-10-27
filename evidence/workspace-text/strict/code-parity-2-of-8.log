@@ -1,0 +1,196 @@
+✔ TEXT01-PATH 3/389 createText.TextProperties.font.name seed (723.7639ms)
+✔ TEXT01-PATH 11/389 createText.TextProperties.decorations.underline (styled).gradient.startX seed (901.3478ms)
+✔ TEXT01-PATH 19/389 createText.TextProperties.decorations.underline (styled).gradient.startAngle seed (916.0002ms)
+✔ TEXT01-PATH 27/389 createText.TextProperties.decorations.overline (boolean) true (877.8311ms)
+✔ TEXT01-PATH 27/389 createText.TextProperties.decorations.overline (boolean) false (957.7427ms)
+✔ TEXT01-PATH 35/389 createText.TextProperties.decorations.overline (styled).gradient.endRadius seed (925.7829ms)
+✔ TEXT01-PATH 43/389 createText.TextProperties.decorations.overline (styled).gradient.colors[].stop seed (758.9887ms)
+✔ TEXT01-PATH 51/389 createText.TextProperties.decorations.strikethrough (styled).gradient.endX seed (801.3055ms)
+✔ TEXT01-PATH 59/389 createText.TextProperties.decorations.strikethrough (styled).gradient.pivotX seed (791.3309ms)
+✔ TEXT01-PATH 67/389 createText.TextProperties.effects.highlight.gradient.startX seed (666.6709ms)
+✔ TEXT01-PATH 75/389 createText.TextProperties.effects.highlight.gradient.startAngle seed (788.1629ms)
+✔ TEXT01-PATH 83/389 createText.TextProperties.effects.glow.color seed (765.4009ms)
+✔ TEXT01-PATH 91/389 createText.TextProperties.effects.glow.gradient.centerX seed (1044.8324ms)
+✔ TEXT01-PATH 99/389 createText.TextProperties.effects.glow.gradient.colors[].color seed (899.6826ms)
+✔ TEXT01-PATH 107/389 createText.TextProperties.effects.shadow.gradient.endY seed (916.8366ms)
+✔ TEXT01-PATH 115/389 createText.TextProperties.effects.shadow.gradient.pivotY seed (1010.8515ms)
+✔ TEXT01-PATH 123/389 createText.TextProperties.layout.lineHeight seed (834.7742ms)
+✖ TEXT01-PATH 131/389 createText.TextProperties.placement.scaleX seed (1164.7302ms)
+✔ TEXT01-PATH 139/389 createText.TextProperties.fill.color seed (1177.4025ms)
+✖ TEXT01-PATH 147/389 createText.TextProperties.fill.gradient.centerX seed (1200.5156ms)
+✔ TEXT01-PATH 155/389 createText.TextProperties.fill.gradient.colors[].color seed (1200.4973ms)
+✖ TEXT01-PATH 163/389 createText.TextProperties.stroke.gradient.endY seed (1283.903ms)
+✔ TEXT01-PATH 171/389 createText.TextProperties.stroke.gradient.pivotY seed (1061.2583ms)
+✔ TEXT01-PATH 179/389 createText.TextProperties.textOnCurve.up true (793.7483ms)
+✔ TEXT01-PATH 179/389 createText.TextProperties.textOnCurve.up false (773.6488ms)
+✔ TEXT01-PATH 187/389 createText.TextProperties[].x seed (701.6146ms)
+✔ TEXT01-PATH 195/389 createText.TextProperties[].decorations.italic true (769.6028ms)
+✔ TEXT01-PATH 195/389 createText.TextProperties[].decorations.italic false (775.1771ms)
+✔ TEXT01-PATH 203/389 createText.TextProperties[].decorations.underline (styled).gradient.startRadius seed (724.2924ms)
+✔ TEXT01-PATH 211/389 createText.TextProperties[].decorations.underline (styled).gradient.repeat no-repeat (671.3049ms)
+✔ TEXT01-PATH 211/389 createText.TextProperties[].decorations.underline (styled).gradient.repeat repeat (760.6923ms)
+✔ TEXT01-PATH 211/389 createText.TextProperties[].decorations.underline (styled).gradient.repeat reflect (798.8986ms)
+✔ TEXT01-PATH 219/389 createText.TextProperties[].decorations.overline (styled).gradient.startY seed (736.5973ms)
+✔ TEXT01-PATH 227/389 createText.TextProperties[].decorations.overline (styled).gradient.rotate seed (671.495ms)
+✔ TEXT01-PATH 235/389 createText.TextProperties[].decorations.strikethrough (styled).color seed (742.7824ms)
+✔ TEXT01-PATH 243/389 createText.TextProperties[].decorations.strikethrough (styled).gradient.centerX seed (937.6212ms)
+✔ TEXT01-PATH 251/389 createText.TextProperties[].decorations.strikethrough (styled).gradient.colors[].color seed (941.0916ms)
+✔ TEXT01-PATH 259/389 createText.TextProperties[].effects.highlight.gradient.startRadius seed (1019.4943ms)
+✔ TEXT01-PATH 267/389 createText.TextProperties[].effects.highlight.gradient.repeat no-repeat (1004.0215ms)
+✔ TEXT01-PATH 267/389 createText.TextProperties[].effects.highlight.gradient.repeat repeat (767.7416ms)
+✔ TEXT01-PATH 267/389 createText.TextProperties[].effects.highlight.gradient.repeat reflect (754.0546ms)
+✔ TEXT01-PATH 275/389 createText.TextProperties[].effects.glow.gradient.endX seed (1014.5495ms)
+✔ TEXT01-PATH 283/389 createText.TextProperties[].effects.glow.gradient.pivotX seed (759.5207ms)
+✔ TEXT01-PATH 291/389 createText.TextProperties[].effects.shadow.gradient.type linear (884.9592ms)
+✔ TEXT01-PATH 291/389 createText.TextProperties[].effects.shadow.gradient.type radial (987.3824ms)
+✔ TEXT01-PATH 291/389 createText.TextProperties[].effects.shadow.gradient.type conic (847.4575ms)
+✔ TEXT01-PATH 299/389 createText.TextProperties[].effects.shadow.gradient.centerY seed (839.9503ms)
+✔ TEXT01-PATH 307/389 createText.TextProperties[].effects.shadow.offsetX seed (610.1987ms)
+✔ TEXT01-PATH 315/389 createText.TextProperties[].layout.maxHeight seed (613.934ms)
+✔ TEXT01-PATH 323/389 createText.TextProperties[].placement.perspective.points[].x seed (726.9637ms)
+✔ TEXT01-PATH 331/389 createText.TextProperties[].fill.gradient.endX seed (778.0283ms)
+✔ TEXT01-PATH 339/389 createText.TextProperties[].fill.gradient.pivotX seed (795.5766ms)
+✔ TEXT01-PATH 347/389 createText.TextProperties[].stroke.gradient.type linear (620.9896ms)
+✔ TEXT01-PATH 347/389 createText.TextProperties[].stroke.gradient.type radial (612.0396ms)
+✔ TEXT01-PATH 347/389 createText.TextProperties[].stroke.gradient.type conic (644.3422ms)
+✔ TEXT01-PATH 355/389 createText.TextProperties[].stroke.gradient.centerY seed (622.4358ms)
+✔ TEXT01-PATH 363/389 createText.TextProperties[].stroke.opacity seed (695.1702ms)
+✔ TEXT01-PATH 371/389 createText.TextProperties[].includeCharMetrics true (623.098ms)
+✔ TEXT01-PATH 371/389 createText.TextProperties[].includeCharMetrics false (664.3773ms)
+✔ TEXT01-PATH 379/389 createText.CreateTextOptions.groupTransform.scaleY seed (1001.1119ms)
+✔ TEXT01-PATH 387/389 createText.CreateTextOptions.groupTransform.perspective.points[].y seed (698.8256ms)
+✔ TEXT01 strict validator/native boundary parity (11.6792ms)
+✔ TEXT01 deprecated alias precedence (32.2048ms)
+✔ TEXT01 baseline createText.TextProperties.text (666.5368ms)
+✔ TEXT01 baseline createText.TextProperties.x (599.9407ms)
+✔ TEXT01 baseline createText.TextProperties.y (711.2492ms)
+✔ TEXT01 baseline createText.TextProperties/font.size baseline (1032.4702ms)
+✔ TEXT01 baseline createText.TextProperties/font.weight baseline (704.4228ms)
+✔ TEXT01 baseline createText.TextProperties/fill.color baseline (728.5088ms)
+✔ TEXT01 baseline createText.TextProperties/fill.opacity baseline (708.2814ms)
+✔ TEXT01 baseline createText.TextProperties/placement.rotation baseline (626.9031ms)
+✔ TEXT01 baseline text selection bounds.width (706.7633ms)
+✖ TEXT01 baseline text selection bounds.height (656.128ms)
+✔ TEXT01 43 native measurement results (19.426ms)
+ℹ tests 74
+ℹ suites 0
+ℹ pass 70
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 59985.0594
+
+✖ failing tests:
+
+test at tests\workspace\text-strict-native.test.ts:2:8315
+✖ TEXT01-PATH 131/389 createText.TextProperties.placement.scaleX seed (1164.7302ms)
+  Error: Command failed: C:\Program Files\nodejs\node.exe D:\ApexifyWorkspaceParallel\text-strict-20261023\_text01_generated_22172_zxp5a43pdbg.mjs
+      at genericNodeError (node:internal/errors:986:15)
+      at wrappedFn (node:internal/errors:540:14)
+      at checkExecSyncError (node:child_process:942:11)
+      at execFileSync (node:child_process:978:15)
+      at generated (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:106:3)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:126:32)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    status: 3221226505,
+    signal: null,
+    output: [ null, <Buffer >, <Buffer > ],
+    pid: 24248,
+    stdout: <Buffer >,
+    stderr: <Buffer >
+  }
+
+test at tests\workspace\text-strict-native.test.ts:2:8315
+✖ TEXT01-PATH 147/389 createText.TextProperties.fill.gradient.centerX seed (1200.5156ms)
+  Error: Command failed: C:\Program Files\nodejs\node.exe D:\ApexifyWorkspaceParallel\text-strict-20261023\_text01_generated_22172_4baabnku0xo.mjs
+      at genericNodeError (node:internal/errors:986:15)
+      at wrappedFn (node:internal/errors:540:14)
+      at checkExecSyncError (node:child_process:942:11)
+      at execFileSync (node:child_process:978:15)
+      at generated (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:106:3)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:126:32)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    status: 3221226505,
+    signal: null,
+    output: [ null, <Buffer >, <Buffer > ],
+    pid: 34524,
+    stdout: <Buffer >,
+    stderr: <Buffer >
+  }
+
+test at tests\workspace\text-strict-native.test.ts:2:8315
+✖ TEXT01-PATH 163/389 createText.TextProperties.stroke.gradient.endY seed (1283.903ms)
+  Error: Command failed: C:\Program Files\nodejs\node.exe D:\ApexifyWorkspaceParallel\text-strict-20261023\_text01_generated_22172_523yuzpemib.mjs
+  
+  <--- Last few GCs --->
+  
+  [21632:00000288B00CE000]      303 ms: Scavenge 10.9 (13.6) -> 10.3 (18.6) MB, pooled: 0 MB, 1.55 / 0.00 ms  (average mu = 1.000, current mu = 1.000) allocation failure; 
+  [21632:00000288B00CE000]      644 ms: Scavenge 14.4 (19.4) -> 12.0 (19.9) MB, pooled: 0 MB, 1.56 / 0.00 ms  (average mu = 1.000, current mu = 1.000) allocation failure; 
+  [21632:00000288B00CE000]      770 ms: Scavenge 15.6 (20.3) -> 13.6 (21.9) MB, pooled: 0 MB, 2.50 / 0.00 ms  (average mu = 1.000, current mu = 1.000) allocation failure; 
+  
+  FATAL ERROR: NewSpace::EnsureCurrentCapacity Allocation failed - JavaScript heap out of memory
+  ----- Native stack trace -----
+  
+   1: 00007FF6271590C6 
+   2: 00007FF627159604 
+   3: 00007FF625D63617 
+   4: 00007FF625B63E57 
+   5: 00007FF625B246D3 
+   6: 00007FF625B6625A 
+   7: 00007FF625B65886 
+   8: 00007FF625B767E2 
+   9: 00007FF625B7630B 
+  10: 00007FF627483BAD 
+  11: 00007FF625B61920 
+  12: 00007FF625B5AA84 
+  13: 00007FF62709C1F5 
+  14: 00007FF62709A560 
+  15: 00007FF625DC9BBB 
+  16: 00007FF625DC972F 
+  17: 00007FF62727A13F 
+  18: 00007FF6270E54E6 
+  19: 00007FF6271BC149 
+  20: 00007FF62727D312 
+  21: 00007FF62748D3C4 
+  22: 00007FF803A6DDA7 BaseThreadInitThunk+23
+  23: 00007FF804B9EE4C RtlUserThreadStart+44
+  
+      at genericNodeError (node:internal/errors:986:15)
+      at wrappedFn (node:internal/errors:540:14)
+      at checkExecSyncError (node:child_process:942:11)
+      at execFileSync (node:child_process:978:15)
+      at generated (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:106:3)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:126:32)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    status: 134,
+    signal: null,
+    output: [ null, <Buffer >, <Buffer 0d 0a 3c 2d 2d 2d 20 4c 61 73 74 20 66 65 77 20 47 43 73 20 2d 2d 2d 3e 0d 0a 0d 0a 5b 32 31 36 33 32 3a 30 30 30 30 30 32 38 38 42 30 30 43 45 30 30 ... 1195 more bytes> ],
+    pid: 21632,
+    stdout: <Buffer >,
+    stderr: <Buffer 0d 0a 3c 2d 2d 2d 20 4c 61 73 74 20 66 65 77 20 47 43 73 20 2d 2d 2d 3e 0d 0a 0d 0a 5b 32 31 36 33 32 3a 30 30 30 30 30 32 38 38 42 30 30 43 45 30 30 ... 1195 more bytes>
+  }
+
+test at tests\workspace\text-strict-native.test.ts:2:12112
+✖ TEXT01 baseline text selection bounds.height (656.128ms)
+  Error: Command failed: C:\Program Files\nodejs\node.exe D:\ApexifyWorkspaceParallel\text-strict-20261023\_text01_generated_22172_acboesd762p.mjs
+  ../../src/core/SkBitmap.cpp(252): fatal error: "assertf(this->tryAllocPixels(info, rowBytes)): ColorType:6 AlphaType:2 [w:640 h:360] rb:0"
+  
+      at genericNodeError (node:internal/errors:986:15)
+      at wrappedFn (node:internal/errors:540:14)
+      at checkExecSyncError (node:child_process:942:11)
+      at execFileSync (node:child_process:978:15)
+      at generated (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:106:3)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:168:30)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    status: 3221225501,
+    signal: null,
+    output: [ null, <Buffer >, <Buffer 2e 2e 2f 2e 2e 2f 73 72 63 2f 63 6f 72 65 2f 53 6b 42 69 74 6d 61 70 2e 63 70 70 28 32 35 32 29 3a 20 66 61 74 61 6c 20 65 72 72 6f 72 3a 20 22 61 73 ... 90 more bytes> ],
+    pid: 13984,
+    stdout: <Buffer >,
+    stderr: <Buffer 2e 2e 2f 2e 2e 2f 73 72 63 2f 63 6f 72 65 2f 53 6b 42 69 74 6d 61 70 2e 63 70 70 28 32 35 32 29 3a 20 66 61 74 61 6c 20 65 72 72 6f 72 3a 20 22 61 73 ... 90 more bytes>
+  }

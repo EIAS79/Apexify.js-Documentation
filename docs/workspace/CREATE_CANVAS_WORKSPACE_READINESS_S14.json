@@ -1,0 +1,2292 @@
+{
+  "schemaVersion": 1,
+  "checkpoint": "Supervisor #14 — UI-first Workspace real functionality",
+  "totalPaths": 208,
+  "metricA": "Functional Workspace support within its declared secure bounded contract. NOT unconditional engine API parity.",
+  "metricB": "Original strict FULL remains unchanged unless original exhaustive certification evidence is supplied.",
+  "pin": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "engineVersion": "6.0.0",
+  "workspaceReadyCount": 81,
+  "strictFullCount": 22,
+  "statusCounts": {
+    "WORKSPACE_READY": 81,
+    "WORKSPACE_PARTIAL": 81,
+    "WORKSPACE_BLOCKED_UPSTREAM": 5,
+    "WORKSPACE_BLOCKED_SECURITY": 40,
+    "WORKSPACE_NOT_APPLICABLE": 1
+  },
+  "statusDefinitions": {
+    "WORKSPACE_READY": "Actual supported Workspace bounded control, canonical validated project, native Apexify v6 output, generated Code, Chromium live edit and persistence/history evidence from shared or per-path integration suites.",
+    "WORKSPACE_PARTIAL": "Not yet demonstrated end-to-end for this exact path, or only partial native subset.",
+    "WORKSPACE_BLOCKED_UPSTREAM": "Pinned renderer defect prevents meaningful native output and is not patched.",
+    "WORKSPACE_BLOCKED_SECURITY": "Secure native media/filter privilege has not been approved, deliberately rejected.",
+    "WORKSPACE_NOT_APPLICABLE": "Option belongs outside per-canvas config with explicit reason."
+  },
+  "sourceFiles": [
+    "docs/workspace/CREATE_CANVAS_COVERAGE_S13.json",
+    "features/apex-workspace/canvas-options.ts",
+    "features/apex-workspace/components/CanvasOptionsEditor.tsx",
+    "tests/workspace/browser-s14-ui-acceptance.cjs",
+    "tests/workspace/browser-s14-layer-types.cjs"
+  ],
+  "realChrome": "http://127.0.0.1:38496/workspace; 9 screenshot stages at D:\\ApexifySupervisor5LocalBuildArtifacts\\supervisor14_live_ui",
+  "prohibited": [
+    "videoBg native media",
+    "unsafe remote image fetching",
+    "unbounded native customBg filters",
+    "unapproved pinned-engine repin"
+  ],
+  "paths": [
+    {
+      "index": 0,
+      "optionPath": "canvas.bgLayers",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "At most 12 ordered validated stable-ID layers: color, gradient, verified image, image tile, procedural preset, noise; compatible opacity/blend/fit/alignment within pinned safe subset",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 1,
+      "optionPath": "canvas.bgLayers.blendMode",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "At most 12 ordered validated stable-ID layers: color, gradient, verified image, image tile, procedural preset, noise; compatible opacity/blend/fit/alignment within pinned safe subset",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 2,
+      "optionPath": "canvas.bgLayers.opacity",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "At most 12 ordered validated stable-ID layers: color, gradient, verified image, image tile, procedural preset, noise; compatible opacity/blend/fit/alignment within pinned safe subset",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 3,
+      "optionPath": "canvas.bgLayers.type",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "At most 12 ordered validated stable-ID layers: color, gradient, verified image, image tile, procedural preset, noise; compatible opacity/blend/fit/alignment within pinned safe subset",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser",
+        "S14 separate six-variant browser switching, nodeId stability, invalid width no-history and reload"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 4,
+      "optionPath": "canvas.bgLayers.value",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "At most 12 ordered validated stable-ID layers: color, gradient, verified image, image tile, procedural preset, noise; compatible opacity/blend/fit/alignment within pinned safe subset",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 5,
+      "optionPath": "canvas.bgLayers.align",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "At most 12 ordered validated stable-ID layers: color, gradient, verified image, image tile, procedural preset, noise; compatible opacity/blend/fit/alignment within pinned safe subset",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 6,
+      "optionPath": "canvas.bgLayers.fit",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "At most 12 ordered validated stable-ID layers: color, gradient, verified image, image tile, procedural preset, noise; compatible opacity/blend/fit/alignment within pinned safe subset",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 7,
+      "optionPath": "canvas.bgLayers.source",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_ASSET_BACKED_CANVAS",
+      "supportedContract": "Only local PNG/JPEG/WebP immutable SHA-256 image assets; no remote URL, arbitrary file path or video. 2MB aggregate raw bytes, verified decode",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 8,
+      "optionPath": "canvas.bgLayers.repeat",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "NOT_MAPPED",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Control or native integration is partial, bound to a narrower safe subset, or not covered by exact live edit+native/Code+history evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 9,
+      "optionPath": "canvas.bgLayers.pattern",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "At most 12 ordered validated stable-ID layers: color, gradient, verified image, image tile, procedural preset, noise; compatible opacity/blend/fit/alignment within pinned safe subset",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 10,
+      "optionPath": "canvas.bgLayers.pattern.blendMode",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "At most 12 ordered validated stable-ID layers: color, gradient, verified image, image tile, procedural preset, noise; compatible opacity/blend/fit/alignment within pinned safe subset",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 11,
+      "optionPath": "canvas.bgLayers.pattern.color",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared procedural editor exists; this precise nested option has not been individually demonstrated in Graph, live browser and persisted native output.",
+      "requiresApproval": null
+    },
+    {
+      "index": 12,
+      "optionPath": "canvas.bgLayers.pattern.customPatternImage",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_ASSET_BACKED_CANVAS",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared procedural editor exists; this precise nested option has not been individually demonstrated in Graph, live browser and persisted native output.",
+      "requiresApproval": null
+    },
+    {
+      "index": 13,
+      "optionPath": "canvas.bgLayers.pattern.gradient",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 14,
+      "optionPath": "canvas.bgLayers.pattern.gradient.angle",
+      "workspaceStatus": "WORKSPACE_BLOCKED_UPSTREAM",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Confirmed pinned renderer ignores or mis-renders this option; native fix and explicit engine repin required.",
+      "requiresApproval": "Explicit pinned engine fix and repin approval"
+    },
+    {
+      "index": 15,
+      "optionPath": "canvas.bgLayers.pattern.gradient.centerX",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 16,
+      "optionPath": "canvas.bgLayers.pattern.gradient.centerY",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 17,
+      "optionPath": "canvas.bgLayers.pattern.gradient.colors",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 18,
+      "optionPath": "canvas.bgLayers.pattern.gradient.colors.color",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 19,
+      "optionPath": "canvas.bgLayers.pattern.gradient.colors.stop",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 20,
+      "optionPath": "canvas.bgLayers.pattern.gradient.endRadius",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 21,
+      "optionPath": "canvas.bgLayers.pattern.gradient.endX",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 22,
+      "optionPath": "canvas.bgLayers.pattern.gradient.endY",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 23,
+      "optionPath": "canvas.bgLayers.pattern.gradient.repeat",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 24,
+      "optionPath": "canvas.bgLayers.pattern.gradient.startAngle",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 25,
+      "optionPath": "canvas.bgLayers.pattern.gradient.startRadius",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 26,
+      "optionPath": "canvas.bgLayers.pattern.gradient.startX",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 27,
+      "optionPath": "canvas.bgLayers.pattern.gradient.startY",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 28,
+      "optionPath": "canvas.bgLayers.pattern.gradient.type",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 29,
+      "optionPath": "canvas.bgLayers.pattern.offsetX",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared procedural editor exists; this precise nested option has not been individually demonstrated in Graph, live browser and persisted native output.",
+      "requiresApproval": null
+    },
+    {
+      "index": 30,
+      "optionPath": "canvas.bgLayers.pattern.offsetY",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared procedural editor exists; this precise nested option has not been individually demonstrated in Graph, live browser and persisted native output.",
+      "requiresApproval": null
+    },
+    {
+      "index": 31,
+      "optionPath": "canvas.bgLayers.pattern.opacity",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "At most 12 ordered validated stable-ID layers: color, gradient, verified image, image tile, procedural preset, noise; compatible opacity/blend/fit/alignment within pinned safe subset",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 32,
+      "optionPath": "canvas.bgLayers.pattern.repeat",
+      "workspaceStatus": "WORKSPACE_BLOCKED_UPSTREAM",
+      "strictStatus": "UPSTREAM_BLOCKED",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Confirmed pinned renderer ignores or mis-renders this option; native fix and explicit engine repin required.",
+      "requiresApproval": "Explicit pinned engine fix and repin approval"
+    },
+    {
+      "index": 33,
+      "optionPath": "canvas.bgLayers.pattern.rotation",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared procedural editor exists; this precise nested option has not been individually demonstrated in Graph, live browser and persisted native output.",
+      "requiresApproval": null
+    },
+    {
+      "index": 34,
+      "optionPath": "canvas.bgLayers.pattern.scale",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared procedural editor exists; this precise nested option has not been individually demonstrated in Graph, live browser and persisted native output.",
+      "requiresApproval": null
+    },
+    {
+      "index": 35,
+      "optionPath": "canvas.bgLayers.pattern.secondaryColor",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared procedural editor exists; this precise nested option has not been individually demonstrated in Graph, live browser and persisted native output.",
+      "requiresApproval": null
+    },
+    {
+      "index": 36,
+      "optionPath": "canvas.bgLayers.pattern.size",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared procedural editor exists; this precise nested option has not been individually demonstrated in Graph, live browser and persisted native output.",
+      "requiresApproval": null
+    },
+    {
+      "index": 37,
+      "optionPath": "canvas.bgLayers.pattern.spacing",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared procedural editor exists; this precise nested option has not been individually demonstrated in Graph, live browser and persisted native output.",
+      "requiresApproval": null
+    },
+    {
+      "index": 38,
+      "optionPath": "canvas.bgLayers.pattern.type",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared procedural editor exists; this precise nested option has not been individually demonstrated in Graph, live browser and persisted native output.",
+      "requiresApproval": null
+    },
+    {
+      "index": 39,
+      "optionPath": "canvas.bgLayers.intensity",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "At most 12 ordered validated stable-ID layers: color, gradient, verified image, image tile, procedural preset, noise; compatible opacity/blend/fit/alignment within pinned safe subset",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 40,
+      "optionPath": "canvas.blendMode",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "NOT_MAPPED",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Control or native integration is partial, bound to a narrower safe subset, or not covered by exact live edit+native/Code+history evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 41,
+      "optionPath": "canvas.blur",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Bounded native blur 0–100 or rotation ±360 degrees; numeric entry verified; wider public-engine range not asserted",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 42,
+      "optionPath": "canvas.borderPosition",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Nine border positions, radius 0–1024 or circular; bounded native CanvasConfig authoring",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 43,
+      "optionPath": "canvas.borderRadius",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Nine border positions, radius 0–1024 or circular; bounded native CanvasConfig authoring",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 44,
+      "optionPath": "canvas.colorBg",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Supported, safe, bounded Workspace subset: pinned v6 public API, validated canonical edit, native render, generated Code, browser and persisted history",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 45,
+      "optionPath": "canvas.customBg",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_ASSET_BACKED_CANVAS",
+      "supportedContract": "Only local PNG/JPEG/WebP immutable SHA-256 image assets; no remote URL, arbitrary file path or video. 2MB aggregate raw bytes, verified decode",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 46,
+      "optionPath": "canvas.customBg.align",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "Only local PNG/JPEG/WebP immutable SHA-256 image assets; no remote URL, arbitrary file path or video. 2MB aggregate raw bytes, verified decode",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 47,
+      "optionPath": "canvas.customBg.filters",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 48,
+      "optionPath": "canvas.customBg.filters.angle",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 49,
+      "optionPath": "canvas.customBg.filters.centerX",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 50,
+      "optionPath": "canvas.customBg.filters.centerY",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 51,
+      "optionPath": "canvas.customBg.filters.height",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 52,
+      "optionPath": "canvas.customBg.filters.intensity",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 53,
+      "optionPath": "canvas.customBg.filters.levels",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 54,
+      "optionPath": "canvas.customBg.filters.radius",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 55,
+      "optionPath": "canvas.customBg.filters.size",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 56,
+      "optionPath": "canvas.customBg.filters.type",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 57,
+      "optionPath": "canvas.customBg.filters.value",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 58,
+      "optionPath": "canvas.customBg.filters.width",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 59,
+      "optionPath": "canvas.customBg.filters.x",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 60,
+      "optionPath": "canvas.customBg.filters.y",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 61,
+      "optionPath": "canvas.customBg.fit",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "Only local PNG/JPEG/WebP immutable SHA-256 image assets; no remote URL, arbitrary file path or video. 2MB aggregate raw bytes, verified decode",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 62,
+      "optionPath": "canvas.customBg.inherit",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_ASSET_BACKED_CANVAS",
+      "supportedContract": "Only local PNG/JPEG/WebP immutable SHA-256 image assets; no remote URL, arbitrary file path or video. 2MB aggregate raw bytes, verified decode",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser",
+        "S14 native intrinsic-fit-pixel regression and reused asset-browser Graph/Inspector test"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 63,
+      "optionPath": "canvas.customBg.opacity",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "Only local PNG/JPEG/WebP immutable SHA-256 image assets; no remote URL, arbitrary file path or video. 2MB aggregate raw bytes, verified decode",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 64,
+      "optionPath": "canvas.customBg.source",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_ASSET_BACKED_CANVAS",
+      "supportedContract": "Only local PNG/JPEG/WebP immutable SHA-256 image assets; no remote URL, arbitrary file path or video. 2MB aggregate raw bytes, verified decode",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 65,
+      "optionPath": "canvas.gradientBg",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Pinned-v6 linear/radial/conic valid paint within Workspace geometry −8192..8192, 2–12 ordered hex/hex-alpha stops; conic startAngle and reflect edge case not certified",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 66,
+      "optionPath": "canvas.gradientBg.colors",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Pinned-v6 linear/radial/conic valid paint within Workspace geometry −8192..8192, 2–12 ordered hex/hex-alpha stops; conic startAngle and reflect edge case not certified",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 67,
+      "optionPath": "canvas.gradientBg.colors.color",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Pinned-v6 linear/radial/conic valid paint within Workspace geometry −8192..8192, 2–12 ordered hex/hex-alpha stops; conic startAngle and reflect edge case not certified",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 68,
+      "optionPath": "canvas.gradientBg.colors.stop",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "Pinned-v6 linear/radial/conic valid paint within Workspace geometry −8192..8192, 2–12 ordered hex/hex-alpha stops; conic startAngle and reflect edge case not certified",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks",
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 69,
+      "optionPath": "canvas.gradientBg.endX",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Pinned-v6 linear/radial/conic valid paint within Workspace geometry −8192..8192, 2–12 ordered hex/hex-alpha stops; conic startAngle and reflect edge case not certified",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 70,
+      "optionPath": "canvas.gradientBg.endY",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Pinned-v6 linear/radial/conic valid paint within Workspace geometry −8192..8192, 2–12 ordered hex/hex-alpha stops; conic startAngle and reflect edge case not certified",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 71,
+      "optionPath": "canvas.gradientBg.pivotX",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Pinned-v6 linear/radial/conic valid paint within Workspace geometry −8192..8192, 2–12 ordered hex/hex-alpha stops; conic startAngle and reflect edge case not certified",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 72,
+      "optionPath": "canvas.gradientBg.pivotY",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Pinned-v6 linear/radial/conic valid paint within Workspace geometry −8192..8192, 2–12 ordered hex/hex-alpha stops; conic startAngle and reflect edge case not certified",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 73,
+      "optionPath": "canvas.gradientBg.repeat",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "No-repeat/repeat render, but reflect equals no-repeat for verified narrow 1280×720 gradient; full working subset not established.",
+      "requiresApproval": null
+    },
+    {
+      "index": 74,
+      "optionPath": "canvas.gradientBg.rotate",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Pinned-v6 linear/radial/conic valid paint within Workspace geometry −8192..8192, 2–12 ordered hex/hex-alpha stops; conic startAngle and reflect edge case not certified",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 75,
+      "optionPath": "canvas.gradientBg.startX",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Pinned-v6 linear/radial/conic valid paint within Workspace geometry −8192..8192, 2–12 ordered hex/hex-alpha stops; conic startAngle and reflect edge case not certified",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 76,
+      "optionPath": "canvas.gradientBg.startY",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Pinned-v6 linear/radial/conic valid paint within Workspace geometry −8192..8192, 2–12 ordered hex/hex-alpha stops; conic startAngle and reflect edge case not certified",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 77,
+      "optionPath": "canvas.gradientBg.type",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "Pinned-v6 linear/radial/conic valid paint within Workspace geometry −8192..8192, 2–12 ordered hex/hex-alpha stops; conic startAngle and reflect edge case not certified",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 78,
+      "optionPath": "canvas.gradientBg.endRadius",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Pinned-v6 linear/radial/conic valid paint within Workspace geometry −8192..8192, 2–12 ordered hex/hex-alpha stops; conic startAngle and reflect edge case not certified",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 79,
+      "optionPath": "canvas.gradientBg.startRadius",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Pinned-v6 linear/radial/conic valid paint within Workspace geometry −8192..8192, 2–12 ordered hex/hex-alpha stops; conic startAngle and reflect edge case not certified",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 80,
+      "optionPath": "canvas.gradientBg.centerX",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Pinned-v6 linear/radial/conic valid paint within Workspace geometry −8192..8192, 2–12 ordered hex/hex-alpha stops; conic startAngle and reflect edge case not certified",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 81,
+      "optionPath": "canvas.gradientBg.centerY",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Pinned-v6 linear/radial/conic valid paint within Workspace geometry −8192..8192, 2–12 ordered hex/hex-alpha stops; conic startAngle and reflect edge case not certified",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 82,
+      "optionPath": "canvas.gradientBg.startAngle",
+      "workspaceStatus": "WORKSPACE_BLOCKED_UPSTREAM",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Confirmed pinned renderer ignores or mis-renders this option; native fix and explicit engine repin required.",
+      "requiresApproval": "Explicit pinned engine fix and repin approval"
+    },
+    {
+      "index": 83,
+      "optionPath": "canvas.height",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Workspace project dimensions 64–2048 px; integer input; project render and reload",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 84,
+      "optionPath": "canvas.noiseBg",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "Supported, safe, bounded Workspace subset: pinned v6 public API, validated canonical edit, native render, generated Code, browser and persisted history",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 85,
+      "optionPath": "canvas.noiseBg.intensity",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "Supported, safe, bounded Workspace subset: pinned v6 public API, validated canonical edit, native render, generated Code, browser and persisted history",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 86,
+      "optionPath": "canvas.opacity",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "Supported, safe, bounded Workspace subset: pinned v6 public API, validated canonical edit, native render, generated Code, browser and persisted history",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 87,
+      "optionPath": "canvas.patternBg",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Twelve procedural + one verified-image variant; bounded size/spacing/scale/opacity/rotation and compatible solid or gradient paint. Procedural repeat remains blocked",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 88,
+      "optionPath": "canvas.patternBg.blendMode",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "Twelve procedural + one verified-image variant; bounded size/spacing/scale/opacity/rotation and compatible solid or gradient paint. Procedural repeat remains blocked",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 89,
+      "optionPath": "canvas.patternBg.color",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Twelve procedural + one verified-image variant; bounded size/spacing/scale/opacity/rotation and compatible solid or gradient paint. Procedural repeat remains blocked",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 90,
+      "optionPath": "canvas.patternBg.customPatternImage",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_ASSET_BACKED_CANVAS",
+      "supportedContract": "Only local PNG/JPEG/WebP immutable SHA-256 image assets; no remote URL, arbitrary file path or video. 2MB aggregate raw bytes, verified decode",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser",
+        "S8 real browser content-addressed custom pattern imported, persisted and restored"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 91,
+      "optionPath": "canvas.patternBg.gradient",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Twelve procedural + one verified-image variant; bounded size/spacing/scale/opacity/rotation and compatible solid or gradient paint. Procedural repeat remains blocked",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser",
+        "S9 real nested pattern gradient paint browser acceptance plus S14 shared editor"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 92,
+      "optionPath": "canvas.patternBg.gradient.angle",
+      "workspaceStatus": "WORKSPACE_BLOCKED_UPSTREAM",
+      "strictStatus": "UPSTREAM_BLOCKED",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Confirmed pinned renderer ignores or mis-renders this option; native fix and explicit engine repin required.",
+      "requiresApproval": "Explicit pinned engine fix and repin approval"
+    },
+    {
+      "index": 93,
+      "optionPath": "canvas.patternBg.gradient.centerX",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 94,
+      "optionPath": "canvas.patternBg.gradient.centerY",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 95,
+      "optionPath": "canvas.patternBg.gradient.colors",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 96,
+      "optionPath": "canvas.patternBg.gradient.colors.color",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 97,
+      "optionPath": "canvas.patternBg.gradient.colors.stop",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 98,
+      "optionPath": "canvas.patternBg.gradient.endRadius",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 99,
+      "optionPath": "canvas.patternBg.gradient.endX",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 100,
+      "optionPath": "canvas.patternBg.gradient.endY",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 101,
+      "optionPath": "canvas.patternBg.gradient.repeat",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 102,
+      "optionPath": "canvas.patternBg.gradient.startAngle",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 103,
+      "optionPath": "canvas.patternBg.gradient.startRadius",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 104,
+      "optionPath": "canvas.patternBg.gradient.startX",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 105,
+      "optionPath": "canvas.patternBg.gradient.startY",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 106,
+      "optionPath": "canvas.patternBg.gradient.type",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Gradient paint/editor shares safe subset; some nested field branches still lack direct end-to-end individual evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 107,
+      "optionPath": "canvas.patternBg.offsetX",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Twelve procedural + one verified-image variant; bounded size/spacing/scale/opacity/rotation and compatible solid or gradient paint. Procedural repeat remains blocked",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 108,
+      "optionPath": "canvas.patternBg.offsetY",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Twelve procedural + one verified-image variant; bounded size/spacing/scale/opacity/rotation and compatible solid or gradient paint. Procedural repeat remains blocked",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 109,
+      "optionPath": "canvas.patternBg.opacity",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "Twelve procedural + one verified-image variant; bounded size/spacing/scale/opacity/rotation and compatible solid or gradient paint. Procedural repeat remains blocked",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks",
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 110,
+      "optionPath": "canvas.patternBg.repeat",
+      "workspaceStatus": "WORKSPACE_BLOCKED_UPSTREAM",
+      "strictStatus": "UPSTREAM_BLOCKED",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Confirmed pinned renderer ignores or mis-renders this option; native fix and explicit engine repin required.",
+      "requiresApproval": "Explicit pinned engine fix and repin approval"
+    },
+    {
+      "index": 111,
+      "optionPath": "canvas.patternBg.rotation",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Twelve procedural + one verified-image variant; bounded size/spacing/scale/opacity/rotation and compatible solid or gradient paint. Procedural repeat remains blocked",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 112,
+      "optionPath": "canvas.patternBg.scale",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Twelve procedural + one verified-image variant; bounded size/spacing/scale/opacity/rotation and compatible solid or gradient paint. Procedural repeat remains blocked",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 113,
+      "optionPath": "canvas.patternBg.secondaryColor",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Twelve procedural + one verified-image variant; bounded size/spacing/scale/opacity/rotation and compatible solid or gradient paint. Procedural repeat remains blocked",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 114,
+      "optionPath": "canvas.patternBg.size",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Twelve procedural + one verified-image variant; bounded size/spacing/scale/opacity/rotation and compatible solid or gradient paint. Procedural repeat remains blocked",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 115,
+      "optionPath": "canvas.patternBg.spacing",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Twelve procedural + one verified-image variant; bounded size/spacing/scale/opacity/rotation and compatible solid or gradient paint. Procedural repeat remains blocked",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 116,
+      "optionPath": "canvas.patternBg.type",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Twelve procedural + one verified-image variant; bounded size/spacing/scale/opacity/rotation and compatible solid or gradient paint. Procedural repeat remains blocked",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 117,
+      "optionPath": "canvas.rotation",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Bounded native blur 0–100 or rotation ±360 degrees; numeric entry verified; wider public-engine range not asserted",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 118,
+      "optionPath": "canvas.shadow",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Native solid-color shadow, offsets −512..512, blur 0–100, opacity 0–1; pinned corner/sides have no demonstrated visual difference",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 119,
+      "optionPath": "canvas.shadow.blur",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Native solid-color shadow, offsets −512..512, blur 0–100, opacity 0–1; pinned corner/sides have no demonstrated visual difference",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 120,
+      "optionPath": "canvas.shadow.borderPosition",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Pinned source accepts selector but S13 nine-mode native fixture produces identical pixels; UI preserves saved values read-only.",
+      "requiresApproval": null
+    },
+    {
+      "index": 121,
+      "optionPath": "canvas.shadow.borderRadius",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Control or native integration is partial, bound to a narrower safe subset, or not covered by exact live edit+native/Code+history evidence.",
+      "requiresApproval": null
+    },
+    {
+      "index": 122,
+      "optionPath": "canvas.shadow.color",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Native solid-color shadow, offsets −512..512, blur 0–100, opacity 0–1; pinned corner/sides have no demonstrated visual difference",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 123,
+      "optionPath": "canvas.shadow.gradient",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 124,
+      "optionPath": "canvas.shadow.gradient.colors",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 125,
+      "optionPath": "canvas.shadow.gradient.colors.color",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 126,
+      "optionPath": "canvas.shadow.gradient.colors.stop",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 127,
+      "optionPath": "canvas.shadow.gradient.endX",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 128,
+      "optionPath": "canvas.shadow.gradient.endY",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 129,
+      "optionPath": "canvas.shadow.gradient.pivotX",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 130,
+      "optionPath": "canvas.shadow.gradient.pivotY",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 131,
+      "optionPath": "canvas.shadow.gradient.repeat",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 132,
+      "optionPath": "canvas.shadow.gradient.rotate",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 133,
+      "optionPath": "canvas.shadow.gradient.startX",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 134,
+      "optionPath": "canvas.shadow.gradient.startY",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 135,
+      "optionPath": "canvas.shadow.gradient.type",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 136,
+      "optionPath": "canvas.shadow.gradient.endRadius",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 137,
+      "optionPath": "canvas.shadow.gradient.startRadius",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 138,
+      "optionPath": "canvas.shadow.gradient.centerX",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 139,
+      "optionPath": "canvas.shadow.gradient.centerY",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 140,
+      "optionPath": "canvas.shadow.gradient.startAngle",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 141,
+      "optionPath": "canvas.shadow.offsetX",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Native solid-color shadow, offsets −512..512, blur 0–100, opacity 0–1; pinned corner/sides have no demonstrated visual difference",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 142,
+      "optionPath": "canvas.shadow.offsetY",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Native solid-color shadow, offsets −512..512, blur 0–100, opacity 0–1; pinned corner/sides have no demonstrated visual difference",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 143,
+      "optionPath": "canvas.shadow.opacity",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Native solid-color shadow, offsets −512..512, blur 0–100, opacity 0–1; pinned corner/sides have no demonstrated visual difference",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 144,
+      "optionPath": "canvas.shadow.roundedCorners",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Pinned source accepts selector but S13 nine-mode native fixture produces identical pixels; UI preserves saved values read-only.",
+      "requiresApproval": null
+    },
+    {
+      "index": 145,
+      "optionPath": "canvas.stroke",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Six stroke styles and nine positions/corners; RGB hex or validated gradient, width 0–200, opacity 0–1, blur 0–100; native rendered plus undo/reload",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 146,
+      "optionPath": "canvas.stroke.blur",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Six stroke styles and nine positions/corners; RGB hex or validated gradient, width 0–200, opacity 0–1, blur 0–100; native rendered plus undo/reload",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 147,
+      "optionPath": "canvas.stroke.borderPosition",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "Six stroke styles and nine positions/corners; RGB hex or validated gradient, width 0–200, opacity 0–1, blur 0–100; native rendered plus undo/reload",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 148,
+      "optionPath": "canvas.stroke.borderRadius",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Six stroke styles and nine positions/corners; RGB hex or validated gradient, width 0–200, opacity 0–1, blur 0–100; native rendered plus undo/reload",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 149,
+      "optionPath": "canvas.stroke.color",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Six stroke styles and nine positions/corners; RGB hex or validated gradient, width 0–200, opacity 0–1, blur 0–100; native rendered plus undo/reload",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 150,
+      "optionPath": "canvas.stroke.gradient",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 151,
+      "optionPath": "canvas.stroke.gradient.colors",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 152,
+      "optionPath": "canvas.stroke.gradient.colors.color",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 153,
+      "optionPath": "canvas.stroke.gradient.colors.stop",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 154,
+      "optionPath": "canvas.stroke.gradient.endX",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 155,
+      "optionPath": "canvas.stroke.gradient.endY",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 156,
+      "optionPath": "canvas.stroke.gradient.pivotX",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 157,
+      "optionPath": "canvas.stroke.gradient.pivotY",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 158,
+      "optionPath": "canvas.stroke.gradient.repeat",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 159,
+      "optionPath": "canvas.stroke.gradient.rotate",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 160,
+      "optionPath": "canvas.stroke.gradient.startX",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 161,
+      "optionPath": "canvas.stroke.gradient.startY",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 162,
+      "optionPath": "canvas.stroke.gradient.type",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 163,
+      "optionPath": "canvas.stroke.gradient.endRadius",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 164,
+      "optionPath": "canvas.stroke.gradient.startRadius",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 165,
+      "optionPath": "canvas.stroke.gradient.centerX",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 166,
+      "optionPath": "canvas.stroke.gradient.centerY",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 167,
+      "optionPath": "canvas.stroke.gradient.startAngle",
+      "workspaceStatus": "WORKSPACE_PARTIAL",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "Shared gradient editor wired, but this exact effect subproperty lacks representative end-to-end native/Graph/browser/persistence proof for its complete authorable contract.",
+      "requiresApproval": null
+    },
+    {
+      "index": 168,
+      "optionPath": "canvas.stroke.opacity",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "Six stroke styles and nine positions/corners; RGB hex or validated gradient, width 0–200, opacity 0–1, blur 0–100; native rendered plus undo/reload",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks",
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 169,
+      "optionPath": "canvas.stroke.position",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Six stroke styles and nine positions/corners; RGB hex or validated gradient, width 0–200, opacity 0–1, blur 0–100; native rendered plus undo/reload",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 170,
+      "optionPath": "canvas.stroke.roundedCorners",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "Six stroke styles and nine positions/corners; RGB hex or validated gradient, width 0–200, opacity 0–1, blur 0–100; native rendered plus undo/reload",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 171,
+      "optionPath": "canvas.stroke.style",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "Six stroke styles and nine positions/corners; RGB hex or validated gradient, width 0–200, opacity 0–1, blur 0–100; native rendered plus undo/reload",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks",
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 172,
+      "optionPath": "canvas.stroke.width",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Six stroke styles and nine positions/corners; RGB hex or validated gradient, width 0–200, opacity 0–1, blur 0–100; native rendered plus undo/reload",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix",
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 173,
+      "optionPath": "canvas.transparentBase",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "FULL",
+      "supportedContract": "Supported, safe, bounded Workspace subset: pinned v6 public API, validated canonical edit, native render, generated Code, browser and persisted history",
+      "implementationEvidence": [
+        "S13 22-path strict FULL certified ledger and Chromium/per-option native-code checks"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 174,
+      "optionPath": "canvas.videoBg",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 175,
+      "optionPath": "canvas.videoBg.align",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 176,
+      "optionPath": "canvas.videoBg.autoplay",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 177,
+      "optionPath": "canvas.videoBg.filters",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 178,
+      "optionPath": "canvas.videoBg.filters.angle",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 179,
+      "optionPath": "canvas.videoBg.filters.centerX",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 180,
+      "optionPath": "canvas.videoBg.filters.centerY",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 181,
+      "optionPath": "canvas.videoBg.filters.height",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 182,
+      "optionPath": "canvas.videoBg.filters.intensity",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 183,
+      "optionPath": "canvas.videoBg.filters.levels",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 184,
+      "optionPath": "canvas.videoBg.filters.radius",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 185,
+      "optionPath": "canvas.videoBg.filters.size",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 186,
+      "optionPath": "canvas.videoBg.filters.type",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 187,
+      "optionPath": "canvas.videoBg.filters.value",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 188,
+      "optionPath": "canvas.videoBg.filters.width",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 189,
+      "optionPath": "canvas.videoBg.filters.x",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 190,
+      "optionPath": "canvas.videoBg.filters.y",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 191,
+      "optionPath": "canvas.videoBg.fit",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 192,
+      "optionPath": "canvas.videoBg.format",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 193,
+      "optionPath": "canvas.videoBg.frame",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 194,
+      "optionPath": "canvas.videoBg.inherit",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 195,
+      "optionPath": "canvas.videoBg.loop",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 196,
+      "optionPath": "canvas.videoBg.opacity",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 197,
+      "optionPath": "canvas.videoBg.quality",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 198,
+      "optionPath": "canvas.videoBg.source",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 199,
+      "optionPath": "canvas.videoBg.time",
+      "workspaceStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "strictStatus": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "New native decoder/file/filter privilege has not been approved. Current model fails closed.",
+      "requiresApproval": "Owner security approval + isolated native media/filter architecture"
+    },
+    {
+      "index": 200,
+      "optionPath": "canvas.width",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Workspace project dimensions 64–2048 px; integer input; project render and reload",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 201,
+      "optionPath": "canvas.x",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Verified bounded canvas positioning −4096 to +4096; finite validated numeric input",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 202,
+      "optionPath": "canvas.y",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Verified bounded canvas positioning −4096 to +4096; finite validated numeric input",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 203,
+      "optionPath": "canvas.zoom",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Validated zoom scale 0.05–16, centers ±8192; pivots affect native pixels only when scale ≠ 1",
+      "implementationEvidence": [
+        "S14 45+ live Chromium canonical transactions, 9 native screenshots, Code export, reload and history / layer-switch browser"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 204,
+      "optionPath": "canvas.zoom.centerX",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Validated zoom scale 0.05–16, centers ±8192; pivots affect native pixels only when scale ≠ 1",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 205,
+      "optionPath": "canvas.zoom.centerY",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Validated zoom scale 0.05–16, centers ±8192; pivots affect native pixels only when scale ≠ 1",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 206,
+      "optionPath": "canvas.zoom.scale",
+      "workspaceStatus": "WORKSPACE_READY",
+      "strictStatus": "PARTIAL_AUTHORING_SUBSET",
+      "supportedContract": "Validated zoom scale 0.05–16, centers ±8192; pivots affect native pixels only when scale ≠ 1",
+      "implementationEvidence": [
+        "S12 31-path real Chrome and independent public-v6 program matrix"
+      ],
+      "remainingFailure": null,
+      "requiresApproval": null
+    },
+    {
+      "index": 207,
+      "optionPath": "painterOpts.resolveAssetRefs",
+      "workspaceStatus": "WORKSPACE_NOT_APPLICABLE",
+      "strictStatus": "NOT_MAPPED",
+      "supportedContract": null,
+      "implementationEvidence": [],
+      "remainingFailure": "PainterOpts.resolveAssetRefs belongs to painter environment, not a per-canvas createCanvas authoring field; no editor wire.",
+      "requiresApproval": null
+    }
+  ]
+}

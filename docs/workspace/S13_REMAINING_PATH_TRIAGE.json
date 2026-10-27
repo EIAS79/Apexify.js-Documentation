@@ -1,0 +1,1887 @@
+{
+  "sourceCommit": "25d09e29b990e5b09dc928fddd44a212e83fdf76",
+  "total": 208,
+  "tierCounts": {
+    "minor-gap": 61,
+    "certified-full": 22,
+    "major-gap": 53,
+    "genuinely-infeasible": 4,
+    "resolvable-blocked": 14,
+    "evidence-only": 27,
+    "approval-dependent": 27
+  },
+  "paths": [
+    {
+      "index": 0,
+      "optionPath": "canvas.bgLayers",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 1,
+      "optionPath": "canvas.bgLayers.blendMode",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "NONE \u2014 S13 per-path evidence in CREATE_CANVAS_COVERAGE_S13.json",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 2,
+      "optionPath": "canvas.bgLayers.opacity",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "NONE \u2014 S13 per-path evidence in CREATE_CANVAS_COVERAGE_S13.json",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 3,
+      "optionPath": "canvas.bgLayers.type",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 4,
+      "optionPath": "canvas.bgLayers.value",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 5,
+      "optionPath": "canvas.bgLayers.align",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "NONE \u2014 S13 per-path evidence in CREATE_CANVAS_COVERAGE_S13.json",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 6,
+      "optionPath": "canvas.bgLayers.fit",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "NONE \u2014 S13 per-path evidence in CREATE_CANVAS_COVERAGE_S13.json",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 7,
+      "optionPath": "canvas.bgLayers.source",
+      "status": "PARTIAL_ASSET_BACKED_CANVAS",
+      "tier": "major-gap",
+      "remainingFailure": "Asset variants need hash/decode, security, Graph, code and browser proof",
+      "marginalEffort": "2-6 h",
+      "approval": "none; remote/unsafe URL forbidden"
+    },
+    {
+      "index": 8,
+      "optionPath": "canvas.bgLayers.repeat",
+      "status": "NOT_MAPPED",
+      "tier": "major-gap",
+      "remainingFailure": "No canonical mapping or union-conditional field mapping",
+      "marginalEffort": "3-7 h",
+      "approval": "none"
+    },
+    {
+      "index": 9,
+      "optionPath": "canvas.bgLayers.pattern",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 10,
+      "optionPath": "canvas.bgLayers.pattern.blendMode",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "NONE \u2014 S13 per-path evidence in CREATE_CANVAS_COVERAGE_S13.json",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 11,
+      "optionPath": "canvas.bgLayers.pattern.color",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 12,
+      "optionPath": "canvas.bgLayers.pattern.customPatternImage",
+      "status": "PARTIAL_ASSET_BACKED_CANVAS",
+      "tier": "major-gap",
+      "remainingFailure": "Asset variants need hash/decode, security, Graph, code and browser proof",
+      "marginalEffort": "2-6 h",
+      "approval": "none; remote/unsafe URL forbidden"
+    },
+    {
+      "index": 13,
+      "optionPath": "canvas.bgLayers.pattern.gradient",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 14,
+      "optionPath": "canvas.bgLayers.pattern.gradient.angle",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 15,
+      "optionPath": "canvas.bgLayers.pattern.gradient.centerX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 16,
+      "optionPath": "canvas.bgLayers.pattern.gradient.centerY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 17,
+      "optionPath": "canvas.bgLayers.pattern.gradient.colors",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 18,
+      "optionPath": "canvas.bgLayers.pattern.gradient.colors.color",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 19,
+      "optionPath": "canvas.bgLayers.pattern.gradient.colors.stop",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 20,
+      "optionPath": "canvas.bgLayers.pattern.gradient.endRadius",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 21,
+      "optionPath": "canvas.bgLayers.pattern.gradient.endX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 22,
+      "optionPath": "canvas.bgLayers.pattern.gradient.endY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 23,
+      "optionPath": "canvas.bgLayers.pattern.gradient.repeat",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 24,
+      "optionPath": "canvas.bgLayers.pattern.gradient.startAngle",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 25,
+      "optionPath": "canvas.bgLayers.pattern.gradient.startRadius",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 26,
+      "optionPath": "canvas.bgLayers.pattern.gradient.startX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 27,
+      "optionPath": "canvas.bgLayers.pattern.gradient.startY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 28,
+      "optionPath": "canvas.bgLayers.pattern.gradient.type",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 29,
+      "optionPath": "canvas.bgLayers.pattern.offsetX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 30,
+      "optionPath": "canvas.bgLayers.pattern.offsetY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 31,
+      "optionPath": "canvas.bgLayers.pattern.opacity",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "NONE \u2014 S13 per-path evidence in CREATE_CANVAS_COVERAGE_S13.json",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 32,
+      "optionPath": "canvas.bgLayers.pattern.repeat",
+      "status": "UPSTREAM_BLOCKED",
+      "tier": "genuinely-infeasible",
+      "remainingFailure": "Pinned native raster accepts option but ignores or mishandles pixels",
+      "marginalEffort": "2-8 h after isolated upstream fix",
+      "approval": "explicit upstream fix and engine repin"
+    },
+    {
+      "index": 33,
+      "optionPath": "canvas.bgLayers.pattern.rotation",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 34,
+      "optionPath": "canvas.bgLayers.pattern.scale",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 35,
+      "optionPath": "canvas.bgLayers.pattern.secondaryColor",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 36,
+      "optionPath": "canvas.bgLayers.pattern.size",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 37,
+      "optionPath": "canvas.bgLayers.pattern.spacing",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 38,
+      "optionPath": "canvas.bgLayers.pattern.type",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 39,
+      "optionPath": "canvas.bgLayers.intensity",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "NONE \u2014 S13 per-path evidence in CREATE_CANVAS_COVERAGE_S13.json",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 40,
+      "optionPath": "canvas.blendMode",
+      "status": "NOT_MAPPED",
+      "tier": "major-gap",
+      "remainingFailure": "No canonical mapping or union-conditional field mapping",
+      "marginalEffort": "3-7 h",
+      "approval": "none"
+    },
+    {
+      "index": 41,
+      "optionPath": "canvas.blur",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 42,
+      "optionPath": "canvas.borderPosition",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 43,
+      "optionPath": "canvas.borderRadius",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 44,
+      "optionPath": "canvas.colorBg",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 45,
+      "optionPath": "canvas.customBg",
+      "status": "PARTIAL_ASSET_BACKED_CANVAS",
+      "tier": "major-gap",
+      "remainingFailure": "Asset variants need hash/decode, security, Graph, code and browser proof",
+      "marginalEffort": "2-6 h",
+      "approval": "none; remote/unsafe URL forbidden"
+    },
+    {
+      "index": 46,
+      "optionPath": "canvas.customBg.align",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "NONE \u2014 S13 per-path evidence in CREATE_CANVAS_COVERAGE_S13.json",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 47,
+      "optionPath": "canvas.customBg.filters",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "resolvable-blocked",
+      "remainingFailure": "Missing bounded native filter authoring and isolated asset decode verification",
+      "marginalEffort": "3-8 h leaf after shared filter adapter",
+      "approval": "security review for native decoder filters"
+    },
+    {
+      "index": 48,
+      "optionPath": "canvas.customBg.filters.angle",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "resolvable-blocked",
+      "remainingFailure": "Missing bounded native filter authoring and isolated asset decode verification",
+      "marginalEffort": "3-8 h leaf after shared filter adapter",
+      "approval": "security review for native decoder filters"
+    },
+    {
+      "index": 49,
+      "optionPath": "canvas.customBg.filters.centerX",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "resolvable-blocked",
+      "remainingFailure": "Missing bounded native filter authoring and isolated asset decode verification",
+      "marginalEffort": "3-8 h leaf after shared filter adapter",
+      "approval": "security review for native decoder filters"
+    },
+    {
+      "index": 50,
+      "optionPath": "canvas.customBg.filters.centerY",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "resolvable-blocked",
+      "remainingFailure": "Missing bounded native filter authoring and isolated asset decode verification",
+      "marginalEffort": "3-8 h leaf after shared filter adapter",
+      "approval": "security review for native decoder filters"
+    },
+    {
+      "index": 51,
+      "optionPath": "canvas.customBg.filters.height",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "resolvable-blocked",
+      "remainingFailure": "Missing bounded native filter authoring and isolated asset decode verification",
+      "marginalEffort": "3-8 h leaf after shared filter adapter",
+      "approval": "security review for native decoder filters"
+    },
+    {
+      "index": 52,
+      "optionPath": "canvas.customBg.filters.intensity",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "resolvable-blocked",
+      "remainingFailure": "Missing bounded native filter authoring and isolated asset decode verification",
+      "marginalEffort": "3-8 h leaf after shared filter adapter",
+      "approval": "security review for native decoder filters"
+    },
+    {
+      "index": 53,
+      "optionPath": "canvas.customBg.filters.levels",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "resolvable-blocked",
+      "remainingFailure": "Missing bounded native filter authoring and isolated asset decode verification",
+      "marginalEffort": "3-8 h leaf after shared filter adapter",
+      "approval": "security review for native decoder filters"
+    },
+    {
+      "index": 54,
+      "optionPath": "canvas.customBg.filters.radius",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "resolvable-blocked",
+      "remainingFailure": "Missing bounded native filter authoring and isolated asset decode verification",
+      "marginalEffort": "3-8 h leaf after shared filter adapter",
+      "approval": "security review for native decoder filters"
+    },
+    {
+      "index": 55,
+      "optionPath": "canvas.customBg.filters.size",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "resolvable-blocked",
+      "remainingFailure": "Missing bounded native filter authoring and isolated asset decode verification",
+      "marginalEffort": "3-8 h leaf after shared filter adapter",
+      "approval": "security review for native decoder filters"
+    },
+    {
+      "index": 56,
+      "optionPath": "canvas.customBg.filters.type",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "resolvable-blocked",
+      "remainingFailure": "Missing bounded native filter authoring and isolated asset decode verification",
+      "marginalEffort": "3-8 h leaf after shared filter adapter",
+      "approval": "security review for native decoder filters"
+    },
+    {
+      "index": 57,
+      "optionPath": "canvas.customBg.filters.value",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "resolvable-blocked",
+      "remainingFailure": "Missing bounded native filter authoring and isolated asset decode verification",
+      "marginalEffort": "3-8 h leaf after shared filter adapter",
+      "approval": "security review for native decoder filters"
+    },
+    {
+      "index": 58,
+      "optionPath": "canvas.customBg.filters.width",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "resolvable-blocked",
+      "remainingFailure": "Missing bounded native filter authoring and isolated asset decode verification",
+      "marginalEffort": "3-8 h leaf after shared filter adapter",
+      "approval": "security review for native decoder filters"
+    },
+    {
+      "index": 59,
+      "optionPath": "canvas.customBg.filters.x",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "resolvable-blocked",
+      "remainingFailure": "Missing bounded native filter authoring and isolated asset decode verification",
+      "marginalEffort": "3-8 h leaf after shared filter adapter",
+      "approval": "security review for native decoder filters"
+    },
+    {
+      "index": 60,
+      "optionPath": "canvas.customBg.filters.y",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "resolvable-blocked",
+      "remainingFailure": "Missing bounded native filter authoring and isolated asset decode verification",
+      "marginalEffort": "3-8 h leaf after shared filter adapter",
+      "approval": "security review for native decoder filters"
+    },
+    {
+      "index": 61,
+      "optionPath": "canvas.customBg.fit",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "NONE \u2014 S13 per-path evidence in CREATE_CANVAS_COVERAGE_S13.json",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 62,
+      "optionPath": "canvas.customBg.inherit",
+      "status": "PARTIAL_ASSET_BACKED_CANVAS",
+      "tier": "major-gap",
+      "remainingFailure": "Asset variants need hash/decode, security, Graph, code and browser proof",
+      "marginalEffort": "2-6 h",
+      "approval": "none; remote/unsafe URL forbidden"
+    },
+    {
+      "index": 63,
+      "optionPath": "canvas.customBg.opacity",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "NONE \u2014 S13 per-path evidence in CREATE_CANVAS_COVERAGE_S13.json",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 64,
+      "optionPath": "canvas.customBg.source",
+      "status": "PARTIAL_ASSET_BACKED_CANVAS",
+      "tier": "major-gap",
+      "remainingFailure": "Asset variants need hash/decode, security, Graph, code and browser proof",
+      "marginalEffort": "2-6 h",
+      "approval": "none; remote/unsafe URL forbidden"
+    },
+    {
+      "index": 65,
+      "optionPath": "canvas.gradientBg",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 66,
+      "optionPath": "canvas.gradientBg.colors",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 67,
+      "optionPath": "canvas.gradientBg.colors.color",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 68,
+      "optionPath": "canvas.gradientBg.colors.stop",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "Validated complete option contract and individual pinned render/Code/browser proof",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 69,
+      "optionPath": "canvas.gradientBg.endX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 70,
+      "optionPath": "canvas.gradientBg.endY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 71,
+      "optionPath": "canvas.gradientBg.pivotX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 72,
+      "optionPath": "canvas.gradientBg.pivotY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 73,
+      "optionPath": "canvas.gradientBg.repeat",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 74,
+      "optionPath": "canvas.gradientBg.rotate",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 75,
+      "optionPath": "canvas.gradientBg.startX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 76,
+      "optionPath": "canvas.gradientBg.startY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 77,
+      "optionPath": "canvas.gradientBg.type",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "Validated complete option contract and individual pinned render/Code/browser proof",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 78,
+      "optionPath": "canvas.gradientBg.endRadius",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 79,
+      "optionPath": "canvas.gradientBg.startRadius",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 80,
+      "optionPath": "canvas.gradientBg.centerX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 81,
+      "optionPath": "canvas.gradientBg.centerY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 82,
+      "optionPath": "canvas.gradientBg.startAngle",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "genuinely-infeasible",
+      "remainingFailure": "Pinned native raster accepts option but ignores or mishandles pixels",
+      "marginalEffort": "2-8 h after isolated upstream fix",
+      "approval": "explicit upstream fix and engine repin"
+    },
+    {
+      "index": 83,
+      "optionPath": "canvas.height",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 84,
+      "optionPath": "canvas.noiseBg",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "Validated complete option contract and individual pinned render/Code/browser proof",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 85,
+      "optionPath": "canvas.noiseBg.intensity",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "Validated complete option contract and individual pinned render/Code/browser proof",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 86,
+      "optionPath": "canvas.opacity",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "NONE \u2014 S13 per-path evidence in CREATE_CANVAS_COVERAGE_S13.json",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 87,
+      "optionPath": "canvas.patternBg",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 88,
+      "optionPath": "canvas.patternBg.blendMode",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "NONE \u2014 S13 per-path evidence in CREATE_CANVAS_COVERAGE_S13.json",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 89,
+      "optionPath": "canvas.patternBg.color",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 90,
+      "optionPath": "canvas.patternBg.customPatternImage",
+      "status": "PARTIAL_ASSET_BACKED_CANVAS",
+      "tier": "major-gap",
+      "remainingFailure": "Asset variants need hash/decode, security, Graph, code and browser proof",
+      "marginalEffort": "2-6 h",
+      "approval": "none; remote/unsafe URL forbidden"
+    },
+    {
+      "index": 91,
+      "optionPath": "canvas.patternBg.gradient",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 92,
+      "optionPath": "canvas.patternBg.gradient.angle",
+      "status": "UPSTREAM_BLOCKED",
+      "tier": "genuinely-infeasible",
+      "remainingFailure": "Pinned native raster accepts option but ignores or mishandles pixels",
+      "marginalEffort": "2-8 h after isolated upstream fix",
+      "approval": "explicit upstream fix and engine repin"
+    },
+    {
+      "index": 93,
+      "optionPath": "canvas.patternBg.gradient.centerX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 94,
+      "optionPath": "canvas.patternBg.gradient.centerY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 95,
+      "optionPath": "canvas.patternBg.gradient.colors",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 96,
+      "optionPath": "canvas.patternBg.gradient.colors.color",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 97,
+      "optionPath": "canvas.patternBg.gradient.colors.stop",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 98,
+      "optionPath": "canvas.patternBg.gradient.endRadius",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 99,
+      "optionPath": "canvas.patternBg.gradient.endX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 100,
+      "optionPath": "canvas.patternBg.gradient.endY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 101,
+      "optionPath": "canvas.patternBg.gradient.repeat",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 102,
+      "optionPath": "canvas.patternBg.gradient.startAngle",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 103,
+      "optionPath": "canvas.patternBg.gradient.startRadius",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 104,
+      "optionPath": "canvas.patternBg.gradient.startX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 105,
+      "optionPath": "canvas.patternBg.gradient.startY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 106,
+      "optionPath": "canvas.patternBg.gradient.type",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 107,
+      "optionPath": "canvas.patternBg.offsetX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 108,
+      "optionPath": "canvas.patternBg.offsetY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 109,
+      "optionPath": "canvas.patternBg.opacity",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "Validated complete option contract and individual pinned render/Code/browser proof",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 110,
+      "optionPath": "canvas.patternBg.repeat",
+      "status": "UPSTREAM_BLOCKED",
+      "tier": "genuinely-infeasible",
+      "remainingFailure": "Pinned native raster accepts option but ignores or mishandles pixels",
+      "marginalEffort": "2-8 h after isolated upstream fix",
+      "approval": "explicit upstream fix and engine repin"
+    },
+    {
+      "index": 111,
+      "optionPath": "canvas.patternBg.rotation",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 112,
+      "optionPath": "canvas.patternBg.scale",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 113,
+      "optionPath": "canvas.patternBg.secondaryColor",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 114,
+      "optionPath": "canvas.patternBg.size",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 115,
+      "optionPath": "canvas.patternBg.spacing",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 116,
+      "optionPath": "canvas.patternBg.type",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 117,
+      "optionPath": "canvas.rotation",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 118,
+      "optionPath": "canvas.shadow",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 119,
+      "optionPath": "canvas.shadow.blur",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 120,
+      "optionPath": "canvas.shadow.borderPosition",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 121,
+      "optionPath": "canvas.shadow.borderRadius",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 122,
+      "optionPath": "canvas.shadow.color",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 123,
+      "optionPath": "canvas.shadow.gradient",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 124,
+      "optionPath": "canvas.shadow.gradient.colors",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 125,
+      "optionPath": "canvas.shadow.gradient.colors.color",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 126,
+      "optionPath": "canvas.shadow.gradient.colors.stop",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 127,
+      "optionPath": "canvas.shadow.gradient.endX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 128,
+      "optionPath": "canvas.shadow.gradient.endY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 129,
+      "optionPath": "canvas.shadow.gradient.pivotX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 130,
+      "optionPath": "canvas.shadow.gradient.pivotY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 131,
+      "optionPath": "canvas.shadow.gradient.repeat",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 132,
+      "optionPath": "canvas.shadow.gradient.rotate",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 133,
+      "optionPath": "canvas.shadow.gradient.startX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 134,
+      "optionPath": "canvas.shadow.gradient.startY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 135,
+      "optionPath": "canvas.shadow.gradient.type",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 136,
+      "optionPath": "canvas.shadow.gradient.endRadius",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 137,
+      "optionPath": "canvas.shadow.gradient.startRadius",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 138,
+      "optionPath": "canvas.shadow.gradient.centerX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 139,
+      "optionPath": "canvas.shadow.gradient.centerY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 140,
+      "optionPath": "canvas.shadow.gradient.startAngle",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 141,
+      "optionPath": "canvas.shadow.offsetX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 142,
+      "optionPath": "canvas.shadow.offsetY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 143,
+      "optionPath": "canvas.shadow.opacity",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 144,
+      "optionPath": "canvas.shadow.roundedCorners",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 145,
+      "optionPath": "canvas.stroke",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 146,
+      "optionPath": "canvas.stroke.blur",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 147,
+      "optionPath": "canvas.stroke.borderPosition",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "NONE \u2014 S13 per-path evidence in CREATE_CANVAS_COVERAGE_S13.json",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 148,
+      "optionPath": "canvas.stroke.borderRadius",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 149,
+      "optionPath": "canvas.stroke.color",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 150,
+      "optionPath": "canvas.stroke.gradient",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 151,
+      "optionPath": "canvas.stroke.gradient.colors",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 152,
+      "optionPath": "canvas.stroke.gradient.colors.color",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 153,
+      "optionPath": "canvas.stroke.gradient.colors.stop",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 154,
+      "optionPath": "canvas.stroke.gradient.endX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 155,
+      "optionPath": "canvas.stroke.gradient.endY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 156,
+      "optionPath": "canvas.stroke.gradient.pivotX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 157,
+      "optionPath": "canvas.stroke.gradient.pivotY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 158,
+      "optionPath": "canvas.stroke.gradient.repeat",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 159,
+      "optionPath": "canvas.stroke.gradient.rotate",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 160,
+      "optionPath": "canvas.stroke.gradient.startX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 161,
+      "optionPath": "canvas.stroke.gradient.startY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 162,
+      "optionPath": "canvas.stroke.gradient.type",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 163,
+      "optionPath": "canvas.stroke.gradient.endRadius",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 164,
+      "optionPath": "canvas.stroke.gradient.startRadius",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 165,
+      "optionPath": "canvas.stroke.gradient.centerX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 166,
+      "optionPath": "canvas.stroke.gradient.centerY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 167,
+      "optionPath": "canvas.stroke.gradient.startAngle",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "major-gap",
+      "remainingFailure": "Combined gradient shadow/effect clip, full numeric/variant and visible RGBA parity incomplete",
+      "marginalEffort": "2-6 h",
+      "approval": "none"
+    },
+    {
+      "index": 168,
+      "optionPath": "canvas.stroke.opacity",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "Validated complete option contract and individual pinned render/Code/browser proof",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 169,
+      "optionPath": "canvas.stroke.position",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 170,
+      "optionPath": "canvas.stroke.roundedCorners",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "NONE \u2014 S13 per-path evidence in CREATE_CANVAS_COVERAGE_S13.json",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 171,
+      "optionPath": "canvas.stroke.style",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "Validated complete option contract and individual pinned render/Code/browser proof",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 172,
+      "optionPath": "canvas.stroke.width",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 173,
+      "optionPath": "canvas.transparentBase",
+      "status": "FULL",
+      "tier": "certified-full",
+      "remainingFailure": "Validated complete option contract and individual pinned render/Code/browser proof",
+      "marginalEffort": "0",
+      "approval": "none"
+    },
+    {
+      "index": 174,
+      "optionPath": "canvas.videoBg",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 175,
+      "optionPath": "canvas.videoBg.align",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 176,
+      "optionPath": "canvas.videoBg.autoplay",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 177,
+      "optionPath": "canvas.videoBg.filters",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 178,
+      "optionPath": "canvas.videoBg.filters.angle",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 179,
+      "optionPath": "canvas.videoBg.filters.centerX",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 180,
+      "optionPath": "canvas.videoBg.filters.centerY",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 181,
+      "optionPath": "canvas.videoBg.filters.height",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 182,
+      "optionPath": "canvas.videoBg.filters.intensity",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 183,
+      "optionPath": "canvas.videoBg.filters.levels",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 184,
+      "optionPath": "canvas.videoBg.filters.radius",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 185,
+      "optionPath": "canvas.videoBg.filters.size",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 186,
+      "optionPath": "canvas.videoBg.filters.type",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 187,
+      "optionPath": "canvas.videoBg.filters.value",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 188,
+      "optionPath": "canvas.videoBg.filters.width",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 189,
+      "optionPath": "canvas.videoBg.filters.x",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 190,
+      "optionPath": "canvas.videoBg.filters.y",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 191,
+      "optionPath": "canvas.videoBg.fit",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 192,
+      "optionPath": "canvas.videoBg.format",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 193,
+      "optionPath": "canvas.videoBg.frame",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 194,
+      "optionPath": "canvas.videoBg.inherit",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 195,
+      "optionPath": "canvas.videoBg.loop",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 196,
+      "optionPath": "canvas.videoBg.opacity",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 197,
+      "optionPath": "canvas.videoBg.quality",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 198,
+      "optionPath": "canvas.videoBg.source",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 199,
+      "optionPath": "canvas.videoBg.time",
+      "status": "BLOCKED_ASSET_OR_NATIVE_BOUNDARY",
+      "tier": "approval-dependent",
+      "remainingFailure": "Secure immutable uploaded media frame extraction not authorized, runtime safety boundary absent",
+      "marginalEffort": "3-12 h per path after shared decoder",
+      "approval": "owner and security: native media sandbox, budgets, frame provenance"
+    },
+    {
+      "index": 200,
+      "optionPath": "canvas.width",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 201,
+      "optionPath": "canvas.x",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 202,
+      "optionPath": "canvas.y",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 203,
+      "optionPath": "canvas.zoom",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "minor-gap",
+      "remainingFailure": "Supported authoring subset needs full native contract including limits/defaults, all field variants and final browser history proof",
+      "marginalEffort": "1-4 h",
+      "approval": "none"
+    },
+    {
+      "index": 204,
+      "optionPath": "canvas.zoom.centerX",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 205,
+      "optionPath": "canvas.zoom.centerY",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 206,
+      "optionPath": "canvas.zoom.scale",
+      "status": "PARTIAL_AUTHORING_SUBSET",
+      "tier": "evidence-only",
+      "remainingFailure": "Individual pixels/Graph/Code/browser pass, but full native legal value envelope/default/variant contract not certified",
+      "marginalEffort": "1-3 h marginal per path",
+      "approval": "none"
+    },
+    {
+      "index": 207,
+      "optionPath": "painterOpts.resolveAssetRefs",
+      "status": "NOT_MAPPED",
+      "tier": "approval-dependent",
+      "remainingFailure": "Painter option outside CanvasConfig path scope",
+      "marginalEffort": "2-4 h inventory resolution",
+      "approval": "owner audit scope"
+    }
+  ]
+}

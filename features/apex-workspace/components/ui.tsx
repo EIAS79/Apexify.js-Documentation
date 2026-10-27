@@ -1,5 +1,6 @@
 "use client";
 import { XMarkIcon, ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
+import {useEffect,useState} from "react";
 import type { ComponentType, ReactNode, SVGProps } from "react";
 export type IconType = ComponentType<SVGProps<SVGSVGElement>>;
 export function IconButton({
@@ -98,20 +99,36 @@ export function NumberField({
   max?: number;
   step?: number;
 }) {
+  // Preserve intermediate drafts: never silently clamp a valid-looking numeric edit.
+  // A complete in-range value commits immediately (also works with browser .fill);
+  // incomplete/out-of-range drafts are restored on blur rather than corrupting history.
+  const [draft,setDraft]=useState(String(value));
+  useEffect(()=>setDraft(String(value)),[value]);
+  const valid=(text:string):number|undefined=>{
+    if(!text.trim())return undefined;
+    const n=Number(text);
+    return Number.isFinite(n)&&n>=min&&n<=max?n:undefined;
+  };
   return (
     <Field label={label}>
       <input
         aria-label={label}
         type="number"
-        value={value}
+        value={draft}
         min={min}
         max={max}
         step={step}
-        onChange={(e) => {
-          if (e.target.value !== "") {
-            const n = Number(e.target.value);
-            if (Number.isFinite(n)) onChange(Math.max(min, Math.min(max, n)));
-          }
+        title={'Supported Workspace range: '+min+' to '+max}
+        onChange={(e)=>{
+          const text=e.target.value;
+          setDraft(text);
+          const n=valid(text);
+          if(n!==undefined&&n!==value)onChange(n);
+        }}
+        onBlur={()=>{
+          const n=valid(draft);
+          if(n===undefined)setDraft(String(value));
+          else if(n!==value)onChange(n);
         }}
       />
     </Field>

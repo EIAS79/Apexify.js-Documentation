@@ -1,0 +1,110 @@
+[
+  {
+    "api": "createText.TextProperties.font.family",
+    "pass": true,
+    "pixelChanged": false,
+    "rawShaA": "c7562d56aae357c03d0de04f977f5c2d8422c85a514467a4c665df776515f222",
+    "rawShaB": "c7562d56aae357c03d0de04f977f5c2d8422c85a514467a4c665df776515f222",
+    "metricsA": {
+      "width": 245.27999877929688,
+      "height": 147,
+      "lineCount": 3
+    },
+    "metricsB": {
+      "width": 245.27999877929688,
+      "height": 147,
+      "lineCount": 3
+    },
+    "metricChanged": false
+  },
+  {
+    "api": "createText.TextProperties.font.name",
+    "pass": true,
+    "pixelChanged": false,
+    "rawShaA": "c7562d56aae357c03d0de04f977f5c2d8422c85a514467a4c665df776515f222",
+    "rawShaB": "c7562d56aae357c03d0de04f977f5c2d8422c85a514467a4c665df776515f222",
+    "metricsA": {
+      "width": 245.27999877929688,
+      "height": 147,
+      "lineCount": 3
+    },
+    "metricsB": {
+      "width": 245.27999877929688,
+      "height": 147,
+      "lineCount": 3
+    },
+    "metricChanged": false
+  },
+  {
+    "api": "createText.TextProperties.decorations.bold",
+    "pass": true,
+    "pixelChanged": true,
+    "rawShaA": "98eff72fa9ee29d7a4342948ba67760ea384ab3970b0763654da62ebc1032d92",
+    "rawShaB": "c745a03ea6ba7e356c4a2d091b1c6bae52c415dcf7145639e3c1ea608d655f4f",
+    "metricsA": {
+      "width": 262.6199951171875,
+      "height": 147,
+      "lineCount": 3
+    },
+    "metricsB": {
+      "width": 289.760009765625,
+      "height": 147,
+      "lineCount": 3
+    },
+    "metricChanged": true
+  },
+  {
+    "api": "createText.TextProperties.layout.lineHeight",
+    "pass": true,
+    "pixelChanged": true,
+    "rawShaA": "bf68ff6de855244e9fcdbb1c2144be1638cde09957e91b62eec5b2987523fbee",
+    "rawShaB": "305ab4354698e24949a896f8e21d8d3823973fc3b17436206e78d44bb8981e9b",
+    "metricsA": {
+      "width": 262.6199951171875,
+      "height": 105,
+      "lineCount": 3
+    },
+    "metricsB": {
+      "width": 262.6199951171875,
+      "height": 220.5,
+      "lineCount": 3
+    },
+    "metricChanged": true
+  },
+  {
+    "api": "createText.TextProperties.layout.maxHeight",
+    "pass": true,
+    "pixelChanged": true,
+    "rawShaA": "6a2270f9129e6ccd4dc3f940bae1c5fdbdd3bd42a6a8c240fc089566f95d4e15",
+    "rawShaB": "98eff72fa9ee29d7a4342948ba67760ea384ab3970b0763654da62ebc1032d92",
+    "metricsA": {
+      "width": 0,
+      "height": 49,
+      "lineCount": 1
+    },
+    "metricsB": {
+      "width": 262.6199951171875,
+      "height": 147,
+      "lineCount": 3
+    },
+    "metricChanged": true
+  },
+  {
+    "api": "createText.TextProperties/font.weight baseline",
+    "pass": true,
+    "pixelChanged": true,
+    "rawShaA": "98eff72fa9ee29d7a4342948ba67760ea384ab3970b0763654da62ebc1032d92",
+    "rawShaB": "7db638f8b00a0d6f0d65a00e802eb0fce5bbbe0920fd9eb13d168ef94943d303",
+    "metricsA": {
+      "width": 262.6199951171875,
+      "height": 147,
+      "lineCount": 3
+    },
+    "metricsB": {
+      "width": 334.0199890136719,
+      "height": 147,
+      "lineCount": 3
+    },
+    "metricChanged": true
+  }
+]

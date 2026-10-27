@@ -1,0 +1,4096 @@
+{
+  "enginePin": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "sourcePaths": 330,
+  "summary": {
+    "CONDITIONAL_REACHABLE_CONTROL": 321,
+    "EXTERNAL_INSPECTOR_OR_SEMANTIC_CONTAINER_NOT_STATICALLY_VERIFIED": 9
+  },
+  "rows": [
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.align",
+      "path": "images.align",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image alignment"
+      ],
+      "matchedLabels": [
+        "Image alignment"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.align"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.blendMode",
+      "path": "images.blendMode",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Composite / blend mode"
+      ],
+      "matchedLabels": [
+        "Composite / blend mode"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.blendMode"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.blur",
+      "path": "images.blur",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Blur"
+      ],
+      "matchedLabels": [
+        "Blur"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.blur"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.borderPosition",
+      "path": "images.borderPosition",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Border position"
+      ],
+      "matchedLabels": [
+        "Border position"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.borderPosition"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.borderRadius",
+      "path": "images.borderRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Border radius"
+      ],
+      "matchedLabels": [
+        "Border radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.borderRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground",
+      "path": "images.boxBackground",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Box background enabled"
+      ],
+      "matchedLabels": [
+        "Box background enabled"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.boxBackground"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.color",
+      "path": "images.boxBackground.color",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Box color"
+      ],
+      "matchedLabels": [
+        "Box color"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.boxBackground.color"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient",
+      "path": "images.boxBackground.gradient",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image box gradient properties"
+      ],
+      "matchedLabels": [
+        "Image box gradient properties"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.boxBackground.gradient"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.colors",
+      "path": "images.boxBackground.gradient.colors",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image box stops"
+      ],
+      "matchedLabels": [
+        "Image box stops"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.boxBackground.gradient.colors"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.colors.color",
+      "path": "images.boxBackground.gradient.colors.color",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image box stop color 1",
+        "Image box stop hex 1"
+      ],
+      "matchedLabels": [
+        "Image box stop color 1",
+        "Image box stop hex 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.boxBackground.gradient.colors.color"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.colors.stop",
+      "path": "images.boxBackground.gradient.colors.stop",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image box stop 1"
+      ],
+      "matchedLabels": [
+        "Image box stop 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.boxBackground.gradient.colors.stop"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.endX",
+      "path": "images.boxBackground.gradient.endX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image box end X"
+      ],
+      "matchedLabels": [
+        "Image box end X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.boxBackground.gradient.endX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.endY",
+      "path": "images.boxBackground.gradient.endY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image box end Y"
+      ],
+      "matchedLabels": [
+        "Image box end Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.boxBackground.gradient.endY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.pivotX",
+      "path": "images.boxBackground.gradient.pivotX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image box pivot X"
+      ],
+      "matchedLabels": [
+        "Image box pivot X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.boxBackground.gradient.pivotX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.pivotY",
+      "path": "images.boxBackground.gradient.pivotY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image box pivot Y"
+      ],
+      "matchedLabels": [
+        "Image box pivot Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.boxBackground.gradient.pivotY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.rotate",
+      "path": "images.boxBackground.gradient.rotate",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image box rotation"
+      ],
+      "matchedLabels": [
+        "Image box rotation"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.boxBackground.gradient.rotate"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.startX",
+      "path": "images.boxBackground.gradient.startX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image box start X"
+      ],
+      "matchedLabels": [
+        "Image box start X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.boxBackground.gradient.startX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.startY",
+      "path": "images.boxBackground.gradient.startY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image box start Y"
+      ],
+      "matchedLabels": [
+        "Image box start Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.boxBackground.gradient.startY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.type",
+      "path": "images.boxBackground.gradient.type",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image box gradient type"
+      ],
+      "matchedLabels": [
+        "Image box gradient type"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.boxBackground.gradient.type"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.endRadius",
+      "path": "images.boxBackground.gradient.endRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image box end radius"
+      ],
+      "matchedLabels": [
+        "Image box end radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.boxBackground.gradient.endRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.startRadius",
+      "path": "images.boxBackground.gradient.startRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image box start radius"
+      ],
+      "matchedLabels": [
+        "Image box start radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.boxBackground.gradient.startRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.centerX",
+      "path": "images.boxBackground.gradient.centerX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image box center X"
+      ],
+      "matchedLabels": [
+        "Image box center X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.boxBackground.gradient.centerX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.centerY",
+      "path": "images.boxBackground.gradient.centerY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image box center Y"
+      ],
+      "matchedLabels": [
+        "Image box center Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.boxBackground.gradient.centerY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.clipPath",
+      "path": "images.clipPath",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Enable polygon clip"
+      ],
+      "matchedLabels": [
+        "Enable polygon clip"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.clipPath"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.clipPath.x",
+      "path": "images.clipPath.x",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Point 1 X",
+        "Y 1"
+      ],
+      "matchedLabels": [
+        "Point 1 X",
+        "Y 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.clipPath.x"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.clipPath.y",
+      "path": "images.clipPath.y",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Point 1 X",
+        "Y 1"
+      ],
+      "matchedLabels": [
+        "Point 1 X",
+        "Y 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.clipPath.y"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion",
+      "path": "images.distortion",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Enable distortion"
+      ],
+      "matchedLabels": [
+        "Enable distortion"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.amplitudeX",
+      "path": "images.distortion.amplitudeX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion amplitudeX"
+      ],
+      "matchedLabels": [
+        "Distortion amplitudeX"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.amplitudeX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.amplitudeY",
+      "path": "images.distortion.amplitudeY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion amplitudeY"
+      ],
+      "matchedLabels": [
+        "Distortion amplitudeY"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.amplitudeY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.angle",
+      "path": "images.distortion.angle",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion angle"
+      ],
+      "matchedLabels": [
+        "Distortion angle"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.angle"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.centerX",
+      "path": "images.distortion.centerX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion centerX"
+      ],
+      "matchedLabels": [
+        "Distortion centerX"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.centerX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.centerY",
+      "path": "images.distortion.centerY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion centerY"
+      ],
+      "matchedLabels": [
+        "Distortion centerY"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.centerY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.controlPoints",
+      "path": "images.distortion.controlPoints",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Warp geometry mode"
+      ],
+      "matchedLabels": [
+        "Warp geometry mode"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.controlPoints"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.controlPoints.falloff",
+      "path": "images.distortion.controlPoints.falloff",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Falloff"
+      ],
+      "matchedLabels": [
+        "Falloff"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.controlPoints.falloff"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.controlPoints.from",
+      "path": "images.distortion.controlPoints.from",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "from X",
+        "to X"
+      ],
+      "matchedLabels": [
+        "from X",
+        "to X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.controlPoints.from"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.controlPoints.from.x",
+      "path": "images.distortion.controlPoints.from.x",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "from X",
+        "to X"
+      ],
+      "matchedLabels": [
+        "from X",
+        "to X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.controlPoints.from.x"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.controlPoints.from.y",
+      "path": "images.distortion.controlPoints.from.y",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "to Y",
+        "from Y"
+      ],
+      "matchedLabels": [
+        "to Y",
+        "from Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.controlPoints.from.y"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.controlPoints.radius",
+      "path": "images.distortion.controlPoints.radius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Influence radius"
+      ],
+      "matchedLabels": [
+        "Influence radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.controlPoints.radius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.controlPoints.strength",
+      "path": "images.distortion.controlPoints.strength",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Strength"
+      ],
+      "matchedLabels": [
+        "Strength"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.controlPoints.strength"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.controlPoints.to",
+      "path": "images.distortion.controlPoints.to",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "to Y",
+        "from Y"
+      ],
+      "matchedLabels": [
+        "to Y",
+        "from Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.controlPoints.to"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.controlPoints.to.x",
+      "path": "images.distortion.controlPoints.to.x",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "from X",
+        "to X"
+      ],
+      "matchedLabels": [
+        "from X",
+        "to X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.controlPoints.to.x"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.controlPoints.to.y",
+      "path": "images.distortion.controlPoints.to.y",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "to Y",
+        "from Y"
+      ],
+      "matchedLabels": [
+        "to Y",
+        "from Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.controlPoints.to.y"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.edgeMode",
+      "path": "images.distortion.edgeMode",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion edge mode"
+      ],
+      "matchedLabels": [
+        "Distortion edge mode"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.edgeMode"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.intensity",
+      "path": "images.distortion.intensity",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion intensity"
+      ],
+      "matchedLabels": [
+        "Distortion intensity"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.intensity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.interpolation",
+      "path": "images.distortion.interpolation",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion interpolation"
+      ],
+      "matchedLabels": [
+        "Distortion interpolation"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.interpolation"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.phaseX",
+      "path": "images.distortion.phaseX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion phaseX"
+      ],
+      "matchedLabels": [
+        "Distortion phaseX"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.phaseX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.phaseY",
+      "path": "images.distortion.phaseY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion phaseY"
+      ],
+      "matchedLabels": [
+        "Distortion phaseY"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.phaseY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.points",
+      "path": "images.distortion.points",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Quad corners · TL → TR → BR → BL",
+        "Point 1 X",
+        "Y 1"
+      ],
+      "matchedLabels": [
+        "Quad corners · TL → TR → BR → BL",
+        "Point 1 X",
+        "Y 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.points"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.points.x",
+      "path": "images.distortion.points.x",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Quad corners · TL → TR → BR → BL",
+        "Point 1 X",
+        "Y 1"
+      ],
+      "matchedLabels": [
+        "Quad corners · TL → TR → BR → BL",
+        "Point 1 X",
+        "Y 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.points.x"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.points.y",
+      "path": "images.distortion.points.y",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Quad corners · TL → TR → BR → BL",
+        "Point 1 X",
+        "Y 1"
+      ],
+      "matchedLabels": [
+        "Quad corners · TL → TR → BR → BL",
+        "Point 1 X",
+        "Y 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.points.y"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.radius",
+      "path": "images.distortion.radius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion radius"
+      ],
+      "matchedLabels": [
+        "Distortion radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.radius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.type",
+      "path": "images.distortion.type",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion type"
+      ],
+      "matchedLabels": [
+        "Distortion type"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.type"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.wavelengthX",
+      "path": "images.distortion.wavelengthX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion wavelengthX"
+      ],
+      "matchedLabels": [
+        "Distortion wavelengthX"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.wavelengthX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.distortion.wavelengthY",
+      "path": "images.distortion.wavelengthY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion wavelengthY"
+      ],
+      "matchedLabels": [
+        "Distortion wavelengthY"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.distortion.wavelengthY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.effects",
+      "path": "images.effects",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Enable vignette",
+        "Group vignette"
+      ],
+      "matchedLabels": [
+        "Enable vignette"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.effects"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.effects.chromaticAberration",
+      "path": "images.effects.chromaticAberration",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Enable chromaticAberration"
+      ],
+      "matchedLabels": [
+        "Enable chromaticAberration"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.effects.chromaticAberration"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.effects.chromaticAberration.intensity",
+      "path": "images.effects.chromaticAberration.intensity",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "chromaticAberration intensity"
+      ],
+      "matchedLabels": [
+        "chromaticAberration intensity"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.effects.chromaticAberration.intensity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.effects.filmGrain",
+      "path": "images.effects.filmGrain",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Enable filmGrain"
+      ],
+      "matchedLabels": [
+        "Enable filmGrain"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.effects.filmGrain"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.effects.filmGrain.intensity",
+      "path": "images.effects.filmGrain.intensity",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "filmGrain intensity"
+      ],
+      "matchedLabels": [
+        "filmGrain intensity"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.effects.filmGrain.intensity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.effects.lensFlare",
+      "path": "images.effects.lensFlare",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Enable lensFlare"
+      ],
+      "matchedLabels": [
+        "Enable lensFlare"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.effects.lensFlare"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.effects.lensFlare.intensity",
+      "path": "images.effects.lensFlare.intensity",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "lensFlare intensity"
+      ],
+      "matchedLabels": [
+        "lensFlare intensity"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.effects.lensFlare.intensity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.effects.lensFlare.x",
+      "path": "images.effects.lensFlare.x",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "lensFlare x"
+      ],
+      "matchedLabels": [
+        "lensFlare x"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.effects.lensFlare.x"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.effects.lensFlare.y",
+      "path": "images.effects.lensFlare.y",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "lensFlare y"
+      ],
+      "matchedLabels": [
+        "lensFlare y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.effects.lensFlare.y"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.effects.vignette",
+      "path": "images.effects.vignette",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Enable vignette"
+      ],
+      "matchedLabels": [
+        "Enable vignette"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.effects.vignette"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.effects.vignette.intensity",
+      "path": "images.effects.vignette.intensity",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "vignette intensity"
+      ],
+      "matchedLabels": [
+        "vignette intensity"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.effects.vignette.intensity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.effects.vignette.size",
+      "path": "images.effects.vignette.size",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "vignette size"
+      ],
+      "matchedLabels": [
+        "vignette size"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.effects.vignette.size"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.filterIntensity",
+      "path": "images.filterIntensity",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Filter intensity"
+      ],
+      "matchedLabels": [
+        "Filter intensity"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.filterIntensity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.filterOrder",
+      "path": "images.filterOrder",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Filter ordering"
+      ],
+      "matchedLabels": [
+        "Filter ordering"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.filterOrder"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.filters",
+      "path": "images.filters",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Filter 1 type"
+      ],
+      "matchedLabels": [
+        "Filter 1 type"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.filters"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.filters.angle",
+      "path": "images.filters.angle",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "motionBlur angle"
+      ],
+      "matchedLabels": [
+        "motionBlur angle"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.filters.angle"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.filters.centerX",
+      "path": "images.filters.centerX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "radialBlur centerX"
+      ],
+      "matchedLabels": [
+        "radialBlur centerX"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.filters.centerX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.filters.centerY",
+      "path": "images.filters.centerY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "radialBlur centerY"
+      ],
+      "matchedLabels": [
+        "radialBlur centerY"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.filters.centerY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.filters.height",
+      "path": "images.filters.height",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "pixelate height"
+      ],
+      "matchedLabels": [
+        "pixelate height"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.filters.height"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.filters.intensity",
+      "path": "images.filters.intensity",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "gaussianBlur intensity",
+        "motionBlur intensity",
+        "radialBlur intensity",
+        "sharpen intensity",
+        "noise intensity",
+        "grain intensity",
+        "edgeDetection intensity",
+        "emboss intensity"
+      ],
+      "matchedLabels": [
+        "gaussianBlur intensity",
+        "motionBlur intensity",
+        "radialBlur intensity",
+        "sharpen intensity",
+        "noise intensity",
+        "grain intensity",
+        "edgeDetection intensity",
+        "emboss intensity"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.filters.intensity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.filters.levels",
+      "path": "images.filters.levels",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "posterize levels"
+      ],
+      "matchedLabels": [
+        "posterize levels"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.filters.levels"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.filters.size",
+      "path": "images.filters.size",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "pixelate size"
+      ],
+      "matchedLabels": [
+        "pixelate size"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.filters.size"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.filters.type",
+      "path": "images.filters.type",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Filter 1 type"
+      ],
+      "matchedLabels": [
+        "Filter 1 type"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.filters.type"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.filters.value",
+      "path": "images.filters.value",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "brightness value",
+        "contrast value",
+        "saturation value",
+        "hueShift value"
+      ],
+      "matchedLabels": [
+        "brightness value",
+        "contrast value",
+        "saturation value",
+        "hueShift value"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.filters.value"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.filters.width",
+      "path": "images.filters.width",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "pixelate width"
+      ],
+      "matchedLabels": [
+        "pixelate width"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.filters.width"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.filters.x",
+      "path": "images.filters.x",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "pixelate x"
+      ],
+      "matchedLabels": [
+        "pixelate x"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.filters.x"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.filters.y",
+      "path": "images.filters.y",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "pixelate y"
+      ],
+      "matchedLabels": [
+        "pixelate y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.filters.y"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.fit",
+      "path": "images.fit",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image fit"
+      ],
+      "matchedLabels": [
+        "Image fit"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.fit"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.height",
+      "path": "images.height",
+      "status": "EXTERNAL_INSPECTOR_OR_SEMANTIC_CONTAINER_NOT_STATICALLY_VERIFIED",
+      "expectedLabels": [],
+      "matchedLabels": [],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.height"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.inherit",
+      "path": "images.inherit",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Use intrinsic dimensions"
+      ],
+      "matchedLabels": [
+        "Use intrinsic dimensions"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.inherit"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.mask",
+      "path": "images.mask",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Enable image mask"
+      ],
+      "matchedLabels": [
+        "Enable image mask"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.mask"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.mask.mode",
+      "path": "images.mask.mode",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Mask mode"
+      ],
+      "matchedLabels": [
+        "Mask mode"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.mask.mode"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.mask.source",
+      "path": "images.mask.source",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Mask SHA-256 source",
+        "Group mask SHA-256 source"
+      ],
+      "matchedLabels": [
+        "Mask SHA-256 source"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.mask.source"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.meshWarp",
+      "path": "images.meshWarp",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Enable mesh warp"
+      ],
+      "matchedLabels": [
+        "Enable mesh warp"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.meshWarp"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.meshWarp.controlPoints",
+      "path": "images.meshWarp.controlPoints",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Vertex 1 X",
+        "Y"
+      ],
+      "matchedLabels": [
+        "Vertex 1 X",
+        "Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.meshWarp.controlPoints"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.meshWarp.controlPoints.x",
+      "path": "images.meshWarp.controlPoints.x",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Vertex 1 X",
+        "Y"
+      ],
+      "matchedLabels": [
+        "Vertex 1 X",
+        "Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.meshWarp.controlPoints.x"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.meshWarp.controlPoints.y",
+      "path": "images.meshWarp.controlPoints.y",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Vertex 1 X",
+        "Y"
+      ],
+      "matchedLabels": [
+        "Vertex 1 X",
+        "Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.meshWarp.controlPoints.y"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.meshWarp.edgeMode",
+      "path": "images.meshWarp.edgeMode",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Mesh edge mode"
+      ],
+      "matchedLabels": [
+        "Mesh edge mode"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.meshWarp.edgeMode"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.meshWarp.gridX",
+      "path": "images.meshWarp.gridX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "gridX"
+      ],
+      "matchedLabels": [
+        "gridX"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.meshWarp.gridX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.meshWarp.gridY",
+      "path": "images.meshWarp.gridY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "gridY"
+      ],
+      "matchedLabels": [
+        "gridY"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.meshWarp.gridY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.meshWarp.interpolation",
+      "path": "images.meshWarp.interpolation",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Mesh interpolation"
+      ],
+      "matchedLabels": [
+        "Mesh interpolation"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.meshWarp.interpolation"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.opacity",
+      "path": "images.opacity",
+      "status": "EXTERNAL_INSPECTOR_OR_SEMANTIC_CONTAINER_NOT_STATICALLY_VERIFIED",
+      "expectedLabels": [],
+      "matchedLabels": [],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.opacity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.rotation",
+      "path": "images.rotation",
+      "status": "EXTERNAL_INSPECTOR_OR_SEMANTIC_CONTAINER_NOT_STATICALLY_VERIFIED",
+      "expectedLabels": [],
+      "matchedLabels": [],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.rotation"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow",
+      "path": "images.shadow",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow enabled"
+      ],
+      "matchedLabels": [
+        "Image shadow enabled"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.blur",
+      "path": "images.shadow.blur",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow blur"
+      ],
+      "matchedLabels": [
+        "Image shadow blur"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.blur"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.borderRadius",
+      "path": "images.shadow.borderRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow radius mode",
+        "Image shadow radius"
+      ],
+      "matchedLabels": [
+        "Image shadow radius mode",
+        "Image shadow radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.borderRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.color",
+      "path": "images.shadow.color",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow color"
+      ],
+      "matchedLabels": [
+        "Image shadow color"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.color"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient",
+      "path": "images.shadow.gradient",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow gradient properties"
+      ],
+      "matchedLabels": [
+        "Image shadow gradient properties"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.gradient"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.colors",
+      "path": "images.shadow.gradient.colors",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow stops"
+      ],
+      "matchedLabels": [
+        "Image shadow stops"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.gradient.colors"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.colors.color",
+      "path": "images.shadow.gradient.colors.color",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow stop color 1",
+        "Image shadow stop hex 1"
+      ],
+      "matchedLabels": [
+        "Image shadow stop color 1",
+        "Image shadow stop hex 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.gradient.colors.color"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.colors.stop",
+      "path": "images.shadow.gradient.colors.stop",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow stop 1"
+      ],
+      "matchedLabels": [
+        "Image shadow stop 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.gradient.colors.stop"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.endX",
+      "path": "images.shadow.gradient.endX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow end X"
+      ],
+      "matchedLabels": [
+        "Image shadow end X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.gradient.endX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.endY",
+      "path": "images.shadow.gradient.endY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow end Y"
+      ],
+      "matchedLabels": [
+        "Image shadow end Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.gradient.endY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.pivotX",
+      "path": "images.shadow.gradient.pivotX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow pivot X"
+      ],
+      "matchedLabels": [
+        "Image shadow pivot X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.gradient.pivotX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.pivotY",
+      "path": "images.shadow.gradient.pivotY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow pivot Y"
+      ],
+      "matchedLabels": [
+        "Image shadow pivot Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.gradient.pivotY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.rotate",
+      "path": "images.shadow.gradient.rotate",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow rotation"
+      ],
+      "matchedLabels": [
+        "Image shadow rotation"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.gradient.rotate"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.startX",
+      "path": "images.shadow.gradient.startX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow start X"
+      ],
+      "matchedLabels": [
+        "Image shadow start X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.gradient.startX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.startY",
+      "path": "images.shadow.gradient.startY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow start Y"
+      ],
+      "matchedLabels": [
+        "Image shadow start Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.gradient.startY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.type",
+      "path": "images.shadow.gradient.type",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow gradient type"
+      ],
+      "matchedLabels": [
+        "Image shadow gradient type"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.gradient.type"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.endRadius",
+      "path": "images.shadow.gradient.endRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow end radius"
+      ],
+      "matchedLabels": [
+        "Image shadow end radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.gradient.endRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.startRadius",
+      "path": "images.shadow.gradient.startRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow start radius"
+      ],
+      "matchedLabels": [
+        "Image shadow start radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.gradient.startRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.centerX",
+      "path": "images.shadow.gradient.centerX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow center X"
+      ],
+      "matchedLabels": [
+        "Image shadow center X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.gradient.centerX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.centerY",
+      "path": "images.shadow.gradient.centerY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow center Y"
+      ],
+      "matchedLabels": [
+        "Image shadow center Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.gradient.centerY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.offsetX",
+      "path": "images.shadow.offsetX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow X"
+      ],
+      "matchedLabels": [
+        "Image shadow X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.offsetX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.offsetY",
+      "path": "images.shadow.offsetY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow Y"
+      ],
+      "matchedLabels": [
+        "Image shadow Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.offsetY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.opacity",
+      "path": "images.shadow.opacity",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shadow opacity"
+      ],
+      "matchedLabels": [
+        "Image shadow opacity"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.opacity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape",
+      "path": "images.shape",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Shape fill"
+      ],
+      "matchedLabels": [
+        "Shape fill"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.centerX",
+      "path": "images.shape.centerX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Shape centerX",
+        "Shape fill"
+      ],
+      "matchedLabels": [
+        "Shape centerX",
+        "Shape fill"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.centerX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.centerY",
+      "path": "images.shape.centerY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Shape centerY",
+        "Shape fill"
+      ],
+      "matchedLabels": [
+        "Shape centerY",
+        "Shape fill"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.centerY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.color",
+      "path": "images.shape.color",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Shape color",
+        "Shape color"
+      ],
+      "matchedLabels": [
+        "Shape color",
+        "Shape color"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.color"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.endAngle",
+      "path": "images.shape.endAngle",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Shape endAngle",
+        "Shape fill"
+      ],
+      "matchedLabels": [
+        "Shape endAngle",
+        "Shape fill"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.endAngle"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.fill",
+      "path": "images.shape.fill",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Shape fill",
+        "Shape fill"
+      ],
+      "matchedLabels": [
+        "Shape fill",
+        "Shape fill"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.fill"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.gradient",
+      "path": "images.shape.gradient",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shape gradient properties"
+      ],
+      "matchedLabels": [
+        "Image shape gradient properties"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.gradient"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.gradient.colors",
+      "path": "images.shape.gradient.colors",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shape stops"
+      ],
+      "matchedLabels": [
+        "Image shape stops"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.gradient.colors"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.gradient.colors.color",
+      "path": "images.shape.gradient.colors.color",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shape stop color 1",
+        "Image shape stop hex 1"
+      ],
+      "matchedLabels": [
+        "Image shape stop color 1",
+        "Image shape stop hex 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.gradient.colors.color"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.gradient.colors.stop",
+      "path": "images.shape.gradient.colors.stop",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shape stop 1"
+      ],
+      "matchedLabels": [
+        "Image shape stop 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.gradient.colors.stop"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.gradient.endX",
+      "path": "images.shape.gradient.endX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shape end X"
+      ],
+      "matchedLabels": [
+        "Image shape end X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.gradient.endX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.gradient.endY",
+      "path": "images.shape.gradient.endY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shape end Y"
+      ],
+      "matchedLabels": [
+        "Image shape end Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.gradient.endY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.gradient.pivotX",
+      "path": "images.shape.gradient.pivotX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shape pivot X"
+      ],
+      "matchedLabels": [
+        "Image shape pivot X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.gradient.pivotX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.gradient.pivotY",
+      "path": "images.shape.gradient.pivotY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shape pivot Y"
+      ],
+      "matchedLabels": [
+        "Image shape pivot Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.gradient.pivotY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.gradient.rotate",
+      "path": "images.shape.gradient.rotate",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shape rotation"
+      ],
+      "matchedLabels": [
+        "Image shape rotation"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.gradient.rotate"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.gradient.startX",
+      "path": "images.shape.gradient.startX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shape start X"
+      ],
+      "matchedLabels": [
+        "Image shape start X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.gradient.startX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.gradient.startY",
+      "path": "images.shape.gradient.startY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shape start Y"
+      ],
+      "matchedLabels": [
+        "Image shape start Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.gradient.startY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.gradient.type",
+      "path": "images.shape.gradient.type",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shape gradient type"
+      ],
+      "matchedLabels": [
+        "Image shape gradient type"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.gradient.type"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.gradient.endRadius",
+      "path": "images.shape.gradient.endRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shape end radius"
+      ],
+      "matchedLabels": [
+        "Image shape end radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.gradient.endRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.gradient.startRadius",
+      "path": "images.shape.gradient.startRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shape start radius"
+      ],
+      "matchedLabels": [
+        "Image shape start radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.gradient.startRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.gradient.centerX",
+      "path": "images.shape.gradient.centerX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shape center X"
+      ],
+      "matchedLabels": [
+        "Image shape center X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.gradient.centerX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.gradient.centerY",
+      "path": "images.shape.gradient.centerY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image shape center Y"
+      ],
+      "matchedLabels": [
+        "Image shape center Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.gradient.centerY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.innerRadius",
+      "path": "images.shape.innerRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Shape innerRadius",
+        "Shape fill"
+      ],
+      "matchedLabels": [
+        "Shape innerRadius",
+        "Shape fill"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.innerRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.outerRadius",
+      "path": "images.shape.outerRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Shape outerRadius",
+        "Shape fill"
+      ],
+      "matchedLabels": [
+        "Shape outerRadius",
+        "Shape fill"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.outerRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.points",
+      "path": "images.shape.points",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Polygon points"
+      ],
+      "matchedLabels": [
+        "Polygon points"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.points"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.points.x",
+      "path": "images.shape.points.x",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Polygon points"
+      ],
+      "matchedLabels": [
+        "Polygon points"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.points.x"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.points.y",
+      "path": "images.shape.points.y",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Polygon points"
+      ],
+      "matchedLabels": [
+        "Polygon points"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.points.y"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.radius",
+      "path": "images.shape.radius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Shape radius",
+        "Shape fill"
+      ],
+      "matchedLabels": [
+        "Shape radius",
+        "Shape fill"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.radius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.sides",
+      "path": "images.shape.sides",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Shape sides",
+        "Shape fill"
+      ],
+      "matchedLabels": [
+        "Shape sides",
+        "Shape fill"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.sides"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.startAngle",
+      "path": "images.shape.startAngle",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Shape startAngle",
+        "Shape fill"
+      ],
+      "matchedLabels": [
+        "Shape startAngle",
+        "Shape fill"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.shape.startAngle"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.source",
+      "path": "images.source",
+      "status": "EXTERNAL_INSPECTOR_OR_SEMANTIC_CONTAINER_NOT_STATICALLY_VERIFIED",
+      "expectedLabels": [],
+      "matchedLabels": [],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.source"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke",
+      "path": "images.stroke",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke enabled"
+      ],
+      "matchedLabels": [
+        "Image stroke enabled"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.blur",
+      "path": "images.stroke.blur",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke blur"
+      ],
+      "matchedLabels": [
+        "Image stroke blur"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.blur"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.borderPosition",
+      "path": "images.stroke.borderPosition",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke border position"
+      ],
+      "matchedLabels": [
+        "Image stroke border position"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.borderPosition"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.borderRadius",
+      "path": "images.stroke.borderRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke radius mode",
+        "Image stroke radius"
+      ],
+      "matchedLabels": [
+        "Image stroke radius mode",
+        "Image stroke radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.borderRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.color",
+      "path": "images.stroke.color",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke color"
+      ],
+      "matchedLabels": [
+        "Image stroke color"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.color"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.gradient",
+      "path": "images.stroke.gradient",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke gradient properties"
+      ],
+      "matchedLabels": [
+        "Image stroke gradient properties"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.gradient"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.gradient.colors",
+      "path": "images.stroke.gradient.colors",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke stops"
+      ],
+      "matchedLabels": [
+        "Image stroke stops"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.gradient.colors"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.gradient.colors.color",
+      "path": "images.stroke.gradient.colors.color",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke stop color 1",
+        "Image stroke stop hex 1"
+      ],
+      "matchedLabels": [
+        "Image stroke stop color 1",
+        "Image stroke stop hex 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.gradient.colors.color"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.gradient.colors.stop",
+      "path": "images.stroke.gradient.colors.stop",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke stop 1"
+      ],
+      "matchedLabels": [
+        "Image stroke stop 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.gradient.colors.stop"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.gradient.endX",
+      "path": "images.stroke.gradient.endX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke end X"
+      ],
+      "matchedLabels": [
+        "Image stroke end X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.gradient.endX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.gradient.endY",
+      "path": "images.stroke.gradient.endY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke end Y"
+      ],
+      "matchedLabels": [
+        "Image stroke end Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.gradient.endY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.gradient.pivotX",
+      "path": "images.stroke.gradient.pivotX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke pivot X"
+      ],
+      "matchedLabels": [
+        "Image stroke pivot X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.gradient.pivotX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.gradient.pivotY",
+      "path": "images.stroke.gradient.pivotY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke pivot Y"
+      ],
+      "matchedLabels": [
+        "Image stroke pivot Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.gradient.pivotY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.gradient.rotate",
+      "path": "images.stroke.gradient.rotate",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke rotation"
+      ],
+      "matchedLabels": [
+        "Image stroke rotation"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.gradient.rotate"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.gradient.startX",
+      "path": "images.stroke.gradient.startX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke start X"
+      ],
+      "matchedLabels": [
+        "Image stroke start X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.gradient.startX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.gradient.startY",
+      "path": "images.stroke.gradient.startY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke start Y"
+      ],
+      "matchedLabels": [
+        "Image stroke start Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.gradient.startY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.gradient.type",
+      "path": "images.stroke.gradient.type",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke gradient type"
+      ],
+      "matchedLabels": [
+        "Image stroke gradient type"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.gradient.type"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.gradient.endRadius",
+      "path": "images.stroke.gradient.endRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke end radius"
+      ],
+      "matchedLabels": [
+        "Image stroke end radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.gradient.endRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.gradient.startRadius",
+      "path": "images.stroke.gradient.startRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke start radius"
+      ],
+      "matchedLabels": [
+        "Image stroke start radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.gradient.startRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.gradient.centerX",
+      "path": "images.stroke.gradient.centerX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke center X"
+      ],
+      "matchedLabels": [
+        "Image stroke center X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.gradient.centerX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.gradient.centerY",
+      "path": "images.stroke.gradient.centerY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke center Y"
+      ],
+      "matchedLabels": [
+        "Image stroke center Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.gradient.centerY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.opacity",
+      "path": "images.stroke.opacity",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke opacity"
+      ],
+      "matchedLabels": [
+        "Image stroke opacity"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.opacity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.position",
+      "path": "images.stroke.position",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke position"
+      ],
+      "matchedLabels": [
+        "Image stroke position"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.position"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.roundedCorners",
+      "path": "images.stroke.roundedCorners",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke rounded corners"
+      ],
+      "matchedLabels": [
+        "Image stroke rounded corners"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.roundedCorners"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.style",
+      "path": "images.stroke.style",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke style"
+      ],
+      "matchedLabels": [
+        "Image stroke style"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.style"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.width",
+      "path": "images.stroke.width",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image stroke width"
+      ],
+      "matchedLabels": [
+        "Image stroke width"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.stroke.width"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.width",
+      "path": "images.width",
+      "status": "EXTERNAL_INSPECTOR_OR_SEMANTIC_CONTAINER_NOT_STATICALLY_VERIFIED",
+      "expectedLabels": [],
+      "matchedLabels": [],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.width"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.x",
+      "path": "images.x",
+      "status": "EXTERNAL_INSPECTOR_OR_SEMANTIC_CONTAINER_NOT_STATICALLY_VERIFIED",
+      "expectedLabels": [],
+      "matchedLabels": [],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.x"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.y",
+      "path": "images.y",
+      "status": "EXTERNAL_INSPECTOR_OR_SEMANTIC_CONTAINER_NOT_STATICALLY_VERIFIED",
+      "expectedLabels": [],
+      "matchedLabels": [],
+      "evidenceId": "IMG01-INSPECTOR-SSR-images.y"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform",
+      "path": "options.groupTransform",
+      "status": "EXTERNAL_INSPECTOR_OR_SEMANTIC_CONTAINER_NOT_STATICALLY_VERIFIED",
+      "expectedLabels": [],
+      "matchedLabels": [],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.blendMode",
+      "path": "options.groupTransform.blendMode",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group compositing"
+      ],
+      "matchedLabels": [
+        "Group compositing"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.blendMode"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.blur",
+      "path": "options.groupTransform.blur",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group blur"
+      ],
+      "matchedLabels": [
+        "Group blur"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.blur"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.borderPosition",
+      "path": "options.groupTransform.borderPosition",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group border position"
+      ],
+      "matchedLabels": [
+        "Group border position"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.borderPosition"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.borderRadius",
+      "path": "options.groupTransform.borderRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group border radius"
+      ],
+      "matchedLabels": [
+        "Group border radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.borderRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground",
+      "path": "options.groupTransform.boxBackground",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group box paint"
+      ],
+      "matchedLabels": [
+        "Group box paint"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.boxBackground"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.color",
+      "path": "options.groupTransform.boxBackground.color",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group box color"
+      ],
+      "matchedLabels": [
+        "Group box color"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.boxBackground.color"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient",
+      "path": "options.groupTransform.boxBackground.gradient",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group box gradient properties"
+      ],
+      "matchedLabels": [
+        "Group box gradient properties"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.boxBackground.gradient"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.colors",
+      "path": "options.groupTransform.boxBackground.gradient.colors",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group box stops"
+      ],
+      "matchedLabels": [
+        "Group box stops"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.boxBackground.gradient.colors"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.colors.color",
+      "path": "options.groupTransform.boxBackground.gradient.colors.color",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group box stop color 1",
+        "Group box stop hex 1"
+      ],
+      "matchedLabels": [
+        "Group box stop color 1",
+        "Group box stop hex 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.boxBackground.gradient.colors.color"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.colors.stop",
+      "path": "options.groupTransform.boxBackground.gradient.colors.stop",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group box stop 1"
+      ],
+      "matchedLabels": [
+        "Group box stop 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.boxBackground.gradient.colors.stop"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.endX",
+      "path": "options.groupTransform.boxBackground.gradient.endX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group box end X"
+      ],
+      "matchedLabels": [
+        "Group box end X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.boxBackground.gradient.endX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.endY",
+      "path": "options.groupTransform.boxBackground.gradient.endY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group box end Y"
+      ],
+      "matchedLabels": [
+        "Group box end Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.boxBackground.gradient.endY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.pivotX",
+      "path": "options.groupTransform.boxBackground.gradient.pivotX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group box pivot X"
+      ],
+      "matchedLabels": [
+        "Group box pivot X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.boxBackground.gradient.pivotX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.pivotY",
+      "path": "options.groupTransform.boxBackground.gradient.pivotY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group box pivot Y"
+      ],
+      "matchedLabels": [
+        "Group box pivot Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.boxBackground.gradient.pivotY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.rotate",
+      "path": "options.groupTransform.boxBackground.gradient.rotate",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group box rotation"
+      ],
+      "matchedLabels": [
+        "Group box rotation"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.boxBackground.gradient.rotate"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.startX",
+      "path": "options.groupTransform.boxBackground.gradient.startX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group box start X"
+      ],
+      "matchedLabels": [
+        "Group box start X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.boxBackground.gradient.startX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.startY",
+      "path": "options.groupTransform.boxBackground.gradient.startY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group box start Y"
+      ],
+      "matchedLabels": [
+        "Group box start Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.boxBackground.gradient.startY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.type",
+      "path": "options.groupTransform.boxBackground.gradient.type",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group box gradient type"
+      ],
+      "matchedLabels": [
+        "Group box gradient type"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.boxBackground.gradient.type"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.endRadius",
+      "path": "options.groupTransform.boxBackground.gradient.endRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group box end radius"
+      ],
+      "matchedLabels": [
+        "Group box end radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.boxBackground.gradient.endRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.startRadius",
+      "path": "options.groupTransform.boxBackground.gradient.startRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group box start radius"
+      ],
+      "matchedLabels": [
+        "Group box start radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.boxBackground.gradient.startRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.centerX",
+      "path": "options.groupTransform.boxBackground.gradient.centerX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group box center X"
+      ],
+      "matchedLabels": [
+        "Group box center X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.boxBackground.gradient.centerX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.centerY",
+      "path": "options.groupTransform.boxBackground.gradient.centerY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group box center Y"
+      ],
+      "matchedLabels": [
+        "Group box center Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.boxBackground.gradient.centerY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.clipPath",
+      "path": "options.groupTransform.clipPath",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group clipping"
+      ],
+      "matchedLabels": [
+        "Group clipping"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.clipPath"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.clipPath.x",
+      "path": "options.groupTransform.clipPath.x",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Point 1 X",
+        "Y 1"
+      ],
+      "matchedLabels": [
+        "Point 1 X",
+        "Y 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.clipPath.x"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.clipPath.y",
+      "path": "options.groupTransform.clipPath.y",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Point 1 X",
+        "Y 1"
+      ],
+      "matchedLabels": [
+        "Point 1 X",
+        "Y 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.clipPath.y"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion",
+      "path": "options.groupTransform.distortion",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group distortion"
+      ],
+      "matchedLabels": [
+        "Group distortion"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.amplitudeX",
+      "path": "options.groupTransform.distortion.amplitudeX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion amplitudeX"
+      ],
+      "matchedLabels": [
+        "Distortion amplitudeX"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.amplitudeX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.amplitudeY",
+      "path": "options.groupTransform.distortion.amplitudeY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion amplitudeY"
+      ],
+      "matchedLabels": [
+        "Distortion amplitudeY"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.amplitudeY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.angle",
+      "path": "options.groupTransform.distortion.angle",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion angle"
+      ],
+      "matchedLabels": [
+        "Distortion angle"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.angle"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.centerX",
+      "path": "options.groupTransform.distortion.centerX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion centerX"
+      ],
+      "matchedLabels": [
+        "Distortion centerX"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.centerX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.centerY",
+      "path": "options.groupTransform.distortion.centerY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion centerY"
+      ],
+      "matchedLabels": [
+        "Distortion centerY"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.centerY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints",
+      "path": "options.groupTransform.distortion.controlPoints",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Warp geometry mode"
+      ],
+      "matchedLabels": [
+        "Warp geometry mode"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.controlPoints"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints.falloff",
+      "path": "options.groupTransform.distortion.controlPoints.falloff",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Falloff"
+      ],
+      "matchedLabels": [
+        "Falloff"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.controlPoints.falloff"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints.from",
+      "path": "options.groupTransform.distortion.controlPoints.from",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "from X",
+        "to X"
+      ],
+      "matchedLabels": [
+        "from X",
+        "to X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.controlPoints.from"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints.from.x",
+      "path": "options.groupTransform.distortion.controlPoints.from.x",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "from X",
+        "to X"
+      ],
+      "matchedLabels": [
+        "from X",
+        "to X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.controlPoints.from.x"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints.from.y",
+      "path": "options.groupTransform.distortion.controlPoints.from.y",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "to Y",
+        "from Y"
+      ],
+      "matchedLabels": [
+        "to Y",
+        "from Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.controlPoints.from.y"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints.radius",
+      "path": "options.groupTransform.distortion.controlPoints.radius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Influence radius"
+      ],
+      "matchedLabels": [
+        "Influence radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.controlPoints.radius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints.strength",
+      "path": "options.groupTransform.distortion.controlPoints.strength",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Strength"
+      ],
+      "matchedLabels": [
+        "Strength"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.controlPoints.strength"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints.to",
+      "path": "options.groupTransform.distortion.controlPoints.to",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "to Y",
+        "from Y"
+      ],
+      "matchedLabels": [
+        "to Y",
+        "from Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.controlPoints.to"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints.to.x",
+      "path": "options.groupTransform.distortion.controlPoints.to.x",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "from X",
+        "to X"
+      ],
+      "matchedLabels": [
+        "from X",
+        "to X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.controlPoints.to.x"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints.to.y",
+      "path": "options.groupTransform.distortion.controlPoints.to.y",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "to Y",
+        "from Y"
+      ],
+      "matchedLabels": [
+        "to Y",
+        "from Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.controlPoints.to.y"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.edgeMode",
+      "path": "options.groupTransform.distortion.edgeMode",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion edge mode"
+      ],
+      "matchedLabels": [
+        "Distortion edge mode"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.edgeMode"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.intensity",
+      "path": "options.groupTransform.distortion.intensity",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion intensity"
+      ],
+      "matchedLabels": [
+        "Distortion intensity"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.intensity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.interpolation",
+      "path": "options.groupTransform.distortion.interpolation",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion interpolation"
+      ],
+      "matchedLabels": [
+        "Distortion interpolation"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.interpolation"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.phaseX",
+      "path": "options.groupTransform.distortion.phaseX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion phaseX"
+      ],
+      "matchedLabels": [
+        "Distortion phaseX"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.phaseX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.phaseY",
+      "path": "options.groupTransform.distortion.phaseY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion phaseY"
+      ],
+      "matchedLabels": [
+        "Distortion phaseY"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.phaseY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.points",
+      "path": "options.groupTransform.distortion.points",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Quad corners · TL → TR → BR → BL",
+        "Point 1 X",
+        "Y 1"
+      ],
+      "matchedLabels": [
+        "Quad corners · TL → TR → BR → BL",
+        "Point 1 X",
+        "Y 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.points"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.points.x",
+      "path": "options.groupTransform.distortion.points.x",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Quad corners · TL → TR → BR → BL",
+        "Point 1 X",
+        "Y 1"
+      ],
+      "matchedLabels": [
+        "Quad corners · TL → TR → BR → BL",
+        "Point 1 X",
+        "Y 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.points.x"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.points.y",
+      "path": "options.groupTransform.distortion.points.y",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Quad corners · TL → TR → BR → BL",
+        "Point 1 X",
+        "Y 1"
+      ],
+      "matchedLabels": [
+        "Quad corners · TL → TR → BR → BL",
+        "Point 1 X",
+        "Y 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.points.y"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.radius",
+      "path": "options.groupTransform.distortion.radius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion radius"
+      ],
+      "matchedLabels": [
+        "Distortion radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.radius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.type",
+      "path": "options.groupTransform.distortion.type",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion type"
+      ],
+      "matchedLabels": [
+        "Distortion type"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.type"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.wavelengthX",
+      "path": "options.groupTransform.distortion.wavelengthX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion wavelengthX"
+      ],
+      "matchedLabels": [
+        "Distortion wavelengthX"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.wavelengthX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.distortion.wavelengthY",
+      "path": "options.groupTransform.distortion.wavelengthY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Distortion wavelengthY"
+      ],
+      "matchedLabels": [
+        "Distortion wavelengthY"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.distortion.wavelengthY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.effects",
+      "path": "options.groupTransform.effects",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Enable vignette",
+        "Group vignette"
+      ],
+      "matchedLabels": [
+        "Group vignette"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.effects"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.effects.chromaticAberration",
+      "path": "options.groupTransform.effects.chromaticAberration",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group chromatic aberration"
+      ],
+      "matchedLabels": [
+        "Group chromatic aberration"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.effects.chromaticAberration"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.effects.chromaticAberration.intensity",
+      "path": "options.groupTransform.effects.chromaticAberration.intensity",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group chromaticAberration intensity",
+        "Group flare intensity"
+      ],
+      "matchedLabels": [
+        "Group flare intensity"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.effects.chromaticAberration.intensity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.effects.filmGrain",
+      "path": "options.groupTransform.effects.filmGrain",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group film grain"
+      ],
+      "matchedLabels": [
+        "Group film grain"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.effects.filmGrain"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.effects.filmGrain.intensity",
+      "path": "options.groupTransform.effects.filmGrain.intensity",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group filmGrain intensity",
+        "Group flare intensity"
+      ],
+      "matchedLabels": [
+        "Group flare intensity"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.effects.filmGrain.intensity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.effects.lensFlare",
+      "path": "options.groupTransform.effects.lensFlare",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group lens flare"
+      ],
+      "matchedLabels": [
+        "Group lens flare"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.effects.lensFlare"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.effects.lensFlare.intensity",
+      "path": "options.groupTransform.effects.lensFlare.intensity",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group lensFlare intensity",
+        "Group flare intensity"
+      ],
+      "matchedLabels": [
+        "Group flare intensity"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.effects.lensFlare.intensity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.effects.lensFlare.x",
+      "path": "options.groupTransform.effects.lensFlare.x",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group lensFlare x",
+        "Group flare x"
+      ],
+      "matchedLabels": [
+        "Group flare x"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.effects.lensFlare.x"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.effects.lensFlare.y",
+      "path": "options.groupTransform.effects.lensFlare.y",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group lensFlare y",
+        "Group flare y"
+      ],
+      "matchedLabels": [
+        "Group flare y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.effects.lensFlare.y"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.effects.vignette",
+      "path": "options.groupTransform.effects.vignette",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group vignette"
+      ],
+      "matchedLabels": [
+        "Group vignette"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.effects.vignette"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.effects.vignette.intensity",
+      "path": "options.groupTransform.effects.vignette.intensity",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group vignette intensity",
+        "Group flare intensity"
+      ],
+      "matchedLabels": [
+        "Group vignette intensity",
+        "Group flare intensity"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.effects.vignette.intensity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.effects.vignette.size",
+      "path": "options.groupTransform.effects.vignette.size",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group vignette size",
+        "Group flare size"
+      ],
+      "matchedLabels": [
+        "Group vignette size"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.effects.vignette.size"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.filterIntensity",
+      "path": "options.groupTransform.filterIntensity",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group filter intensity"
+      ],
+      "matchedLabels": [
+        "Group filter intensity"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.filterIntensity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.filterOrder",
+      "path": "options.groupTransform.filterOrder",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group filter order"
+      ],
+      "matchedLabels": [
+        "Group filter order"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.filterOrder"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.filters",
+      "path": "options.groupTransform.filters",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Filter 1 type"
+      ],
+      "matchedLabels": [
+        "Filter 1 type"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.filters"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.filters.angle",
+      "path": "options.groupTransform.filters.angle",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "motionBlur angle"
+      ],
+      "matchedLabels": [
+        "motionBlur angle"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.filters.angle"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.filters.centerX",
+      "path": "options.groupTransform.filters.centerX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "radialBlur centerX"
+      ],
+      "matchedLabels": [
+        "radialBlur centerX"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.filters.centerX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.filters.centerY",
+      "path": "options.groupTransform.filters.centerY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "radialBlur centerY"
+      ],
+      "matchedLabels": [
+        "radialBlur centerY"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.filters.centerY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.filters.height",
+      "path": "options.groupTransform.filters.height",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "pixelate height"
+      ],
+      "matchedLabels": [
+        "pixelate height"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.filters.height"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.filters.intensity",
+      "path": "options.groupTransform.filters.intensity",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "gaussianBlur intensity",
+        "motionBlur intensity",
+        "radialBlur intensity",
+        "sharpen intensity",
+        "noise intensity",
+        "grain intensity",
+        "edgeDetection intensity",
+        "emboss intensity"
+      ],
+      "matchedLabels": [
+        "gaussianBlur intensity",
+        "motionBlur intensity",
+        "radialBlur intensity",
+        "sharpen intensity",
+        "noise intensity",
+        "grain intensity",
+        "edgeDetection intensity",
+        "emboss intensity"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.filters.intensity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.filters.levels",
+      "path": "options.groupTransform.filters.levels",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "posterize levels"
+      ],
+      "matchedLabels": [
+        "posterize levels"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.filters.levels"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.filters.size",
+      "path": "options.groupTransform.filters.size",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "pixelate size"
+      ],
+      "matchedLabels": [
+        "pixelate size"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.filters.size"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.filters.type",
+      "path": "options.groupTransform.filters.type",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Filter 1 type"
+      ],
+      "matchedLabels": [
+        "Filter 1 type"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.filters.type"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.filters.value",
+      "path": "options.groupTransform.filters.value",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "brightness value",
+        "contrast value",
+        "saturation value",
+        "hueShift value"
+      ],
+      "matchedLabels": [
+        "brightness value",
+        "contrast value",
+        "saturation value",
+        "hueShift value"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.filters.value"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.filters.width",
+      "path": "options.groupTransform.filters.width",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "pixelate width"
+      ],
+      "matchedLabels": [
+        "pixelate width"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.filters.width"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.filters.x",
+      "path": "options.groupTransform.filters.x",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "pixelate x"
+      ],
+      "matchedLabels": [
+        "pixelate x"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.filters.x"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.filters.y",
+      "path": "options.groupTransform.filters.y",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "pixelate y"
+      ],
+      "matchedLabels": [
+        "pixelate y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.filters.y"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.mask",
+      "path": "options.groupTransform.mask",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group mask"
+      ],
+      "matchedLabels": [
+        "Group mask"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.mask"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.mask.mode",
+      "path": "options.groupTransform.mask.mode",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group mask mode"
+      ],
+      "matchedLabels": [
+        "Group mask mode"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.mask.mode"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.mask.source",
+      "path": "options.groupTransform.mask.source",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Mask SHA-256 source",
+        "Group mask SHA-256 source"
+      ],
+      "matchedLabels": [
+        "Group mask SHA-256 source"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.mask.source"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.meshWarp",
+      "path": "options.groupTransform.meshWarp",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group mesh"
+      ],
+      "matchedLabels": [
+        "Group mesh"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.meshWarp"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.meshWarp.controlPoints",
+      "path": "options.groupTransform.meshWarp.controlPoints",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Vertex 1 X",
+        "Y"
+      ],
+      "matchedLabels": [
+        "Vertex 1 X",
+        "Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.meshWarp.controlPoints"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.meshWarp.controlPoints.x",
+      "path": "options.groupTransform.meshWarp.controlPoints.x",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Vertex 1 X",
+        "Y"
+      ],
+      "matchedLabels": [
+        "Vertex 1 X",
+        "Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.meshWarp.controlPoints.x"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.meshWarp.controlPoints.y",
+      "path": "options.groupTransform.meshWarp.controlPoints.y",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Vertex 1 X",
+        "Y"
+      ],
+      "matchedLabels": [
+        "Vertex 1 X",
+        "Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.meshWarp.controlPoints.y"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.meshWarp.edgeMode",
+      "path": "options.groupTransform.meshWarp.edgeMode",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Mesh edge mode"
+      ],
+      "matchedLabels": [
+        "Mesh edge mode"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.meshWarp.edgeMode"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.meshWarp.gridX",
+      "path": "options.groupTransform.meshWarp.gridX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "gridX"
+      ],
+      "matchedLabels": [
+        "gridX"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.meshWarp.gridX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.meshWarp.gridY",
+      "path": "options.groupTransform.meshWarp.gridY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "gridY"
+      ],
+      "matchedLabels": [
+        "gridY"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.meshWarp.gridY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.meshWarp.interpolation",
+      "path": "options.groupTransform.meshWarp.interpolation",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Mesh interpolation"
+      ],
+      "matchedLabels": [
+        "Mesh interpolation"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.meshWarp.interpolation"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.opacity",
+      "path": "options.groupTransform.opacity",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group opacity"
+      ],
+      "matchedLabels": [
+        "Group opacity"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.opacity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.pivotX",
+      "path": "options.groupTransform.pivotX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group pivotX"
+      ],
+      "matchedLabels": [
+        "Group pivotX"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.pivotX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.pivotY",
+      "path": "options.groupTransform.pivotY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group pivotY"
+      ],
+      "matchedLabels": [
+        "Group pivotY"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.pivotY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.rotation",
+      "path": "options.groupTransform.rotation",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group rotation"
+      ],
+      "matchedLabels": [
+        "Group rotation"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.rotation"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.scaleX",
+      "path": "options.groupTransform.scaleX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group scaleX"
+      ],
+      "matchedLabels": [
+        "Group scaleX"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.scaleX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.scaleY",
+      "path": "options.groupTransform.scaleY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group scaleY"
+      ],
+      "matchedLabels": [
+        "Group scaleY"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.scaleY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow",
+      "path": "options.groupTransform.shadow",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow enabled"
+      ],
+      "matchedLabels": [
+        "Image group shadow enabled"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.blur",
+      "path": "options.groupTransform.shadow.blur",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow blur"
+      ],
+      "matchedLabels": [
+        "Image group shadow blur"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.blur"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.borderRadius",
+      "path": "options.groupTransform.shadow.borderRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow radius mode",
+        "Image group shadow radius"
+      ],
+      "matchedLabels": [
+        "Image group shadow radius mode",
+        "Image group shadow radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.borderRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.color",
+      "path": "options.groupTransform.shadow.color",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow color"
+      ],
+      "matchedLabels": [
+        "Image group shadow color"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.color"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient",
+      "path": "options.groupTransform.shadow.gradient",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow gradient properties"
+      ],
+      "matchedLabels": [
+        "Image group shadow gradient properties"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.gradient"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.colors",
+      "path": "options.groupTransform.shadow.gradient.colors",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow stops"
+      ],
+      "matchedLabels": [
+        "Image group shadow stops"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.gradient.colors"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.colors.color",
+      "path": "options.groupTransform.shadow.gradient.colors.color",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow stop color 1",
+        "Image group shadow stop hex 1"
+      ],
+      "matchedLabels": [
+        "Image group shadow stop color 1",
+        "Image group shadow stop hex 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.gradient.colors.color"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.colors.stop",
+      "path": "options.groupTransform.shadow.gradient.colors.stop",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow stop 1"
+      ],
+      "matchedLabels": [
+        "Image group shadow stop 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.gradient.colors.stop"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.endX",
+      "path": "options.groupTransform.shadow.gradient.endX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow end X"
+      ],
+      "matchedLabels": [
+        "Image group shadow end X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.gradient.endX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.endY",
+      "path": "options.groupTransform.shadow.gradient.endY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow end Y"
+      ],
+      "matchedLabels": [
+        "Image group shadow end Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.gradient.endY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.pivotX",
+      "path": "options.groupTransform.shadow.gradient.pivotX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow pivot X"
+      ],
+      "matchedLabels": [
+        "Image group shadow pivot X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.gradient.pivotX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.pivotY",
+      "path": "options.groupTransform.shadow.gradient.pivotY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow pivot Y"
+      ],
+      "matchedLabels": [
+        "Image group shadow pivot Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.gradient.pivotY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.rotate",
+      "path": "options.groupTransform.shadow.gradient.rotate",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow rotation"
+      ],
+      "matchedLabels": [
+        "Image group shadow rotation"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.gradient.rotate"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.startX",
+      "path": "options.groupTransform.shadow.gradient.startX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow start X"
+      ],
+      "matchedLabels": [
+        "Image group shadow start X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.gradient.startX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.startY",
+      "path": "options.groupTransform.shadow.gradient.startY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow start Y"
+      ],
+      "matchedLabels": [
+        "Image group shadow start Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.gradient.startY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.type",
+      "path": "options.groupTransform.shadow.gradient.type",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow gradient type"
+      ],
+      "matchedLabels": [
+        "Image group shadow gradient type"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.gradient.type"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.endRadius",
+      "path": "options.groupTransform.shadow.gradient.endRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow end radius"
+      ],
+      "matchedLabels": [
+        "Image group shadow end radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.gradient.endRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.startRadius",
+      "path": "options.groupTransform.shadow.gradient.startRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow start radius"
+      ],
+      "matchedLabels": [
+        "Image group shadow start radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.gradient.startRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.centerX",
+      "path": "options.groupTransform.shadow.gradient.centerX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow center X"
+      ],
+      "matchedLabels": [
+        "Image group shadow center X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.gradient.centerX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.centerY",
+      "path": "options.groupTransform.shadow.gradient.centerY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow center Y"
+      ],
+      "matchedLabels": [
+        "Image group shadow center Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.gradient.centerY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.offsetX",
+      "path": "options.groupTransform.shadow.offsetX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow X"
+      ],
+      "matchedLabels": [
+        "Image group shadow X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.offsetX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.offsetY",
+      "path": "options.groupTransform.shadow.offsetY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow Y"
+      ],
+      "matchedLabels": [
+        "Image group shadow Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.offsetY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.opacity",
+      "path": "options.groupTransform.shadow.opacity",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group shadow opacity"
+      ],
+      "matchedLabels": [
+        "Image group shadow opacity"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.opacity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke",
+      "path": "options.groupTransform.stroke",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke enabled"
+      ],
+      "matchedLabels": [
+        "Image group stroke enabled"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.blur",
+      "path": "options.groupTransform.stroke.blur",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke blur"
+      ],
+      "matchedLabels": [
+        "Image group stroke blur"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.blur"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.borderPosition",
+      "path": "options.groupTransform.stroke.borderPosition",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke border position"
+      ],
+      "matchedLabels": [
+        "Image group stroke border position"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.borderPosition"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.borderRadius",
+      "path": "options.groupTransform.stroke.borderRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke radius mode",
+        "Image group stroke radius"
+      ],
+      "matchedLabels": [
+        "Image group stroke radius mode",
+        "Image group stroke radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.borderRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.color",
+      "path": "options.groupTransform.stroke.color",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke color"
+      ],
+      "matchedLabels": [
+        "Image group stroke color"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.color"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient",
+      "path": "options.groupTransform.stroke.gradient",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke gradient properties"
+      ],
+      "matchedLabels": [
+        "Image group stroke gradient properties"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.gradient"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.colors",
+      "path": "options.groupTransform.stroke.gradient.colors",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke stops"
+      ],
+      "matchedLabels": [
+        "Image group stroke stops"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.gradient.colors"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.colors.color",
+      "path": "options.groupTransform.stroke.gradient.colors.color",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke stop color 1",
+        "Image group stroke stop hex 1"
+      ],
+      "matchedLabels": [
+        "Image group stroke stop color 1",
+        "Image group stroke stop hex 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.gradient.colors.color"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.colors.stop",
+      "path": "options.groupTransform.stroke.gradient.colors.stop",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke stop 1"
+      ],
+      "matchedLabels": [
+        "Image group stroke stop 1"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.gradient.colors.stop"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.endX",
+      "path": "options.groupTransform.stroke.gradient.endX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke end X"
+      ],
+      "matchedLabels": [
+        "Image group stroke end X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.gradient.endX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.endY",
+      "path": "options.groupTransform.stroke.gradient.endY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke end Y"
+      ],
+      "matchedLabels": [
+        "Image group stroke end Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.gradient.endY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.pivotX",
+      "path": "options.groupTransform.stroke.gradient.pivotX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke pivot X"
+      ],
+      "matchedLabels": [
+        "Image group stroke pivot X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.gradient.pivotX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.pivotY",
+      "path": "options.groupTransform.stroke.gradient.pivotY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke pivot Y"
+      ],
+      "matchedLabels": [
+        "Image group stroke pivot Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.gradient.pivotY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.rotate",
+      "path": "options.groupTransform.stroke.gradient.rotate",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke rotation"
+      ],
+      "matchedLabels": [
+        "Image group stroke rotation"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.gradient.rotate"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.startX",
+      "path": "options.groupTransform.stroke.gradient.startX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke start X"
+      ],
+      "matchedLabels": [
+        "Image group stroke start X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.gradient.startX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.startY",
+      "path": "options.groupTransform.stroke.gradient.startY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke start Y"
+      ],
+      "matchedLabels": [
+        "Image group stroke start Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.gradient.startY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.type",
+      "path": "options.groupTransform.stroke.gradient.type",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke gradient type"
+      ],
+      "matchedLabels": [
+        "Image group stroke gradient type"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.gradient.type"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.endRadius",
+      "path": "options.groupTransform.stroke.gradient.endRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke end radius"
+      ],
+      "matchedLabels": [
+        "Image group stroke end radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.gradient.endRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.startRadius",
+      "path": "options.groupTransform.stroke.gradient.startRadius",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke start radius"
+      ],
+      "matchedLabels": [
+        "Image group stroke start radius"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.gradient.startRadius"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.centerX",
+      "path": "options.groupTransform.stroke.gradient.centerX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke center X"
+      ],
+      "matchedLabels": [
+        "Image group stroke center X"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.gradient.centerX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.centerY",
+      "path": "options.groupTransform.stroke.gradient.centerY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke center Y"
+      ],
+      "matchedLabels": [
+        "Image group stroke center Y"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.gradient.centerY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.opacity",
+      "path": "options.groupTransform.stroke.opacity",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke opacity"
+      ],
+      "matchedLabels": [
+        "Image group stroke opacity"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.opacity"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.position",
+      "path": "options.groupTransform.stroke.position",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke position"
+      ],
+      "matchedLabels": [
+        "Image group stroke position"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.position"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.roundedCorners",
+      "path": "options.groupTransform.stroke.roundedCorners",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke rounded corners"
+      ],
+      "matchedLabels": [
+        "Image group stroke rounded corners"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.roundedCorners"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.style",
+      "path": "options.groupTransform.stroke.style",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke style"
+      ],
+      "matchedLabels": [
+        "Image group stroke style"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.style"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.width",
+      "path": "options.groupTransform.stroke.width",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Image group stroke width"
+      ],
+      "matchedLabels": [
+        "Image group stroke width"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.stroke.width"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.translateX",
+      "path": "options.groupTransform.translateX",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group translateX"
+      ],
+      "matchedLabels": [
+        "Group translateX"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.translateX"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.translateY",
+      "path": "options.groupTransform.translateY",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
+      "expectedLabels": [
+        "Group translateY"
+      ],
+      "matchedLabels": [
+        "Group translateY"
+      ],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.translateY"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.isGrouped",
+      "path": "options.isGrouped",
+      "status": "EXTERNAL_INSPECTOR_OR_SEMANTIC_CONTAINER_NOT_STATICALLY_VERIFIED",
+      "expectedLabels": [],
+      "matchedLabels": [],
+      "evidenceId": "IMG01-INSPECTOR-SSR-options.isGrouped"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+✔ TEXT01 pinned canonical inventory path/ordering completeness (4.0156ms)
+✔ TEXT01 every FULL authoring path has traceable native, Code, control, lifecycle, output and project proof (3.0707ms)
+✔ TEXT01 measurement outputs and deliberate exclusions (0.4267ms)
+✔ TEXT01 corrected ledger SHA-256, exact inventory and immutable classification checksum (5.5956ms)
+✔ TEXT01 FULL certification gate and browser state must never contradict proof (5.9117ms)
+✔ TEXT01 every cited browser file exists and retains recorded SHA-256 (62.0753ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 191.2105

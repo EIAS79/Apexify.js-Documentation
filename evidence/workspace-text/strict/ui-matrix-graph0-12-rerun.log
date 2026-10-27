@@ -1,0 +1,3 @@
+LAYER_PROBE {"layer":"text","graph":true,"path":"Advanced typography editor"}
+BATCH_PROGRESS 0 10 pass 0 fail 2
+UI_MATRIX_RESULT D:\ApexifyWorkspaceParallel\text-strict-20261023\evidence\workspace-text\strict\ui-matrix-0-12.json {"pass":0,"fail":2,"skips":0,"failures":[{"id":"UI-0002","api":"createText.TextProperties.font.family","status":"FAIL","error":"Error: UNDO_MISMATCH expected=\"DejaVu Sans\" got=undefined"},{"id":"UI-0003","api":"createText.TextProperties.font.name","status":"FAIL","error":"Error: UNDO_MISMATCH expected=\"DejaVu Sans\" got=undefined"}]}

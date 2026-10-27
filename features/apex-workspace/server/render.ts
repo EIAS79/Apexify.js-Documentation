@@ -7,6 +7,10 @@ import {
   type CanvasConfig,
 } from "apexify.js";
 import { validateDocument } from "../model";
+import {textArguments} from '../domain/text';
+import {makeAssetCanvasConfig,verifyCanvasAssets} from './assets';
+import {resolveImageReference,ASSET_REFERENCE} from '../asset-store';
+import {imageArguments,groupArguments} from '../image-runtime';
 
 /** Data-only execution. This renderer never evaluates submitted JavaScript or loads arbitrary paths/URLs. */
 export async function renderWorkspaceDocument(
@@ -19,6 +23,8 @@ export async function renderWorkspaceDocument(
       throw new Error("Rendering was cancelled or exceeded its time budget.");
   };
   checkCancelled();
+  await verifyCanvasAssets(document,signal);
+  checkCancelled();
   const painter = new ApexPainter({ type: "buffer" });
   // Literal read gives Next's file tracer the bundled artwork dependency.
   const artwork = await readFile(
@@ -27,31 +33,15 @@ export async function renderWorkspaceDocument(
   const localSource = (source: string) =>
     source === "/workspace/assets/crystal-lake.webp"
       ? artwork
-      : Buffer.from(source.slice(source.indexOf(",") + 1), "base64");
+      : ASSET_REFERENCE.test(source)
+        ? Buffer.from(resolveImageReference(source,document.assets??[]).split(',')[1],'base64')
+        : Buffer.from(source.slice(source.indexOf(",") + 1), "base64");
   const bg = document.background;
-  const config: CanvasConfig = {
-    width: document.width,
-    height: document.height,
-    ...(bg.mode === "image"
-      ? { transparentBase: true }
-      : bg.mode === "gradient"
-        ? {
-            gradientBg: {
-              type: "linear" as const,
-              endX: document.width,
-              colors: [
-                { stop: 0, color: bg.startColor },
-                { stop: 1, color: bg.endColor },
-              ],
-            },
-          }
-        : bg.transparent
-          ? { transparentBase: true }
-          : { colorBg: bg.color }),
-  };
+  const config: CanvasConfig = makeAssetCanvasConfig(document,artwork);
   const canvas = await painter.createCanvas(config);
   let output = canvas.buffer;
-  if (bg.mode === "image")
+  if (bg.mode === "image" && !document.canvasExtras?.customBg &&
+    !document.canvasExtras?.gradientBg && !document.canvasExtras?.patternBg && !document.canvasExtras?.noiseBg)
     output = await painter.createImage(
       {
         source: localSource(bg.image),
@@ -63,24 +53,13 @@ export async function renderWorkspaceDocument(
       },
       output,
     );
-  for (const layer of document.layers.filter((l) => l.visible)) {
+  const visibleLayers=document.layers.filter(l=>l.visible);
+  for(let index=0; index<visibleLayers.length; index++){
+    const layer=visibleLayers[index];
     checkCancelled();
     if (layer.kind === "text") {
-      output = await painter.createText(
-        {
-          text: layer.text,
-          x: layer.x,
-          y: layer.y,
-          font: {
-            family: "DejaVu Sans",
-            size: layer.fontSize,
-            weight: layer.weight,
-          },
-          fill: { color: layer.color, opacity: layer.opacity },
-          placement: { textBaseline: "top", rotation: layer.rotation },
-        },
-        output,
-      );
+      const {texts,options}=textArguments(layer);
+      output = options ? await painter.createText(texts,output,options) : await painter.createText(texts,output);
     } else if (layer.kind === "chart") {
       const chart = await painter.createChart(
         layer.chartType,
@@ -105,28 +84,18 @@ export async function renderWorkspaceDocument(
         output,
       );
     } else {
-      const image: ImageProperties = {
-        source:
-          layer.kind === "image" ? localSource(layer.source) : layer.shape,
-        x: layer.x,
-        y: layer.y,
-        width: layer.width,
-        height: layer.height,
-        rotation: layer.rotation,
-        opacity: layer.opacity,
-        ...(layer.kind === "image"
-          ? { fit: "cover" as const }
-          : {
-              shape: { fill: true, color: layer.color },
-              borderRadius: layer.radius,
-              stroke: {
-                color: layer.strokeColor,
-                width: layer.strokeWidth,
-                borderRadius: layer.radius,
-              },
-            }),
-      };
-      output = await painter.createImage(image, output);
+      const group=layer.imageGroupId?document.imageGroups?.find(g=>g.id===layer.imageGroupId):undefined;
+      const members:[typeof layer,...typeof layer[]]=[layer];
+      if(group){
+        while(index+1<visibleLayers.length && visibleLayers[index+1].imageGroupId===group.id &&
+          (visibleLayers[index+1].kind==='image'||visibleLayers[index+1].kind==='shape')){
+          members.push(visibleLayers[++index] as typeof layer);
+        }
+      }
+      const images=members.map(item=>imageArguments(item,document,artwork));
+      output=group
+        ?await painter.createImage(images,output,{isGrouped:true,groupTransform:groupArguments(group.transform,document,artwork)})
+        :await painter.createImage(images[0],output);
     }
   }
   checkCancelled();

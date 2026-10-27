@@ -1,0 +1,195 @@
+
+> apexify.js-documentation@1.0.0 build
+> node scripts/docs/doc4-ensure-generated.mjs && node scripts/docs/doc5-ensure-generated.mjs && node scripts/docs/doc6-ensure-generated.mjs && next build
+
+[doc4-ensure] generated API runtime data present
+[doc5-ensure] generated example manifest present
+[doc6-ensure] generated search artifacts present
+  ▲ Next.js 14.2.35
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/482) ...
+
+<--- Last few GCs --->
+
+FATAL ERROR: Committing semi space failed. Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 00007FF6271590C6 node::SetAbortHandler+54
+ 2: 00007FF627159604 node::OnFatalError+1284
+ 3: 00007FF625D63617 v8::Function::NewInstance+423
+ 4: 00007FF625B63E57 X509_STORE_CTX_get_cert_crl+54423
+ 5: 00007FF625AFC44B v8::HeapStatistics::peak_malloced_memory+76331
+ 6: 00007FF625AD3E7E v8::base::EmulatedVirtualAddressSubspace::mapped_size+28894
+ 7: 00007FF625B668F2 X509_STORE_CTX_get_cert_crl+65330
+ 8: 00007FF625B658A7 X509_STORE_CTX_get_cert_crl+61159
+ 9: 00007FF625B767E2 v8::internal::StrongRootAllocatorBase::deallocate_impl+15858
+10: 00007FF625B7630B v8::internal::StrongRootAllocatorBase::deallocate_impl+14619
+11: 00007FF627483BAD node::AsyncResource::CallbackScope::CallbackScope+2124541
+12: 00007FF625B61920 X509_STORE_CTX_get_cert_crl+44896
+13: 00007FF625B7C17A X509_STORE_set_cleanup+5098
+14: 00007FF625B88616 uv_timer_set_repeat+20694
+15: 00007FF625759277 v8::CodeEvent::GetFunctionName+131959
+16: 00000271DC5B75FA 
+
+<--- Last few GCs --->
+
+[23204:000002BDF8280000]      801 ms: Scavenge 18.5 (24.2) -> 17.0 (33.4) MB, pooled: 0 MB, 5.05 / 0.00 ms  (average mu = 1.000, current mu = 1.000) task; 
+[23204:000002BDF8280000]      936 ms: Mark-Compact 18.9 (34.2) -> 16.0 (34.3) MB, pooled: 0 MB, 53.30 / 0.00 ms  (+ 1.4 ms in 11 steps since start of marking, biggest step 0.5 ms, walltime since start of marking 127 ms) (average mu = 0.942, current mu = 0
+FATAL ERROR: Zone Allocation failed - process out of memory
+----- Native stack trace -----
+
+ 1: 00007FF6271590C6 node::SetAbortHandler+54
+ 2: 00007FF627159604 node::OnFatalError+1284
+ 3: 00007FF625D63617 v8::Function::NewInstance+423
+ 4: 00007FF6256DB506 v8::SnapshotCreator::GetIsolate+57750
+ 5: 00007FF6257F3C19 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+115689
+ 6: 00007FF6257F0B25 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+103157
+ 7: 00007FF6257F5B2E v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+123646
+ 8: 00007FF6257F522E v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+121342
+ 9: 00007FF6257F45C3 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+118163
+10: 00007FF6257F301A v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+112618
+11: 00007FF6257FB86F v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+147519
+12: 00007FF6257EE836 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+94214
+13: 00007FF6257EDE0D v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+91613
+14: 00007FF6257F9FEB v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+141243
+15: 00007FF6257FB736 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+147206
+16: 00007FF6257EEED7 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+95911
+17: 00007FF6257EDE0D v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+91613
+18: 00007FF6257ED5CB v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+89499
+19: 00007FF6257ECACC v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+86684
+20: 00007FF6257F211A v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+108778
+21: 00007FF6257F0C29 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+103417
+22: 00007FF6257F50FB v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+121035
+23: 00007FF6257F45C3 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+118163
+24: 00007FF6257F4C57 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+119847
+25: 00007FF6257F463D v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+118285
+26: 00007FF6257F301A v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+112618
+27: 00007FF6257FF2C1 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+162449
+28: 00007FF6257EE8A1 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+94321
+29: 00007FF6257EDE0D v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+91613
+30: 00007FF6257ED5CB v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+89499
+31: 00007FF6257F6E99 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+128617
+32: 00007FF6257F4F20 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+120560
+33: 00007FF6257F463D v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+118285
+34: 00007FF6257F4064 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+116788
+35: 00007FF6257F055B v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+101675
+36: 00007FF6257F516A v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+121146
+37: 00007FF6257F45C3 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+118163
+38: 00007FF6257F301A v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+112618
+39: 00007FF6257FE154 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+157988
+40: 00007FF6257EE82C v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+94204
+41: 00007FF6257EDE0D v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+91613
+42: 00007FF6257ED5CB v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+89499
+43: 00007FF6257F6E99 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+128617
+44: 00007FF6257F4F20 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+120560
+45: 00007FF6257F463D v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+118285
+46: 00007FF6257FB3A7 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+146295
+47: 00007FF6257EDBD6 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+91046
+48: 00007FF6257ED5CB v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+89499
+49: 00007FF6257ECACC v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+86684
+50: 00007FF6257F211A v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+108778
+51: 00007FF6257F0C29 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+103417
+52: 00007FF6257F50FB v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+121035
+53: 00007FF6257F45C3 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+118163
+54: 00007FF6257F4C57 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+119847
+55: 00007FF6257F463D v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+118285
+56: 00007FF6257F301A v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+112618
+57: 00007FF6257FF2C1 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+162449
+58: 00007FF6257EE8A1 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+94321
+59: 00007FF6257EDE0D v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+91613
+60: 00007FF6257ED5CB v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+89499
+61: 00007FF6257ECACC v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+86684
+62: 00007FF6257F211A v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+108778
+63: 00007FF6257F0C29 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+103417
+64: 00007FF6257F63DF v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+125871
+65: 00007FF6257F5088 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+120920
+66: 00007FF6257F45C3 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+118163
+67: 00007FF6257F301A v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+112618
+68: 00007FF6257FF2C1 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+162449
+69: 00007FF6257EE8A1 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+94321
+70: 00007FF6257EDE0D v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+91613
+71: 00007FF6257ED5CB v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+89499
+72: 00007FF6257F6E99 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+128617
+73: 00007FF6257F4F20 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+120560
+74: 00007FF6257F463D v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+118285
+75: 00007FF6257F4064 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+116788
+76: 00007FF6257F055B v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+101675
+77: 00007FF6257F516A v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+121146
+78: 00007FF6257F45C3 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+118163
+79: 00007FF6257F301A v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+112618
+80: 00007FF6257FE154 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+157988
+81: 00007FF6257EE82C v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+94204
+82: 00007FF6257EDE0D v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+91613
+83: 00007FF6257ED5CB v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+89499
+84: 00007FF6257F6E99 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+128617
+85: 00007FF6257F4F20 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+120560
+86: 00007FF6257F463D v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+118285
+87: 00007FF6257F4064 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+116788
+88: 00007FF6257F055B v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+101675
+89: 00007FF6257F516A v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+121146
+90: 00007FF6257F45C3 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+118163
+91: 00007FF6257ED2B9 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+88713
+92: 00007FF6257F6EFB v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+128715
+93: 00007FF6257F4F20 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+120560
+94: 00007FF6257F463D v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+118285
+95: 00007FF6257F4064 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+116788
+96: 00007FF6257F055B v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+101675
+97: 00007FF6257F516A v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+121146
+98: 00007FF6257F45C3 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+118163
+99: 00007FF6257ED2B9 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+88713
+100: 00007FF6257F6EFB v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+128715
+101: 00007FF6257F4F20 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+120560
+102: 00007FF6257F463D v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+118285
+103: 00007FF6257F4064 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+116788
+104: 00007FF6257F055B v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+101675
+105: 00007FF6257F6936 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+127238
+106: 00007FF6257F50DC v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+121004
+107: 00007FF6257F45C3 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+118163
+108: 00007FF6257FB3A7 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+146295
+109: 00007FF6257EDBD6 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+91046
+110: 00007FF6257EC53B v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+85259
+111: 00007FF6257EB876 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+81990
+112: 00007FF6258163D8 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+256936
+113: 00007FF62580A3F0 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+207808
+114: 00007FF6258277FF v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+327631
+115: 00007FF62580DE15 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+222693
+116: 00007FF6258249F2 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+315842
+117: 00007FF625810772 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+233282
+118: 00007FF62581787B v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+262219
+119: 00007FF62580D2BA v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+219786
+120: 00007FF62581DFF0 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+288704
+121: 00007FF62581D314 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+285412
+122: 00007FF625822C94 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+308324
+123: 00007FF62582111E v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+301294
+124: 00007FF62581E0FB v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+288971
+125: 00007FF62581D2CE v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+285342
+126: 00007FF625822C94 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+308324
+127: 00007FF62582E0AF v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+354431
+128: 00007FF62581787B v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+262219
+129: 00007FF62580D2BA v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+219786
+130: 00007FF62581DFF0 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+288704
+131: 00007FF62581D314 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+285412
+132: 00007FF625822C94 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+308324
+133: 00007FF62582111E v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+301294
+134: 00007FF62581E0FB v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+288971
+135: 00007FF62581D2CE v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+285342
+136: 00007FF625822C94 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+308324
+137: 00007FF62582E0AF v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+354431
+138: 00007FF62581787B v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+262219
+139: 00007FF625816D7A v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+259402
+140: 00007FF62580A477 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+207943
+141: 00007FF625809644 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+204308
+142: 00007FF625808932 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+200962
+143: 00007FF6258085DA v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+200106
+144: 00007FF625803C09 v8::ResourceConstraints::set_initial_old_generation_size_in_bytes+181209
+145: 00007FF625CE105F X509_STORE_get_get_crl+36783
+146: 00007FF625CE3E61 X509_STORE_get_get_crl+48561
+147: 00007FF625D6CAD3 v8::ScriptCompiler::CompileFunction+1011
+148: 00007FF627176F3F node::GetCurrentEnvironment+22351
+149: 00007FF627175493 node::GetCurrentEnvironment+15523
+150: 000002BDB7DCF64D 
+ ⨯ Next.js build worker exited with code: 3221226505 and signal: null

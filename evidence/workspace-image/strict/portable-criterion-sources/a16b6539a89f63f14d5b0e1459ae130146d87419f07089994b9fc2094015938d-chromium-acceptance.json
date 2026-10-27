@@ -1,0 +1,200 @@
+{
+  "origin": "http://127.0.0.1:38497/workspace",
+  "steps": [
+    {
+      "step": "workspace loaded",
+      "value": {
+        "title": "Workspace — Apexify.js",
+        "layers": 14,
+        "buttons": [
+          {
+            "text": "",
+            "label": "Undo"
+          },
+          {
+            "text": "",
+            "label": "Redo"
+          },
+          {
+            "text": "Image",
+            "label": null
+          },
+          {
+            "text": "Shape",
+            "label": null
+          },
+          {
+            "text": "",
+            "label": "Select New shape"
+          },
+          {
+            "text": "",
+            "label": "Select New shape"
+          },
+          {
+            "text": "",
+            "label": "Maximize Code"
+          },
+          {
+            "text": "",
+            "label": "Close Code"
+          },
+          {
+            "text": "Apply code",
+            "label": null
+          },
+          {
+            "text": "",
+            "label": "Maximize Visual Graph"
+          },
+          {
+            "text": "",
+            "label": "Close Visual Graph"
+          },
+          {
+            "text": "",
+            "label": "Zoom graph out"
+          },
+          {
+            "text": "",
+            "label": "Zoom graph in"
+          },
+          {
+            "text": "Noise input: off",
+            "label": "Toggle canvas graph noise input"
+          },
+          {
+            "text": "Run Graph",
+            "label": null
+          },
+          {
+            "text": "Connect graph ports",
+            "label": null
+          },
+          {
+            "text": "ShapeCall to action",
+            "label": null
+          },
+          {
+            "text": "ShapeNew shape",
+            "label": null
+          },
+          {
+            "text": "ShapeNew shape",
+            "label": null
+          },
+          {
+            "text": "Image",
+            "label": null
+          },
+          {
+            "text": "Images",
+            "label": null
+          },
+          {
+            "text": "Add verified image layer",
+            "label": null
+          },
+          {
+            "text": "New shape",
+            "label": null
+          },
+          {
+            "text": "",
+            "label": "Hide New shape"
+          },
+          {
+            "text": "New shape",
+            "label": null
+          }
+        ]
+      }
+    },
+    {
+      "step": "shape added",
+      "value": {
+        "editor": true,
+        "source": "New shapeNew shapeNew shapeButton labelCall to actionDescriptionBrand accentApexify"
+      }
+    },
+    {
+      "step": "native filter added",
+      "value": {
+        "filters": [
+          "Filters · ordered native pipeline",
+          "1. gaussianBlur",
+          "Filters · ordered native pipeline",
+          "1. gaussianBlur"
+        ],
+        "render": 1280
+      }
+    },
+    {
+      "step": "render preview",
+      "value": {
+        "naturalWidth": 1280,
+        "renderError": null
+      }
+    },
+    {
+      "step": "undo action",
+      "found": true
+    },
+    {
+      "step": "redo action",
+      "found": true
+    },
+    {
+      "step": "graph contains selected image node editor",
+      "value": true
+    },
+    {
+      "step": "reload durable persistence",
+      "value": {
+        "layerNames": [
+          "New shape",
+          "",
+          "New shape",
+          "",
+          "New shape",
+          "",
+          "Button label",
+          "",
+          "Call to action",
+          "",
+          "Description",
+          "",
+          "Brand accent",
+          "",
+          "Apexify",
+          ""
+        ],
+        "hasNativeImageEditor": false,
+        "renderWidth": 0
+      }
+    }
+  ],
+  "screenshots": [
+    {
+      "name": "01-workspace-loaded",
+      "bytes": 235090
+    },
+    {
+      "name": "02-createimage-inspector",
+      "bytes": 623009
+    },
+    {
+      "name": "03-filter-editor",
+      "bytes": 623083
+    },
+    {
+      "name": "04-graph-with-image-node",
+      "bytes": 623086
+    },
+    {
+      "name": "05-reload-persistence",
+      "bytes": 232400
+    }
+  ],
+  "passed": true
+}

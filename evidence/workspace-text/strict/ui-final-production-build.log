@@ -1,0 +1,69 @@
+
+> apexify.js-documentation@1.0.0 build
+> node scripts/docs/doc4-ensure-generated.mjs && node scripts/docs/doc5-ensure-generated.mjs && node scripts/docs/doc6-ensure-generated.mjs && next build
+
+[doc4-ensure] generated API runtime data present
+[doc5-ensure] generated example manifest present
+[doc6-ensure] generated search artifacts present
+  ▲ Next.js 14.2.35
+  - Experiments (use with caution):
+    · cpus
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/482) ...
+   Generating static pages (120/482) 
+   Generating static pages (240/482) 
+   Generating static pages (361/482) 
+ ✓ Generating static pages (482/482)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                        Size     First Load JS
+┌ ○ /                                              7.22 kB        94.8 kB
+├ ○ /__docs-fixtures/future-readiness              0 B                0 B
+├ ○ /_not-found                                    156 B          87.7 kB
+├ ○ /api-reference                                 1.53 kB         107 kB
+├ ● /api-reference/[package]/[...symbol]           1.81 kB         109 kB
+├   ├ /api-reference/apexify.js/AdsrEnvelope
+├   ├ /api-reference/apexify.js/AlignMode
+├   ├ /api-reference/apexify.js/ApexifyAssetError
+├   └ [+322 more paths]
+├ ƒ /api/docs                                      0 B                0 B
+├ ƒ /api/docs/search                               0 B                0 B
+├ ƒ /api/gallery/run                               0 B                0 B
+├ ƒ /api/gallery/source                            0 B                0 B
+├ ƒ /api/workspace/render                          0 B                0 B
+├ ƒ /api/workspace/text-metrics                    0 B                0 B
+├ ○ /apple-icon.png                                0 B                0 B
+├ ○ /docs                                          156 B          87.7 kB
+├ ● /docs/[...slug]                                1.73 kB         117 kB
+├   ├ /docs/getting-started
+├   ├ /docs/node/canvas/size-and-coordinates
+├   ├ /docs/start/beginner-guide
+├   └ [+132 more paths]
+├ ○ /docs/api                                      156 B          87.7 kB
+├ ○ /docs/node/canvas                              2.6 kB          118 kB
+├ ● /examples/[id]                                 223 B           116 kB
+├   ├ /examples/node.canvas.basic
+├   ├ /examples/node.chart.bar
+├   ├ /examples/node.gif.basic
+├   └ /examples/node.integration.report
+├ ○ /gallery                                       9.25 kB        96.8 kB
+├ ○ /robots.txt                                    0 B                0 B
+├ ○ /sitemap.xml                                   0 B                0 B
+└ ○ /workspace                                     207 kB          294 kB
++ First Load JS shared by all                      87.6 kB
+  ├ chunks/3348-931c09f140336c2d.js                31.7 kB
+  ├ chunks/38bec7ad-5e11f3d123ce038b.js            53.6 kB
+  └ other shared chunks (total)                    2.22 kB
+
+
+ƒ Middleware                                       26.5 kB
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses getStaticProps)
+ƒ  (Dynamic)  server-rendered on demand
+

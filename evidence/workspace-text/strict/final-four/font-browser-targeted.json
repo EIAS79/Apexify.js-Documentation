@@ -1,0 +1,56 @@
+{
+  "results": [
+    {
+      "api": "createText.TextProperties.font.family",
+      "evidenceId": "UI-FOUR-FONT-FAMILY-001",
+      "status": "PASS",
+      "inspector": {
+        "value": "Arial",
+        "model": "Arial"
+      },
+      "graph": {
+        "value": "Courier New",
+        "model": "Courier New"
+      },
+      "undo": "Arial",
+      "redo": "Courier New",
+      "indexedDB": "Courier New",
+      "reloaded": "Courier New",
+      "exportedValue": "Courier New",
+      "imported": "Courier New",
+      "generatedCodeContainsExactFont": true,
+      "serverNativePng": {
+        "arialDigest": "4b6b4b178ecd5e23576d4b70ff83c52bd08bde4b883ba614dbc2cdd7d780e901",
+        "courierDigest": "fc2bdb90b5e1fdd82162175e0b759428fdcd844f29d32aab09f9d80b35e92595",
+        "changed": true
+      },
+      "exportFile": "final-four\\exports\\Hero-composition.apexify.json"
+    },
+    {
+      "api": "createText.TextProperties.font.name",
+      "evidenceId": "UI-FOUR-FONT-NAME-001",
+      "status": "PASS",
+      "inspector": {
+        "value": "Arial",
+        "model": "Arial"
+      },
+      "graph": {
+        "value": "Courier New",
+        "model": "Courier New"
+      },
+      "undo": "Arial",
+      "redo": "Courier New",
+      "indexedDB": "Courier New",
+      "reloaded": "Courier New",
+      "exportedValue": "Courier New",
+      "imported": "Courier New",
+      "generatedCodeContainsExactFont": true,
+      "serverNativePng": {
+        "arialDigest": "4b6b4b178ecd5e23576d4b70ff83c52bd08bde4b883ba614dbc2cdd7d780e901",
+        "courierDigest": "fc2bdb90b5e1fdd82162175e0b759428fdcd844f29d32aab09f9d80b35e92595",
+        "changed": true
+      },
+      "exportFile": "final-four\\exports\\Hero-composition.apexify.json"
+    }
+  ]
+}

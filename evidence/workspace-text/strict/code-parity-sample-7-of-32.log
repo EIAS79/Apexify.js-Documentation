@@ -1,0 +1,38 @@
+✔ TEXT01-PATH 8/389 createText.TextProperties.decorations.underline (boolean) true (55.021ms)
+✔ TEXT01-PATH 8/389 createText.TextProperties.decorations.underline (boolean) false (25.4949ms)
+✔ TEXT01-PATH 40/389 createText.TextProperties.decorations.overline (styled).gradient.pivotX seed (26.0221ms)
+✔ TEXT01-PATH 72/389 createText.TextProperties.effects.highlight.gradient.endRadius seed (26.3478ms)
+✔ TEXT01-PATH 104/389 createText.TextProperties.effects.shadow.gradient.startX seed (26.6666ms)
+✔ TEXT01-PATH 136/389 createText.TextProperties.placement.perspective.points[].y seed (49.7852ms)
+✔ TEXT01-PATH 168/389 createText.TextProperties.stroke.gradient.startAngle seed (23.7709ms)
+✔ TEXT01-PATH 200/389 createText.TextProperties[].decorations.underline (styled).gradient.startY seed (24.9162ms)
+✔ TEXT01-PATH 232/389 createText.TextProperties[].decorations.overline (styled).gradient.colors[].color seed (21.4685ms)
+✔ TEXT01-PATH 264/389 createText.TextProperties[].effects.highlight.gradient.rotate seed (24.2726ms)
+✔ TEXT01-PATH 296/389 createText.TextProperties[].effects.shadow.gradient.startRadius seed (23.013ms)
+✔ TEXT01-PATH 328/389 createText.TextProperties[].fill.gradient.type linear (22.183ms)
+✔ TEXT01-PATH 328/389 createText.TextProperties[].fill.gradient.type radial (24.7566ms)
+✔ TEXT01-PATH 328/389 createText.TextProperties[].fill.gradient.type conic (25.8867ms)
+✔ TEXT01-PATH 360/389 createText.TextProperties[].stroke.gradient.repeat no-repeat (28.4195ms)
+✔ TEXT01-PATH 360/389 createText.TextProperties[].stroke.gradient.repeat repeat (26.4173ms)
+✔ TEXT01-PATH 360/389 createText.TextProperties[].stroke.gradient.repeat reflect (26.8964ms)
+✔ TEXT01 strict validator/native boundary parity (10.6207ms)
+✔ TEXT01 deprecated alias precedence (28.5874ms)
+✔ TEXT01 baseline createText.TextProperties.text (26.2397ms)
+✔ TEXT01 baseline createText.TextProperties.x (26.5261ms)
+✔ TEXT01 baseline createText.TextProperties.y (25.7763ms)
+✔ TEXT01 baseline createText.TextProperties/font.size baseline (23.3194ms)
+✔ TEXT01 baseline createText.TextProperties/font.weight baseline (21.9186ms)
+✔ TEXT01 baseline createText.TextProperties/fill.color baseline (21.0164ms)
+✔ TEXT01 baseline createText.TextProperties/fill.opacity baseline (22.3497ms)
+✔ TEXT01 baseline createText.TextProperties/placement.rotation baseline (21.3045ms)
+✔ TEXT01 baseline text selection bounds.width (21.0832ms)
+✔ TEXT01 baseline text selection bounds.height (22.8839ms)
+✔ TEXT01 43 native measurement results (8.458ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2251.3711

@@ -1,0 +1,1 @@
+gitdir: C:/Users/khali/AppData/Local/Temp/apexify-workspace-checkpoint-20261019-git-sparse/.git/worktrees/text-strict-20261023

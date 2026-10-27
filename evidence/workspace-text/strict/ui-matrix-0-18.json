@@ -1,0 +1,186 @@
+{
+  "start": 0,
+  "count": 18,
+  "results": [
+    {
+      "id": "UI-0001",
+      "api": "createText.TextProperties.font.size",
+      "status": "INSPECTOR_MODEL_PASS",
+      "evidence": {
+        "expected": 32,
+        "current": 32,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0002",
+      "api": "createText.TextProperties.font.family",
+      "status": "INSPECTOR_MODEL_PASS",
+      "evidence": {
+        "expected": "DejaVu Sans",
+        "current": "DejaVu Sans",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0003",
+      "api": "createText.TextProperties.font.name",
+      "status": "INSPECTOR_MODEL_PASS",
+      "evidence": {
+        "expected": "DejaVu Sans",
+        "current": "DejaVu Sans",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0004",
+      "api": "createText.TextProperties.font.weight",
+      "status": "INSPECTOR_MODEL_PASS",
+      "evidence": {
+        "expected": 350,
+        "current": 350,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0005",
+      "api": "createText.TextProperties.font.style",
+      "status": "INSPECTOR_MODEL_PASS",
+      "evidence": {
+        "expected": "italic",
+        "current": "italic",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0006",
+      "api": "createText.TextProperties.decorations.bold",
+      "status": "INSPECTOR_MODEL_PASS",
+      "evidence": {
+        "expected": true,
+        "current": true,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0007",
+      "api": "createText.TextProperties.decorations.italic",
+      "status": "INSPECTOR_MODEL_PASS",
+      "evidence": {
+        "expected": true,
+        "current": true,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0008",
+      "api": "createText.TextProperties.decorations.underline (boolean)",
+      "status": "INSPECTOR_MODEL_PASS",
+      "evidence": {
+        "expected": true,
+        "current": true,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0009",
+      "api": "createText.TextProperties.decorations.underline (styled).color",
+      "status": "INSPECTOR_MODEL_PASS",
+      "evidence": {
+        "expected": "#ff8800",
+        "current": "#ff8800",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0010",
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.type",
+      "status": "INSPECTOR_MODEL_PASS",
+      "evidence": {
+        "expected": "radial",
+        "current": "radial",
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0011",
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.startX",
+      "status": "INSPECTOR_MODEL_PASS",
+      "evidence": {
+        "expected": 5,
+        "current": 5,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0012",
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.startY",
+      "status": "INSPECTOR_MODEL_PASS",
+      "evidence": {
+        "expected": 5,
+        "current": 5,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0013",
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.endX",
+      "status": "INSPECTOR_MODEL_PASS",
+      "evidence": {
+        "expected": 5,
+        "current": 5,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0014",
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.endY",
+      "status": "INSPECTOR_MODEL_PASS",
+      "evidence": {
+        "expected": 5,
+        "current": 5,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0015",
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.startRadius",
+      "status": "INSPECTOR_MODEL_PASS",
+      "evidence": {
+        "expected": 80,
+        "current": 80,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0016",
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.endRadius",
+      "status": "INSPECTOR_MODEL_PASS",
+      "evidence": {
+        "expected": 80,
+        "current": 80,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0017",
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.centerX",
+      "status": "INSPECTOR_MODEL_PASS",
+      "evidence": {
+        "expected": 5,
+        "current": 5,
+        "graphMounted": true
+      }
+    },
+    {
+      "id": "UI-0018",
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.centerY",
+      "status": "INSPECTOR_MODEL_PASS",
+      "evidence": {
+        "expected": 5,
+        "current": 5,
+        "graphMounted": true
+      }
+    }
+  ]
+}

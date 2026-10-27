@@ -21,6 +21,7 @@ import {
   ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 import type { WorkspaceDocument, WorkspaceLayer } from "../model";
+import {importImageAsset,type WorkspaceImageAsset} from '../asset-store';
 import type { IconType } from "./ui";
 type Tool = { name: string; icon: IconType; color?: string; action: string };
 const groups: { title?: string; tools: Tool[] }[] = [
@@ -77,7 +78,7 @@ export function UploadImage({
   onError,
   children,
 }: {
-  onUpload: (source: string, name: string) => void;
+  onUpload: (source: string, name: string, asset: WorkspaceImageAsset) => void;
   onError: (message: string) => void;
   children?: React.ReactNode;
 }) {
@@ -97,21 +98,16 @@ export function UploadImage({
         hidden
         type="file"
         accept="image/png,image/jpeg,image/webp"
-        onChange={(e) => {
-          const f = e.target.files?.[0];
-          e.target.value = "";
-          if (!f) return;
-          if (
-            !["image/png", "image/jpeg", "image/webp"].includes(f.type) ||
-            f.size > 4 * 1024 * 1024
-          ) {
-            onError("Choose a PNG, JPEG, or WebP under 4 MB.");
-            return;
+        onChange={async (e) => {
+          const input=e.currentTarget, file=input.files?.[0];
+          input.value="";
+          if(!file)return;
+          try {
+            const asset=await importImageAsset(file);
+            onUpload(asset.id,file.name,asset);
+          } catch(error) {
+            onError(error instanceof Error?error.message:"Image validation failed.");
           }
-          const reader = new FileReader();
-          reader.onerror = () => onError("The image could not be read.");
-          reader.onload = () => onUpload(String(reader.result), f.name);
-          reader.readAsDataURL(f);
         }}
       />
     </>

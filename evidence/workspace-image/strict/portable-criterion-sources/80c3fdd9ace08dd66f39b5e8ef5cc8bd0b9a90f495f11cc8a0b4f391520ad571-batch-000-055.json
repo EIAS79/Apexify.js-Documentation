@@ -1,0 +1,600 @@
+{
+  "schemaVersion": 1,
+  "pin": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "start": 0,
+  "end": 55,
+  "results": [
+    {
+      "index": 0,
+      "path": "images.align",
+      "id": "apexify.js::ApexPainter#createImage::images.align",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-0",
+        "IMG01-E-INSPECTOR-0",
+        "IMG01-E-HISTORY-0",
+        "IMG01-E-GRAPH-0",
+        "IMG01-E-PERSIST-0",
+        "IMG01-E-EXPORT-0"
+      ],
+      "issues": [],
+      "control": "Image alignment",
+      "before": "bottom-right",
+      "after": "bottom-left",
+      "graphAfter": "bottom-right",
+      "elapsedMs": 6141
+    },
+    {
+      "index": 1,
+      "path": "images.blendMode",
+      "id": "apexify.js::ApexPainter#createImage::images.blendMode",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-1",
+        "IMG01-E-INSPECTOR-1",
+        "IMG01-E-HISTORY-1",
+        "IMG01-E-GRAPH-1",
+        "IMG01-E-PERSIST-1",
+        "IMG01-E-EXPORT-1"
+      ],
+      "issues": [],
+      "control": "Composite / blend mode",
+      "before": "multiply",
+      "after": "screen",
+      "graphAfter": "overlay",
+      "elapsedMs": 6115
+    },
+    {
+      "index": 2,
+      "path": "images.blur",
+      "id": "apexify.js::ApexPainter#createImage::images.blur",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-2",
+        "IMG01-E-INSPECTOR-2",
+        "IMG01-E-HISTORY-2",
+        "IMG01-E-GRAPH-2",
+        "IMG01-E-PERSIST-2",
+        "IMG01-E-EXPORT-2"
+      ],
+      "issues": [],
+      "control": "Blur",
+      "before": 2,
+      "after": 2.5,
+      "graphAfter": 3,
+      "elapsedMs": 6165
+    },
+    {
+      "index": 3,
+      "path": "images.borderPosition",
+      "id": "apexify.js::ApexPainter#createImage::images.borderPosition",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-3",
+        "IMG01-E-INSPECTOR-3",
+        "IMG01-E-HISTORY-3",
+        "IMG01-E-GRAPH-3",
+        "IMG01-E-PERSIST-3",
+        "IMG01-E-EXPORT-3"
+      ],
+      "issues": [],
+      "control": "Border position",
+      "before": "top-left",
+      "after": "top-right",
+      "graphAfter": "bottom-left",
+      "elapsedMs": 6738
+    },
+    {
+      "index": 4,
+      "path": "images.borderRadius",
+      "id": "apexify.js::ApexPainter#createImage::images.borderRadius",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-4",
+        "IMG01-E-INSPECTOR-4",
+        "IMG01-E-HISTORY-4",
+        "IMG01-E-GRAPH-4",
+        "IMG01-E-PERSIST-4",
+        "IMG01-E-EXPORT-4"
+      ],
+      "issues": [],
+      "control": "Border radius",
+      "before": 8,
+      "after": 9,
+      "graphAfter": 10,
+      "elapsedMs": 7007
+    },
+    {
+      "index": 5,
+      "path": "images.boxBackground",
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-5",
+        "IMG01-E-INSPECTOR-5",
+        "IMG01-E-HISTORY-5",
+        "IMG01-E-GRAPH-5",
+        "IMG01-E-PERSIST-5",
+        "IMG01-E-EXPORT-5"
+      ],
+      "issues": [],
+      "control": "Box background enabled",
+      "before": {
+        "color": "#ef7a2c"
+      },
+      "graphAfter": {
+        "color": "#141c30"
+      },
+      "elapsedMs": 6375
+    },
+    {
+      "index": 6,
+      "path": "images.boxBackground.color",
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.color",
+      "sourceFixtureValid": true,
+      "inspector": false,
+      "graph": false,
+      "undoRedo": false,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": false,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-6"
+      ],
+      "issues": [
+        "Error: Inspector edit cannot operate mapped control: Native HTML color picker requires separate verified OS-picker interaction\n    at D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:142:24"
+      ],
+      "control": "Box color",
+      "elapsedMs": 2100
+    },
+    {
+      "index": 7,
+      "path": "images.boxBackground.gradient",
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-7",
+        "IMG01-E-INSPECTOR-7",
+        "IMG01-E-HISTORY-7",
+        "IMG01-E-GRAPH-7",
+        "IMG01-E-PERSIST-7",
+        "IMG01-E-EXPORT-7"
+      ],
+      "issues": [],
+      "control": "Image box gradient properties",
+      "before": {
+        "type": "linear",
+        "colors": [
+          {
+            "stop": 0,
+            "color": "#fa355b"
+          },
+          {
+            "stop": 1,
+            "color": "#17d6c4"
+          }
+        ],
+        "startX": 0,
+        "startY": 0,
+        "endX": 39,
+        "endY": 38
+      },
+      "after": {
+        "type": "radial",
+        "colors": [
+          {
+            "stop": 0,
+            "color": "#fa355b"
+          },
+          {
+            "stop": 1,
+            "color": "#17d6c4"
+          }
+        ]
+      },
+      "graphAfter": {
+        "type": "conic",
+        "colors": [
+          {
+            "stop": 0,
+            "color": "#fa355b"
+          },
+          {
+            "stop": 1,
+            "color": "#17d6c4"
+          }
+        ]
+      },
+      "elapsedMs": 5791
+    },
+    {
+      "index": 8,
+      "path": "images.boxBackground.gradient.colors",
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.colors",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-8",
+        "IMG01-E-INSPECTOR-8",
+        "IMG01-E-HISTORY-8",
+        "IMG01-E-GRAPH-8",
+        "IMG01-E-PERSIST-8",
+        "IMG01-E-EXPORT-8"
+      ],
+      "issues": [],
+      "control": "Image box stops",
+      "before": [
+        {
+          "stop": 0,
+          "color": "#ffee00"
+        },
+        {
+          "stop": 1,
+          "color": "#113bee"
+        }
+      ],
+      "after": [
+        {
+          "stop": 0.1,
+          "color": "#ffee00"
+        },
+        {
+          "stop": 1,
+          "color": "#113bee"
+        }
+      ],
+      "graphAfter": [
+        {
+          "stop": 0.2,
+          "color": "#ffee00"
+        },
+        {
+          "stop": 1,
+          "color": "#113bee"
+        }
+      ],
+      "elapsedMs": 4843
+    },
+    {
+      "index": 9,
+      "path": "images.boxBackground.gradient.colors.color",
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.colors.color",
+      "sourceFixtureValid": true,
+      "inspector": false,
+      "graph": false,
+      "undoRedo": false,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": false,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-9"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:143:18"
+      ],
+      "control": "Image box stop hex 1",
+      "elapsedMs": 18666
+    },
+    {
+      "index": 10,
+      "path": "images.boxBackground.gradient.colors.stop",
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.colors.stop",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-10",
+        "IMG01-E-INSPECTOR-10",
+        "IMG01-E-HISTORY-10",
+        "IMG01-E-GRAPH-10",
+        "IMG01-E-PERSIST-10",
+        "IMG01-E-EXPORT-10"
+      ],
+      "issues": [],
+      "control": "Image box stop 1",
+      "before": 0.15,
+      "after": 0.25,
+      "graphAfter": 0.35,
+      "elapsedMs": 3933
+    },
+    {
+      "index": 11,
+      "path": "images.boxBackground.gradient.endX",
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.endX",
+      "sourceFixtureValid": true,
+      "inspector": false,
+      "graph": false,
+      "undoRedo": false,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": false,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-11"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:143:18"
+      ],
+      "control": "Image box end X",
+      "elapsedMs": 18454
+    },
+    {
+      "index": 12,
+      "path": "images.boxBackground.gradient.endY",
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.endY",
+      "sourceFixtureValid": true,
+      "inspector": false,
+      "graph": false,
+      "undoRedo": false,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": false,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-12"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:143:18"
+      ],
+      "control": "Image box end Y",
+      "elapsedMs": 18149
+    },
+    {
+      "index": 13,
+      "path": "images.boxBackground.gradient.pivotX",
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.pivotX",
+      "sourceFixtureValid": true,
+      "inspector": false,
+      "graph": false,
+      "undoRedo": false,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": false,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-13"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:143:18"
+      ],
+      "control": "Image box pivot X",
+      "elapsedMs": 18492
+    },
+    {
+      "index": 14,
+      "path": "images.boxBackground.gradient.pivotY",
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.pivotY",
+      "sourceFixtureValid": true,
+      "inspector": false,
+      "graph": false,
+      "undoRedo": false,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": false,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-14"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:143:18"
+      ],
+      "control": "Image box pivot Y",
+      "elapsedMs": 19116
+    },
+    {
+      "index": 15,
+      "path": "images.boxBackground.gradient.rotate",
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.rotate",
+      "sourceFixtureValid": true,
+      "inspector": false,
+      "graph": false,
+      "undoRedo": false,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": false,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-15"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:143:18"
+      ],
+      "control": "Image box rotation",
+      "elapsedMs": 19545
+    },
+    {
+      "index": 16,
+      "path": "images.boxBackground.gradient.startX",
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.startX",
+      "sourceFixtureValid": true,
+      "inspector": false,
+      "graph": false,
+      "undoRedo": false,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": false,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-16"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:143:18"
+      ],
+      "control": "Image box start X",
+      "elapsedMs": 19398
+    },
+    {
+      "index": 17,
+      "path": "images.boxBackground.gradient.startY",
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.startY",
+      "sourceFixtureValid": true,
+      "inspector": false,
+      "graph": false,
+      "undoRedo": false,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": false,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-17"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:143:18"
+      ],
+      "control": "Image box start Y",
+      "elapsedMs": 18114
+    },
+    {
+      "index": 18,
+      "path": "images.boxBackground.gradient.type",
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.type",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-18",
+        "IMG01-E-INSPECTOR-18",
+        "IMG01-E-HISTORY-18",
+        "IMG01-E-GRAPH-18",
+        "IMG01-E-PERSIST-18",
+        "IMG01-E-EXPORT-18"
+      ],
+      "issues": [],
+      "control": "Image box gradient type",
+      "before": "radial",
+      "after": "conic",
+      "graphAfter": "radial",
+      "elapsedMs": 4065
+    },
+    {
+      "index": 19,
+      "path": "images.boxBackground.gradient.endRadius",
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.endRadius",
+      "sourceFixtureValid": true,
+      "inspector": false,
+      "graph": false,
+      "undoRedo": false,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": false,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-19"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:143:18"
+      ],
+      "control": "Image box end radius",
+      "elapsedMs": 18647
+    },
+    {
+      "index": 20,
+      "path": "images.boxBackground.gradient.startRadius",
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.startRadius",
+      "sourceFixtureValid": true,
+      "inspector": false,
+      "graph": false,
+      "undoRedo": false,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": false,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-20"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:143:18"
+      ],
+      "control": "Image box start radius",
+      "elapsedMs": 18216
+    },
+    {
+      "index": 21,
+      "path": "images.boxBackground.gradient.centerX",
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.centerX",
+      "sourceFixtureValid": true,
+      "inspector": false,
+      "graph": false,
+      "undoRedo": false,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": false,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-21"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:143:18"
+      ],
+      "control": "Image box center X",
+      "elapsedMs": 18395
+    }
+  ]
+}

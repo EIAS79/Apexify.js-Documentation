@@ -1,0 +1,11 @@
+Error: Use a six or eight digit hex color.
+    at color (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\model.ts:240:11)
+    at <anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\model.ts:306:16)
+    at Array.map (<anonymous>)
+    at validateDocument (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\model.ts:282:27)
+    at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-final-four-code.test.ts:19:39)
+    at run (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-final-four-code.test.ts:46:10)
+    at assert (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-final-four-code.test.ts:62:1)
+    at Object.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-final-four-code.test.ts:62:61)
+    at Module._compile (node:internal/modules/cjs/loader:1929:14)
+    at Object.transformer (D:\ApexifyWorkspaceParallel\text-acceptance-20261022\node_modules\tsx\dist\register-D46fvsV_.cjs:3:1104)

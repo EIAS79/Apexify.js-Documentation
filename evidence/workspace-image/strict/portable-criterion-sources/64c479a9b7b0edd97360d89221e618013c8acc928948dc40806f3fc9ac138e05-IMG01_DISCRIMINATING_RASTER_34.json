@@ -1,0 +1,319 @@
+{
+  "schemaVersion": 1,
+  "enginePin": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "caseCount": 34,
+  "summary": {
+    "executed": 34,
+    "changed": 31,
+    "unchanged": 3,
+    "rejected": 0
+  },
+  "results": [
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.align",
+      "path": "images.align",
+      "fixture": "non-square-bitmap-on-square-bounds",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "6259b8a31323d7ff0ce56579a047839499414edbf391d02f15203e4507567a8c",
+      "afterSha256": "493a823030dd032fa301a26098f5b73356f45c86459829df505d83d29231fae6"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.borderPosition",
+      "path": "images.borderPosition",
+      "fixture": "thick-border-selective-corners",
+      "executed": true,
+      "pixelChanged": false,
+      "beforeSha256": "b481c1d946c59037e5e098b0273198eba603640d219eb598f7a1b80930cdaf30",
+      "afterSha256": "b481c1d946c59037e5e098b0273198eba603640d219eb598f7a1b80930cdaf30"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground",
+      "path": "images.boxBackground",
+      "fixture": "translucent-alpha-background",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "4f2cb2d63c90bc2a95ca6706d47e093f9d4d23be03473010b1b42c81ea920c99",
+      "afterSha256": "84800d6d0d6f1498aea63ae86f6aa2cfc8ae44dd21019703873c8df084eda51a"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.color",
+      "path": "images.boxBackground.color",
+      "fixture": "transparent-image-color",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "c6ac7b3e948c86a8b0370ea1b9b0fcf3e76ca63fcef34486084d4b822bfe5e80",
+      "afterSha256": "d0b646bdbbe7bc3b95712c644975f837a82f4b63b4bb2a98119cacd5ac6e2b0f"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient",
+      "path": "images.boxBackground.gradient",
+      "fixture": "transparent-source+changed-gradient",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "e680ecef943cea2b1b13fc6ec1ad840672dde36b207a4ee37014fe4baa765bab",
+      "afterSha256": "2e9fad4887b73f14039ea8d81197b11877a7aa34f9dbc916cbc6f02fcb698567"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.colors",
+      "path": "images.boxBackground.gradient.colors",
+      "fixture": "transparent-source+changed-colors",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "e680ecef943cea2b1b13fc6ec1ad840672dde36b207a4ee37014fe4baa765bab",
+      "afterSha256": "5192962ae1714c3baab0693dc5258c5e33f273427245ba66a61e1c9ab7c94915"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.colors.color",
+      "path": "images.boxBackground.gradient.colors.color",
+      "fixture": "transparent-source+changed-color",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "e680ecef943cea2b1b13fc6ec1ad840672dde36b207a4ee37014fe4baa765bab",
+      "afterSha256": "5192962ae1714c3baab0693dc5258c5e33f273427245ba66a61e1c9ab7c94915"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.colors.stop",
+      "path": "images.boxBackground.gradient.colors.stop",
+      "fixture": "transparent-source+changed-stop",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "e680ecef943cea2b1b13fc6ec1ad840672dde36b207a4ee37014fe4baa765bab",
+      "afterSha256": "6ab4a9fcbcb154e8bc434058e3378252a448c338502ff0dab4ca046aff77587b"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.endX",
+      "path": "images.boxBackground.gradient.endX",
+      "fixture": "transparent-source+changed-endX",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "e680ecef943cea2b1b13fc6ec1ad840672dde36b207a4ee37014fe4baa765bab",
+      "afterSha256": "c4bbc4cc68c402bd5915c0b3889af3c8331c23939f1023e8d58a3266fa4782c0"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.endY",
+      "path": "images.boxBackground.gradient.endY",
+      "fixture": "transparent-source+changed-endY",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "e680ecef943cea2b1b13fc6ec1ad840672dde36b207a4ee37014fe4baa765bab",
+      "afterSha256": "6aed0aa56ae20ee4be3a85699ac350789951fe487b6faef7813c609a1433adb4"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.pivotX",
+      "path": "images.boxBackground.gradient.pivotX",
+      "fixture": "transparent-source+changed-pivotX",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "e31430365e07fbdbccc983d3dc792d5580e826eea41f36168edd93019f7e6b11",
+      "afterSha256": "59c645956706b76fdb1d0bc449925664668789b704ecec322eb51f2ce9a8f996"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.pivotY",
+      "path": "images.boxBackground.gradient.pivotY",
+      "fixture": "transparent-source+changed-pivotY",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "e31430365e07fbdbccc983d3dc792d5580e826eea41f36168edd93019f7e6b11",
+      "afterSha256": "f533ea5964f75d314a048b7fe0e7f00984c88a7a7a85e600f7336f75d50bc4f3"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.rotate",
+      "path": "images.boxBackground.gradient.rotate",
+      "fixture": "transparent-source+changed-rotate",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "e680ecef943cea2b1b13fc6ec1ad840672dde36b207a4ee37014fe4baa765bab",
+      "afterSha256": "856b1edbbda78b60d01b861fa9bed4880e8c663f424f8f90804472749475850d"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.startX",
+      "path": "images.boxBackground.gradient.startX",
+      "fixture": "transparent-source+changed-startX",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "e680ecef943cea2b1b13fc6ec1ad840672dde36b207a4ee37014fe4baa765bab",
+      "afterSha256": "e452877189a82f392d6f4be1b71d852961bca4d17fa8713ae0bdab5977c6a117"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.startY",
+      "path": "images.boxBackground.gradient.startY",
+      "fixture": "transparent-source+changed-startY",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "e680ecef943cea2b1b13fc6ec1ad840672dde36b207a4ee37014fe4baa765bab",
+      "afterSha256": "d5df338de6ab2626db81998f981c862d03c262318ea84e0fc31d3bf9bd671766"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.type",
+      "path": "images.boxBackground.gradient.type",
+      "fixture": "transparent-source+changed-type",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "e680ecef943cea2b1b13fc6ec1ad840672dde36b207a4ee37014fe4baa765bab",
+      "afterSha256": "2e9fad4887b73f14039ea8d81197b11877a7aa34f9dbc916cbc6f02fcb698567"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.endRadius",
+      "path": "images.boxBackground.gradient.endRadius",
+      "fixture": "transparent-source+changed-endRadius",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "2e9fad4887b73f14039ea8d81197b11877a7aa34f9dbc916cbc6f02fcb698567",
+      "afterSha256": "196843dae2ce05c2486a3df61d9e9f2592209772371a0ff53e03a1aeeaadaa69"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.startRadius",
+      "path": "images.boxBackground.gradient.startRadius",
+      "fixture": "transparent-source+changed-startRadius",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "2e9fad4887b73f14039ea8d81197b11877a7aa34f9dbc916cbc6f02fcb698567",
+      "afterSha256": "73410071dae4790b8f9248b63eb2d923c5e2e227e5cc8c97ab093cbeabd46076"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.centerX",
+      "path": "images.boxBackground.gradient.centerX",
+      "fixture": "transparent-source+changed-centerX",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "747fa10c14d7d01445faeb48a7bbc5b6a0110f1d3db7f5c3d17322543ff726f5",
+      "afterSha256": "0940a24b024fe62f533c61ba544d324987fd889b1ca193eaabff6d41e27ec95d"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.centerY",
+      "path": "images.boxBackground.gradient.centerY",
+      "fixture": "transparent-source+changed-centerY",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "747fa10c14d7d01445faeb48a7bbc5b6a0110f1d3db7f5c3d17322543ff726f5",
+      "afterSha256": "6ba60a9f75f1848237505673a956a3f00afd5e3f0c92eb51e25276f07355b8fe"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.filterIntensity",
+      "path": "images.filterIntensity",
+      "fixture": "strong-multi-filter-pipeline",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "e021b15ac77dbbea139ac3a839819604d172c2fd0d721c23606560587926e1be",
+      "afterSha256": "5b0b01aa3ecb64fd298cdbc3b963366c12debd914589857359286cef224a5333"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.filterOrder",
+      "path": "images.filterOrder",
+      "fixture": "noncommutative-filter-order",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "9431a30a3bee9c6c134bc6c68aa3b12618b536ffb130b186d5494d545c9a1468",
+      "afterSha256": "b7c3210c12f2cfc354079502a6a9b6ef6aaabd6e8e9175c989a37d5724d8de8f"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.fit",
+      "path": "images.fit",
+      "fixture": "non-square-bitmap-on-square-bounds",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "6259b8a31323d7ff0ce56579a047839499414edbf391d02f15203e4507567a8c",
+      "afterSha256": "231d29a7207a3face6f1c006e0d9559e837d5d8ea12ebb6cfe4c5044627f0ade"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.inherit",
+      "path": "images.inherit",
+      "fixture": "intrinsic-64x46-vs-bounds-79x77",
+      "executed": true,
+      "pixelChanged": false,
+      "beforeSha256": "6259b8a31323d7ff0ce56579a047839499414edbf391d02f15203e4507567a8c",
+      "afterSha256": "6259b8a31323d7ff0ce56579a047839499414edbf391d02f15203e4507567a8c"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.mask",
+      "path": "images.mask",
+      "fixture": "opposing-alpha-half-planes",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "68646bcfbd371f005b0a7b30b48186b14013606f56332831fdeb5307d06b3b6c",
+      "afterSha256": "28d4a23ce47155953be80584e505dbf794794941adc123049e13306fdb2f9f22"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.mask.source",
+      "path": "images.mask.source",
+      "fixture": "opposing-alpha-half-planes",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "68646bcfbd371f005b0a7b30b48186b14013606f56332831fdeb5307d06b3b6c",
+      "afterSha256": "28d4a23ce47155953be80584e505dbf794794941adc123049e13306fdb2f9f22"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.source",
+      "path": "images.source",
+      "fixture": "two-distinct-verified-bitmap-bytes",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "6259b8a31323d7ff0ce56579a047839499414edbf391d02f15203e4507567a8c",
+      "afterSha256": "9dec0f5b1730b6208d694c5333fbfc4b42a2b815a42b48cd5ade5e3783b19c12"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.borderPosition",
+      "path": "options.groupTransform.borderPosition",
+      "fixture": "thick-border-selective-corners",
+      "executed": true,
+      "pixelChanged": false,
+      "beforeSha256": "e093ed58975b0d8c823af9160b52932b1713b51c5865d286517b03054dd654af",
+      "afterSha256": "e093ed58975b0d8c823af9160b52932b1713b51c5865d286517b03054dd654af"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.filterIntensity",
+      "path": "options.groupTransform.filterIntensity",
+      "fixture": "strong-multi-filter-pipeline",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "6e6e5b874812d886940af257e7a0b61e4f7e00e3861d4d17c3f6d7845150c48f",
+      "afterSha256": "670be52b27f1f0158e25d29ed51457c0a6d9c659cfc63d5d3496e1bb18caa4fd"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.filterOrder",
+      "path": "options.groupTransform.filterOrder",
+      "fixture": "noncommutative-filter-order",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "3f9957c4b8b2ae08da2fb76045bab62d7e31cff7596a01882112abdefad77a6a",
+      "afterSha256": "c9008858fb151bfffaad9b34ef65d416eaa322c838e137bef7a60f5f278c4651"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.mask",
+      "path": "options.groupTransform.mask",
+      "fixture": "opposing-alpha-half-planes",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "56d31ddf57d8ca25c89b3c9170b15e30fe0c1e1174fecca87c723ef1ac9992d0",
+      "afterSha256": "4abaaa4ec6db092384d2dbec8616c661ba230c3e27012fde2c6f27681f64d610"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.mask.source",
+      "path": "options.groupTransform.mask.source",
+      "fixture": "opposing-alpha-half-planes",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "56d31ddf57d8ca25c89b3c9170b15e30fe0c1e1174fecca87c723ef1ac9992d0",
+      "afterSha256": "4abaaa4ec6db092384d2dbec8616c661ba230c3e27012fde2c6f27681f64d610"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.pivotX",
+      "path": "options.groupTransform.pivotX",
+      "fixture": "non-zero-rotation-with-shifted-pivot",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "10961db913bc374fe2247695114b8b54211dbcc4aa4d48df9d17d160f9e683f7",
+      "afterSha256": "43f53810b230a4aaea3e89ccb4eb8407361a8163aa75dcdbcef96c930e965375"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.pivotY",
+      "path": "options.groupTransform.pivotY",
+      "fixture": "non-zero-rotation-with-shifted-pivot",
+      "executed": true,
+      "pixelChanged": true,
+      "beforeSha256": "10961db913bc374fe2247695114b8b54211dbcc4aa4d48df9d17d160f9e683f7",
+      "afterSha256": "7af0c9e1f6c667c9bb260201003e460951738b2231de57389c324b3495c606c9"
+    }
+  ]
+}

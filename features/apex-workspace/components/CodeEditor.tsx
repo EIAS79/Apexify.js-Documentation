@@ -52,6 +52,10 @@ export default function CodeEditor({
         <Editor
           value={source}
           onChange={onChange}
+          onCreateEditor={(view) => {
+            view.contentDOM.setAttribute("aria-label", "TypeScript code editor");
+            view.scrollDOM.setAttribute("tabindex", "0");
+          }}
           theme="dark"
           height="100%"
           extensions={extensions}

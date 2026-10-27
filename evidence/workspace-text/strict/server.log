@@ -1,0 +1,20 @@
+
+> apexify.js-documentation@1.0.0 start
+> next start -p 38498
+
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::38498
+    at Server.setupListenHandle [as _listen2] (node:net:2328:16)
+    at listenInCluster (node:net:2437:12)
+    at Server.listen (node:net:2562:7)
+    at D:\ApexifyWorkspaceParallel\text-acceptance-20261022\node_modules\next\dist\server\lib\start-server.js:280:16
+    at new Promise (<anonymous>)
+    at startServer (D:\ApexifyWorkspaceParallel\text-acceptance-20261022\node_modules\next\dist\server\lib\start-server.js:191:11)
+    at Module.nextStart (D:\ApexifyWorkspaceParallel\text-acceptance-20261022\node_modules\next\dist\cli\next-start.js:25:40)
+    at D:\ApexifyWorkspaceParallel\text-acceptance-20261022\node_modules\next\dist\bin\next:105:856 {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 38498
+}

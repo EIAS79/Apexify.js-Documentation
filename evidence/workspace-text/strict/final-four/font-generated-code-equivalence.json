@@ -1,0 +1,63 @@
+{
+  "pathCount": 2,
+  "cases": [
+    {
+      "id": "NATIVE-FOUR-FONT-FAMILY-CODE",
+      "path": "createText.TextProperties.font.family",
+      "font": {
+        "family": "Arial"
+      },
+      "caseName": "Arial",
+      "measuredWidth": 859.1900024414062,
+      "nativeSha256": "d95c4d5ffaa0c8e18dca351358d4a1aef290155c6c4b5fcbda6e8a1418849296",
+      "codeSha256": "d95c4d5ffaa0c8e18dca351358d4a1aef290155c6c4b5fcbda6e8a1418849296",
+      "codeExecution": "PASS",
+      "codeToVisual": "PASS",
+      "pixelEquality": true
+    },
+    {
+      "id": "NATIVE-FOUR-FONT-FAMILY-CODE",
+      "path": "createText.TextProperties.font.family",
+      "font": {
+        "family": "Courier New"
+      },
+      "caseName": "Courier New",
+      "measuredWidth": 936.1500244140625,
+      "nativeSha256": "e788f019a87603f3e5bb6d376b23240697ee1f6df128dbfc5acf96eddd377eac",
+      "codeSha256": "e788f019a87603f3e5bb6d376b23240697ee1f6df128dbfc5acf96eddd377eac",
+      "codeExecution": "PASS",
+      "codeToVisual": "PASS",
+      "pixelEquality": true
+    },
+    {
+      "id": "NATIVE-FOUR-FONT-NAME-CODE",
+      "path": "createText.TextProperties.font.name",
+      "font": {
+        "family": "Courier New",
+        "name": "Arial"
+      },
+      "caseName": "Arial",
+      "measuredWidth": 859.1900024414062,
+      "nativeSha256": "d95c4d5ffaa0c8e18dca351358d4a1aef290155c6c4b5fcbda6e8a1418849296",
+      "codeSha256": "d95c4d5ffaa0c8e18dca351358d4a1aef290155c6c4b5fcbda6e8a1418849296",
+      "codeExecution": "PASS",
+      "codeToVisual": "PASS",
+      "pixelEquality": true
+    },
+    {
+      "id": "NATIVE-FOUR-FONT-NAME-CODE",
+      "path": "createText.TextProperties.font.name",
+      "font": {
+        "family": "Arial",
+        "name": "Courier New"
+      },
+      "caseName": "Courier New",
+      "measuredWidth": 936.1500244140625,
+      "nativeSha256": "e788f019a87603f3e5bb6d376b23240697ee1f6df128dbfc5acf96eddd377eac",
+      "codeSha256": "e788f019a87603f3e5bb6d376b23240697ee1f6df128dbfc5acf96eddd377eac",
+      "codeExecution": "PASS",
+      "codeToVisual": "PASS",
+      "pixelEquality": true
+    }
+  ]
+}

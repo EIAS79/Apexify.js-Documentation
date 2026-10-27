@@ -65,6 +65,7 @@ export function Queue({
             <span className={`aw-job-dot aw-job-${job.state}`} />
             <button
               className="aw-job-art"
+              aria-label={job.url ? "Open " + job.name + " rendered image" : job.name + " image unavailable"}
               onClick={() => job.url && onSelect(job.url)}
               disabled={!job.url}
             >

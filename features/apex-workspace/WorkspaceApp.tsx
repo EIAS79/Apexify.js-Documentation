@@ -32,6 +32,9 @@ import {
   type WorkspaceLayer,
 } from "./model";
 import { generateSource, parseSource } from "./codegen";
+import {transactCanvasViaV2} from "./domain/canvas-bridge";
+import {verifyBrowserImageAssets} from "./asset-store";
+import {readWorkspaceProject,saveWorkspaceProject,WORKSPACE_STORAGE_KEY,WORKSPACE_BACKUP_KEY,preserveDurableRecoveryBackup,exportRawRecoveryRecord,acceptRecoveryRevision,ProjectSaveConflictError} from './durable-assets';
 import { requestWorkspaceRender } from "./client-render";
 import {
   DockLayout,
@@ -53,7 +56,6 @@ import {
   type RenderJob,
   type LogEntry,
 } from "./components/Results";
-import { BrandBanner, BrandIcon } from "../../components/Brand";
 import "./workspace.css";
 
 let idCounter = 0;
@@ -162,12 +164,16 @@ export default function WorkspaceApp() {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [message, setMessage] = useState<string | null>(null);
+  const [recoveryRecord,setRecoveryRecord] = useState<string|null>(null);
+  const [recoveryDownloaded,setRecoveryDownloaded] = useState(false);
+  const [saveConflict,setSaveConflict]=useState<string|null>(null);
   const [dialog, setDialog] = useState<string | null>(null);
   const [pump, setPump] = useState(0);
   const activeJob = useRef<{ id: string; controller: AbortController } | null>(
     null,
   );
   const livePreviewUrl = useRef<string | null>(null);
+  const liveRenderRevision = useRef(0);
   const allUrls = useRef(new Set<string>());
   const nextLogId = useRef(0);
   const alive = useRef(true);
@@ -175,6 +181,8 @@ export default function WorkspaceApp() {
   const lastEdit = useRef({ key: "", time: 0 });
   const sourceDirtyRef = useRef(false);
   const persistError = useRef(false);
+  const recoveryBlocked = useRef(false);
+  const hydratedDocument = useRef<WorkspaceDocument|null>(null);
   sourceDirtyRef.current = sourceDirty;
   const log = useCallback(
     (message: string, kind: LogEntry["kind"] = "info") => {
@@ -207,12 +215,15 @@ export default function WorkspaceApp() {
   }, [message]);
   useEffect(() => {
     alive.current = true;
+    let disposed=false;
+    const recover=async()=>{
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const restored = validateDocument(JSON.parse(stored));
-        setHistory({ past: [], present: restored, future: [] });
-        setSource(generateSource(restored));
+      const saved = await readWorkspaceProject();
+      if(saved){
+        if(disposed)return;
+        hydratedDocument.current=saved.legacy?null:saved.document; // migrate legacy v1 automatically
+        setHistory({past:[],present:saved.document,future:[]});
+        setSource(generateSource(saved.document));
       }
       const draft = localStorage.getItem(DRAFT_KEY);
       if (draft && draft.length < 6_000_000) {
@@ -245,32 +256,38 @@ export default function WorkspaceApp() {
         }
       }
     } catch {
-      notify(
-        "A saved project could not be restored. The reference composition is ready; import a backup JSON to recover.",
-      );
+      recoveryBlocked.current=true;
+      if(!disposed)setRecoveryRecord(localStorage.getItem(WORKSPACE_STORAGE_KEY)??'');
+      notify('A saved project could not be restored. The original record is preserved until explicit recovery.');
     }
-    setReady(true);
-    log("Workspace ready. Type help in Terminal for commands.");
+    if(!disposed){
+      setReady(true);
+      log("Workspace ready. Type help in Terminal for commands.");
+    }
+    };
+    void recover();
     return () => {
+      disposed=true;
       alive.current = false;
       activeJob.current?.controller.abort();
       allUrls.current.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [log, notify]);
   useEffect(() => {
-    if (!ready) return;
-    const timer = setTimeout(() => {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(document));
-      } catch {
-        if (!persistError.current) {
-          persistError.current = true;
-          notify(
-            "Device storage is full. Download your project JSON to preserve these changes.",
-          );
+    if (!ready || recoveryBlocked.current || document===hydratedDocument.current || saveConflict) return;
+    const timer=setTimeout(()=>{
+      void saveWorkspaceProject(document).catch(e=>{
+        if(e instanceof ProjectSaveConflictError){
+          setSaveConflict(e.message);
+          error(e.message);
+          return;
         }
-      }
-    }, 350);
+        if(!persistError.current){
+          persistError.current=true;
+          notify('Project save failed: '+(e instanceof Error?e.message:'device storage error')+'. Download project JSON.');
+        }
+      });
+    },350);
     return () => clearTimeout(timer);
   }, [ready, document, notify]);
   useEffect(() => {
@@ -303,6 +320,8 @@ export default function WorkspaceApp() {
   }, [document, sourceDirty]);
 
   function commit(next: WorkspaceDocument, key = "edit", force = false) {
+    if(!ready){error('Workspace is restoring saved data. Try this edit after it finishes loading.');return;}
+    if(saveConflict){error('A newer project was committed in another tab. Download local changes, then reload.');return;}
     if (sourceDirtyRef.current && !force) {
       error(
         "Apply or discard your Code edits before changing the visual composition.",
@@ -310,7 +329,12 @@ export default function WorkspaceApp() {
       return;
     }
     try {
+      if(recoveryBlocked.current){
+        error('Recovery mode is locked. Download the original record, then explicitly import a backup or reset.');
+        return;
+      }
       const valid = validateDocument(next);
+      liveRenderRevision.current++;
       const now = Date.now();
       const merge =
         key === lastEdit.current.key && now - lastEdit.current.time < 500;
@@ -325,6 +349,7 @@ export default function WorkspaceApp() {
     }
   }
   function undo() {
+    liveRenderRevision.current++;
     if (sourceDirtyRef.current) {
       error("Apply or discard Code edits before Undo.");
       return;
@@ -341,6 +366,7 @@ export default function WorkspaceApp() {
     lastEdit.current.key = "";
   }
   function redo() {
+    liveRenderRevision.current++;
     if (sourceDirtyRef.current) {
       error("Apply or discard Code edits before Redo.");
       return;
@@ -398,6 +424,46 @@ export default function WorkspaceApp() {
       setCodeError(text);
       error(text);
     }
+  }
+  async function downloadRejectedRecord(){
+    if(recoveryRecord===null)return;
+    const bundle=await exportRawRecoveryRecord();
+    downloadFile(new Blob([bundle],{type:'application/json'}),
+      'apexify-preserved-recovery-record.json');
+    setRecoveryDownloaded(true);
+  }
+  async function beginRecovery(next:WorkspaceDocument) {
+    if(recoveryRecord===null)return;
+    try{
+      await preserveDurableRecoveryBackup();
+    }catch(e){
+      if(!recoveryDownloaded){
+        error('Durable recovery backup failed. Download the original record before continuing.');
+        return;
+      }
+      error('The original record was downloaded but could not be independently backed up on this device.');
+    }
+    try{await acceptRecoveryRevision();}
+    catch(e){error('Cannot safely establish recovery revision: '+(e instanceof Error?e.message:'unknown'));return;}
+    recoveryBlocked.current=false;
+    persistError.current=false;
+    setRecoveryRecord(null);
+    setHistory({past:[],present:next,future:[]});
+    setSource(generateSource(next));
+    setSourceDirty(false);
+    log('Explicit project recovery accepted. Original record preserved.','success');
+  }
+  async function importRecoveryProject(file:File){
+    try{
+      if(file.size>3_000_000)throw new Error('Recovery project exceeds 3 MB');
+      const parsed=validateDocument(JSON.parse(await file.text()));
+      await verifyBrowserImageAssets(parsed.assets??[]);
+      await beginRecovery(parsed);
+    }catch(e){error('Recovery import rejected: '+(e instanceof Error?e.message:'invalid project'));}
+  }
+  function resetRecoveredProject(){
+    if(!window.confirm('Reset the saved Workspace project? First download the preserved record or keep the recovery backup.'))return;
+    void beginRecovery(createHeroDocument());
   }
   function downloadProject() {
     downloadFile(
@@ -472,13 +538,16 @@ export default function WorkspaceApp() {
   }, [ready, document]);
   useEffect(() => {
     if (!ready) return;
+    const generation=++liveRenderRevision.current;
     const controller = new AbortController();
+    const stale=()=>controller.signal.aborted||generation!==liveRenderRevision.current;
     const timer = setTimeout(async () => {
+      if(stale())return;
       setRendering(true);
       setPreviewError(null);
       try {
         const blob = await requestWorkspaceRender(document, controller.signal);
-        if (controller.signal.aborted) return;
+        if(stale())return;
         const url = URL.createObjectURL(blob);
         allUrls.current.add(url);
         if (livePreviewUrl.current) {
@@ -488,17 +557,18 @@ export default function WorkspaceApp() {
         livePreviewUrl.current = url;
         setPreview(url);
       } catch (e) {
-        if (!controller.signal.aborted) {
+        if (!stale()) {
           const text = e instanceof Error ? e.message : "Preview failed.";
           setPreviewError(text);
           error(text);
         }
       } finally {
-        if (!controller.signal.aborted) setRendering(false);
+        if (!stale()) setRendering(false);
       }
     }, 450);
     return () => {
       clearTimeout(timer);
+      liveRenderRevision.current++;
       controller.abort();
     };
   }, [document, ready, error]);
@@ -751,12 +821,21 @@ export default function WorkspaceApp() {
           <Inspector
             document={document}
             selected={selected}
-            onDocument={(patch) =>
-              commit(
-                { ...document, ...patch },
-                `document:${Object.keys(patch).join(",")}`,
-              )
-            }
+            onDocument={(patch) => {
+              // Canvas discriminant changes are discrete actions. Rapid layer
+              // type switches must not merge into one generic Undo history step.
+              const fingerprint=(extras:WorkspaceDocument['canvasExtras'])=>[
+                extras?.gradientBg?.type??'none',extras?.patternBg?.type??'none',
+                extras?.stroke?.gradient?.type??(extras?.stroke?'solid':'none'),
+                extras?.shadow?.gradient?.type??(extras?.shadow?'solid':'none'),
+                ...(extras?.bgLayers??[]).map(layer=>(layer.nodeId??'?')+':'+layer.type)
+              ].join('|');
+              const switched=patch.canvasExtras!==undefined&&
+                fingerprint(patch.canvasExtras)!==fingerprint(document.canvasExtras);
+              commit({...document,...patch},
+                switched?'canvas:variant:'+fingerprint(patch.canvasExtras):
+                  'document:'+Object.keys(patch).join(','));
+            }}
             onLayer={updateLayer}
             onSelect={select}
             onRemove={(id) => {
@@ -783,7 +862,32 @@ export default function WorkspaceApp() {
               commit(createHeroDocument(), "preset");
               setSelected(null);
             }}
-            onUpload={(source, name) => add("image", source, name)}
+            onUpload={(source,name,asset)=>{
+              if(sourceDirtyRef.current){error("Apply or discard Code edits before importing images.");return;}
+              const id=workspaceId(),layer=newLayer("image",id,source);
+              layer.name=name.slice(0,200);
+              const assets=document.assets?.some(a=>a.id===asset.id)?document.assets:[...(document.assets??[]),asset];
+              try{
+                const next=validateDocument({...document,assets,layers:[...document.layers,layer]});
+                commit(next,`add:${id}`);
+                select(id);
+                log("Imported verified SHA-256 image layer: "+layer.name);
+              }catch(e){error(e instanceof Error?e.message:"Invalid image asset");}
+            }}
+            onCanvasAsset={(asset,placement)=>{
+              const assets=document.assets?.some(x=>x.id===asset.id)?document.assets:[...(document.assets??[]),asset];
+              const extras={...document.canvasExtras};
+              if(placement==='custom'){
+                extras.customBg={source:asset.id,fit:'cover',opacity:1};
+                delete extras.gradientBg;delete extras.patternBg;delete extras.noiseBg;
+              } else if(placement==='pattern'){
+                extras.patternBg={type:'custom',customPatternImage:asset.id,size:24,spacing:24,opacity:1,repeat:'repeat'};
+                delete extras.gradientBg;delete extras.customBg;delete extras.noiseBg;
+              } else {
+                extras.bgLayers=[...(extras.bgLayers??[]),{type:'image',source:asset.id,fit:'cover',opacity:1}];
+              }
+              commit({...document,assets,canvasExtras:extras},'canvas:import-asset');
+            }}
             onError={error}
             tab={inspectorTab}
             setTab={setInspectorTab}
@@ -808,6 +912,8 @@ export default function WorkspaceApp() {
             onSelect={select}
             preview={preview}
             onRender={enqueue}
+            onCanvas={(canvasExtras)=>commit(transactCanvasViaV2(document,canvasExtras).document,'graph:canvas-v2-bridge')}
+            onDocument={(updated)=>commit(transactCanvasViaV2(updated,updated.canvasExtras??{}).document,'graph:background-v2-bridge')}
           />
         ) : id === "queue" ? (
           <Queue
@@ -845,12 +951,13 @@ export default function WorkspaceApp() {
     <main
       className={`aw-app${contrast ? " aw-contrast" : ""}`}
       aria-label="Apexify creative workspace"
+      aria-busy={!ready}
     >
       <header className="aw-topbar">
-        <a className="aw-brand" href="/" aria-label="Apexify.js home">
-          <BrandBanner className="aw-brand-lockup" maxWidth={150} />
-          <span className="aw-brand-icon">
-            <BrandIcon />
+        <a className="aw-brand" href="/" aria-label="Apexify home">
+          <img src="/workspace/assets/apex-mark.webp" alt="" />
+          <span>
+            Apexify<span className="aw-brand-js">.js</span>
           </span>
         </a>
         <nav className="aw-topnav" aria-label="Main navigation">
@@ -935,6 +1042,24 @@ export default function WorkspaceApp() {
           </button>
         </div>
       </header>
+      {saveConflict?<div role="alert" aria-label="Workspace save conflict" className="aw-recovery-panel" style={{padding:'10px 20px',border:'1px solid #ba8655',background:'#171b2a',color:'#f5e9e4'}}>
+        <strong>Another Workspace tab saved a newer project.</strong>
+        <p>{saveConflict}</p>
+        <button type="button" className="aw-button" onClick={downloadProject}>Download unsaved local project</button>
+        <button type="button" className="aw-button" onClick={()=>window.location.reload()}>Reload committed revision</button>
+      </div>:null}
+      {recoveryRecord!==null?<div role="alert" aria-label="Workspace project recovery" className="aw-recovery-panel" style={{padding:'12px 20px',border:'1px solid #b35b49',background:'#171b2a',color:'#f5e9e4'}}>
+        <strong>Saved project could not be verified.</strong>
+        <p>Your rejected project has not been overwritten. Normal edits and automatic saving are locked until you choose recovery.</p>
+        <div className="aw-field-row">
+          <button type="button" className="aw-button" onClick={downloadRejectedRecord}>Download original recovery record</button>
+          <label>Import valid backup project
+            <input type="file" accept=".json,.apexify.json,application/json" aria-label="Import recovery project"
+              onChange={e=>{const file=e.currentTarget.files?.[0];e.currentTarget.value='';if(file)void importRecoveryProject(file);}}/>
+          </label>
+          <button type="button" className="aw-button" onClick={resetRecoveredProject}>Explicitly reset saved project</button>
+        </div>
+      </div>:null}
       <div className="aw-mobile-tabs">
         <label>
           <Bars3Icon />
@@ -978,7 +1103,7 @@ export default function WorkspaceApp() {
           />
         ) : (
           <div className="aw-empty-workspace">
-            <BrandIcon size={48} />
+            <CubeTransparentIcon />
             <h1>Your space. Your workflow.</h1>
             <p>Open a panel to keep creating.</p>
             <button className="aw-button aw-primary" onClick={resetLayout}>

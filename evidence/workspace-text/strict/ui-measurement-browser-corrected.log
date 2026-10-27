@@ -1,0 +1,24 @@
+STRICT_NUMERIC_WEIGHT_350_PASS
+STRICT_CURVE_REQUIRED_120_PASS
+STRICT_MEASUREMENT_CANVAS_INTEGER_256_PASS
+CHROME_CHAR_METRICS_ENABLED
+CURVE_REMOVED_FOR_PLAIN_METRICS
+NATIVE_METRICS Width: 1117.90 px
+Height: 140.00 px
+Line count: 1
+Ascent: 49.00 px
+Descent: 311.94 px
+Baseline: 49.00 px
+Use measured selection bounds
+Per-line measured data
+Character positions
+Complete native TextMetrics result
+METRIC_BROWSER_RESULT {"count":43,"observed":41,"absent":["measureText.TextMetrics.hangingBaseline","measureText.TextMetrics.ideographicBaseline"]}
+SCREENSHOT D:\ApexifyWorkspaceParallel\text-strict-20261023\evidence\workspace-text\strict\01-native-typography-inspector.png
+EDITOR_INPUT_COMMITTED 3.25
+GRAPH_TO_INSPECTOR_SYNC true
+UNDO_REDO_PASS
+SCREENSHOT D:\ApexifyWorkspaceParallel\text-strict-20261023\evidence\workspace-text\strict\02-typed-graph-with-text-editor.png
+PERSISTED_AFTER_RELOAD 3.25
+SCREENSHOT D:\ApexifyWorkspaceParallel\text-strict-20261023\evidence\workspace-text\strict\03-persisted-text-after-reload.png
+BROWSER_PASS

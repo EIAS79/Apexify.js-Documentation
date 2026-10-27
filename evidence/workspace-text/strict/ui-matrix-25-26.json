@@ -1,0 +1,20 @@
+{
+  "start": 25,
+  "count": 1,
+  "results": [
+    {
+      "id": "UI-0026",
+      "api": "createText.TextProperties.decorations.underline (styled).width",
+      "status": "INSPECTOR_GRAPH_HISTORY_PASS",
+      "evidence": {
+        "inspectorExpected": 30,
+        "inspectorCurrent": 30,
+        "graphValue": 40,
+        "graphModel": 40,
+        "undo": 30,
+        "redo": 40,
+        "graphMounted": true
+      }
+    }
+  ]
+}

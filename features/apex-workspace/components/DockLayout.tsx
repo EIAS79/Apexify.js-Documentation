@@ -152,6 +152,12 @@ export function DockLayout({
               role="separator"
               tabIndex={0}
               aria-label={`Resize ${tree.id} panels`}
+              aria-valuemin={12}
+              aria-valuemax={88}
+              aria-valuenow={Math.round(
+                (100 * weights[children[position - 1].index]) /
+                  (weights[children[position - 1].index] + weights[index]),
+              )}
               aria-orientation={
                 tree.direction === "row" ? "vertical" : "horizontal"
               }

@@ -1,3 +1,7 @@
+import {validateCanvasExtras,validateCanvasImageFilters,type CanvasExtras} from './canvas-options';
+import {validateTextSettings,type TextSettings} from './domain/text';
+import {validateImageOptions,validateImageGroups,IMAGE_SHAPES,type ImageEditorOptions,type ImageEditorGroup} from './image-options';
+import {validateImageAssets,resolveImageReference,type WorkspaceImageAsset,ASSET_REFERENCE} from './asset-store';
 /** Workspace-owned authoring model. No dependency on the legacy Studio. */
 export type PanelId =
   | "tools"
@@ -37,13 +41,14 @@ export type WorkspaceLayer = LayerBase &
     | {
         kind: "text";
         text: string;
+        textSettings?: TextSettings;
         fontSize: number;
         weight: number;
         color: string;
       }
     | {
         kind: "shape";
-        shape: "rectangle" | "circle";
+        shape: (typeof IMAGE_SHAPES)[number];
         color: string;
         radius: number;
         strokeColor: string;
@@ -57,7 +62,7 @@ export type WorkspaceLayer = LayerBase &
         labels: string[];
         colors: string[];
       }
-  );
+  ) & {imageOptions?:ImageEditorOptions;imageGroupId?:string};
 export interface WorkspaceDocument {
   schemaVersion: 1;
   name: string;
@@ -72,6 +77,10 @@ export interface WorkspaceDocument {
     transparent: boolean;
   };
   layers: WorkspaceLayer[];
+  canvasExtras?: CanvasExtras;
+  imageGroups?: ImageEditorGroup[];
+  /** Immutable image records keyed by SHA-256; referenced by canvas options and frames. */
+  assets?: WorkspaceImageAsset[];
 }
 const base = (
   id: string,
@@ -240,6 +249,7 @@ function bool(v: unknown): boolean {
 function imageSource(v: unknown): string {
   const s = str(v, "Image source", 5_600_000);
   if (
+    !ASSET_REFERENCE.test(s) &&
     s !== "/workspace/assets/crystal-lake.webp" &&
     !/^data:image\/(png|jpeg|webp);base64,[A-Za-z\d+/=]+$/.test(s)
   )
@@ -254,6 +264,30 @@ export function validateDocument(value: unknown): WorkspaceDocument {
   if (d.schemaVersion !== 1)
     throw new Error("Unsupported workspace document version.");
   const b = record(d.background);
+  const assets=validateImageAssets(d.assets);
+  // All browser/project export paths share the same 6 MB JSON render transport.
+  // A tighter authoring limit also leaves storage headroom for source drafts and UI metadata.
+  if(JSON.stringify(d).length>3_000_000)throw new Error('Workspace project exceeds the 3 MB durable JSON budget.');
+  const canvasExtras=validateCanvasExtras(d.canvasExtras);
+  const imageGroups=validateImageGroups(d.imageGroups,assets);
+  if(canvasExtras.customBg){
+    const resolved=resolveImageReference(canvasExtras.customBg.source,assets);
+    if(canvasExtras.customBg.filters?.length){
+      // Pinned CanvasConfig.customBg.source is a 16,384-char string. Fail closed
+      // rather than silently dropping filters or decoding oversized sources.
+      if(resolved.length>16_384)throw Error('Verified background asset exceeds pinned 16,384-character filtered-source limit');
+      if(num(d.width,"Canvas width",64,2048)>1024||num(d.height,"Canvas height",64,2048)>1024||
+         num(d.width,"Canvas width",64,2048)*num(d.height,"Canvas height",64,2048)>1_048_576)
+        throw Error('Filtered canvas exceeds bounded 1024px / 1,048,576-pixel native filter budget');
+      validateCanvasImageFilters(canvasExtras.customBg.filters,num(d.width,"Canvas width",64,2048),num(d.height,"Canvas height",64,2048));
+    }
+  }
+  if(canvasExtras.patternBg?.type==='custom')resolveImageReference(canvasExtras.patternBg.customPatternImage!,assets);
+  for(const entry of canvasExtras.bgLayers??[]){
+    if(entry.type==='image'||entry.type==='pattern')resolveImageReference(entry.source,assets);
+    if(entry.type==='presetPattern'&&entry.pattern.type==='custom')
+      resolveImageReference(entry.pattern.customPatternImage!,assets);
+  }
   if (!["image", "gradient", "color"].includes(String(b.mode)))
     throw new Error("Invalid background mode.");
   if (!Array.isArray(d.layers) || d.layers.length > 64)
@@ -284,14 +318,20 @@ export function validateDocument(value: unknown): WorkspaceDocument {
         fontSize: num(l.fontSize, "Font size", 4, 320),
         weight: num(l.weight, "Font weight", 100, 900),
         color: color(l.color),
+        ...(l.textSettings === undefined ? {} : {textSettings:validateTextSettings(l.textSettings)}),
       };
+    const imageData=(l.kind==='image'||l.kind==='shape')?{
+      ...(l.imageOptions===undefined?{}:{imageOptions:validateImageOptions(l.imageOptions,assets)}),
+      ...(l.imageGroupId===undefined?{}:{imageGroupId:str(l.imageGroupId,'Image group ID',80)})
+    }:{};
+    if('imageGroupId' in imageData && !imageGroups.some(g=>g.id===imageData.imageGroupId))throw Error('Unknown image group');
     if (l.kind === "shape") {
-      if (l.shape !== "rectangle" && l.shape !== "circle")
+      if (!IMAGE_SHAPES.includes(l.shape as (typeof IMAGE_SHAPES)[number]))
         throw new Error("Unsupported shape.");
       return {
-        ...common,
+        ...common,...imageData,
         kind: "shape",
-        shape: l.shape,
+        shape: l.shape as (typeof IMAGE_SHAPES)[number],
         color: color(l.color),
         radius: num(l.radius, "Radius", 0, 1024),
         strokeColor: color(l.strokeColor),
@@ -299,7 +339,7 @@ export function validateDocument(value: unknown): WorkspaceDocument {
       };
     }
     if (l.kind === "image")
-      return { ...common, kind: "image", source: imageSource(l.source) };
+      return { ...common,...imageData, kind: "image", source: imageSource(l.source) };
     if (l.kind === "chart") {
       if (l.chartType !== "bar" && l.chartType !== "pie")
         throw new Error("Unsupported chart type.");
@@ -340,5 +380,8 @@ export function validateDocument(value: unknown): WorkspaceDocument {
       transparent: bool(b.transparent),
     },
     layers,
+    ...(d.imageGroups===undefined?{}:{imageGroups}),
+    ...(d.canvasExtras===undefined?{}:{canvasExtras}),
+    ...(d.assets===undefined?{}:{assets}),
   };
 }

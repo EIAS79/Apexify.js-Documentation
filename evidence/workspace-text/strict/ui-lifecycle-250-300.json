@@ -1,0 +1,706 @@
+{
+  "begin": 250,
+  "limit": 50,
+  "results": [
+    {
+      "id": "LIFE-0251",
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.colors[].color",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": "#ff8800",
+          "current": "#ff8800"
+        },
+        "stored": "#ff8800",
+        "reloaded": "#ff8800",
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0252",
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).width",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 30,
+          "current": 30
+        },
+        "stored": 30,
+        "reloaded": 30,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0253",
+      "api": "createText.TextProperties[].effects.highlight.color",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": "#ff8800",
+          "current": "#ff8800"
+        },
+        "stored": "#ff8800",
+        "reloaded": "#ff8800",
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0254",
+      "api": "createText.TextProperties[].effects.highlight.gradient.type",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": "radial",
+          "current": "radial"
+        },
+        "stored": "radial",
+        "reloaded": "radial",
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0255",
+      "api": "createText.TextProperties[].effects.highlight.gradient.startX",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0256",
+      "api": "createText.TextProperties[].effects.highlight.gradient.startY",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0257",
+      "api": "createText.TextProperties[].effects.highlight.gradient.endX",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0258",
+      "api": "createText.TextProperties[].effects.highlight.gradient.endY",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0259",
+      "api": "createText.TextProperties[].effects.highlight.gradient.startRadius",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 80,
+          "current": 80
+        },
+        "stored": 80,
+        "reloaded": 80,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0260",
+      "api": "createText.TextProperties[].effects.highlight.gradient.endRadius",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 80,
+          "current": 80
+        },
+        "stored": 80,
+        "reloaded": 80,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0261",
+      "api": "createText.TextProperties[].effects.highlight.gradient.centerX",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0262",
+      "api": "createText.TextProperties[].effects.highlight.gradient.centerY",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0263",
+      "api": "createText.TextProperties[].effects.highlight.gradient.startAngle",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0264",
+      "api": "createText.TextProperties[].effects.highlight.gradient.rotate",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0265",
+      "api": "createText.TextProperties[].effects.highlight.gradient.pivotX",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0266",
+      "api": "createText.TextProperties[].effects.highlight.gradient.pivotY",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0267",
+      "api": "createText.TextProperties[].effects.highlight.gradient.repeat",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": "repeat",
+          "current": "repeat"
+        },
+        "stored": "repeat",
+        "reloaded": "repeat",
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0268",
+      "api": "createText.TextProperties[].effects.highlight.gradient.colors[].stop",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 0.15,
+          "current": 0.15
+        },
+        "stored": 0.15,
+        "reloaded": 0.15,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0269",
+      "api": "createText.TextProperties[].effects.highlight.gradient.colors[].color",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": "#ff8800",
+          "current": "#ff8800"
+        },
+        "stored": "#ff8800",
+        "reloaded": "#ff8800",
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0270",
+      "api": "createText.TextProperties[].effects.highlight.opacity",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 0.7,
+          "current": 0.7
+        },
+        "stored": 0.7,
+        "reloaded": 0.7,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0271",
+      "api": "createText.TextProperties[].effects.glow.color",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": "#ff8800",
+          "current": "#ff8800"
+        },
+        "stored": "#ff8800",
+        "reloaded": "#ff8800",
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0272",
+      "api": "createText.TextProperties[].effects.glow.gradient.type",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": "radial",
+          "current": "radial"
+        },
+        "stored": "radial",
+        "reloaded": "radial",
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0273",
+      "api": "createText.TextProperties[].effects.glow.gradient.startX",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0274",
+      "api": "createText.TextProperties[].effects.glow.gradient.startY",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0275",
+      "api": "createText.TextProperties[].effects.glow.gradient.endX",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0276",
+      "api": "createText.TextProperties[].effects.glow.gradient.endY",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0277",
+      "api": "createText.TextProperties[].effects.glow.gradient.startRadius",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 80,
+          "current": 80
+        },
+        "stored": 80,
+        "reloaded": 80,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0278",
+      "api": "createText.TextProperties[].effects.glow.gradient.endRadius",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 80,
+          "current": 80
+        },
+        "stored": 80,
+        "reloaded": 80,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0279",
+      "api": "createText.TextProperties[].effects.glow.gradient.centerX",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0280",
+      "api": "createText.TextProperties[].effects.glow.gradient.centerY",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0281",
+      "api": "createText.TextProperties[].effects.glow.gradient.startAngle",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0282",
+      "api": "createText.TextProperties[].effects.glow.gradient.rotate",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0283",
+      "api": "createText.TextProperties[].effects.glow.gradient.pivotX",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0284",
+      "api": "createText.TextProperties[].effects.glow.gradient.pivotY",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0285",
+      "api": "createText.TextProperties[].effects.glow.gradient.repeat",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": "repeat",
+          "current": "repeat"
+        },
+        "stored": "repeat",
+        "reloaded": "repeat",
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0286",
+      "api": "createText.TextProperties[].effects.glow.gradient.colors[].stop",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 0.15,
+          "current": 0.15
+        },
+        "stored": 0.15,
+        "reloaded": 0.15,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0287",
+      "api": "createText.TextProperties[].effects.glow.gradient.colors[].color",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": "#ff8800",
+          "current": "#ff8800"
+        },
+        "stored": "#ff8800",
+        "reloaded": "#ff8800",
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0288",
+      "api": "createText.TextProperties[].effects.glow.intensity",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0289",
+      "api": "createText.TextProperties[].effects.glow.opacity",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 0.7,
+          "current": 0.7
+        },
+        "stored": 0.7,
+        "reloaded": 0.7,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0290",
+      "api": "createText.TextProperties[].effects.shadow.color",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": "#ff8800",
+          "current": "#ff8800"
+        },
+        "stored": "#ff8800",
+        "reloaded": "#ff8800",
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0291",
+      "api": "createText.TextProperties[].effects.shadow.gradient.type",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": "radial",
+          "current": "radial"
+        },
+        "stored": "radial",
+        "reloaded": "radial",
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0292",
+      "api": "createText.TextProperties[].effects.shadow.gradient.startX",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0293",
+      "api": "createText.TextProperties[].effects.shadow.gradient.startY",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0294",
+      "api": "createText.TextProperties[].effects.shadow.gradient.endX",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0295",
+      "api": "createText.TextProperties[].effects.shadow.gradient.endY",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0296",
+      "api": "createText.TextProperties[].effects.shadow.gradient.startRadius",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 80,
+          "current": 80
+        },
+        "stored": 80,
+        "reloaded": 80,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0297",
+      "api": "createText.TextProperties[].effects.shadow.gradient.endRadius",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 80,
+          "current": 80
+        },
+        "stored": 80,
+        "reloaded": 80,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0298",
+      "api": "createText.TextProperties[].effects.shadow.gradient.centerX",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0299",
+      "api": "createText.TextProperties[].effects.shadow.gradient.centerY",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0300",
+      "api": "createText.TextProperties[].effects.shadow.gradient.startAngle",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "pin": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "packageDependency": "github:EIAS79/Apexify.js#379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "lockResolved": "git+ssh://git@github.com/EIAS79/Apexify.js.git#379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "engineSource": {
+    "file": "node_modules/apexify.js/dist/esm/index.js",
+    "sha256": "544ed38bf96814b65e2bbee843664c6c57f58ea2c59a9d9f1c754159628fd00d",
+    "lineNumbers": {
+      "resolveTextFontIdentity": 4188,
+      "namePrecedence": 4190,
+      "familyPrecedence": 4191,
+      "nameOverridesFamily": 4195,
+      "registerTextFontFromPath": 4197,
+      "registeredCanvasFont": 4207,
+      "setupTextFont": 4243,
+      "nativeOptionalMetric": 7060,
+      "finiteMetricGuard": 7062,
+      "optionalMetricCopy": 7083
+    }
+  },
+  "engineDeclaration": {
+    "file": "node_modules/apexify.js/dist/declarations/types/text.d.ts",
+    "sha256": "59659173f3e922a4535ee14a294fd0961d7abb7179146f13b93c4cc963115af1",
+    "optionalNumeric": [
+      "hangingBaseline",
+      "ideographicBaseline"
+    ]
+  },
+  "fontContract": "font.name overrides font.family; if neither requested uses Arial; trusted backend may register fonts through GlobalFonts.registerFromPath",
+  "security": "No browser font.path authoring or arbitrary local filesystem path acceptance introduced",
+  "metricsContract": "Engine copies each baseline only if underlying @napi-rs/canvas ctx.measureText property is a finite number; otherwise omits it",
+  "observedPinnedCanvasMetrics": {
+    "hangingBaseline": {
+      "present": false,
+      "value": null
+    },
+    "ideographicBaseline": {
+      "present": false,
+      "value": null
+    },
+    "alphabeticBaseline": {
+      "present": true,
+      "value": 47.07421875
+    },
+    "emHeightAscent": {
+      "present": true,
+      "value": 47.07421875
+    },
+    "emHeightDescent": {
+      "present": true,
+      "value": 11.01953125
+    }
+  },
+  "optionalBaselineRecommendation": {
+    "hangingBaseline": "PARTIAL - COMPLIANT_OPTIONAL_ABSENCE; upstream only if requirement changes",
+    "ideographicBaseline": "PARTIAL - COMPLIANT_OPTIONAL_ABSENCE; upstream only if requirement changes"
+  },
+  "dependencies": "Arial and Courier New installed or deterministically registered on render host; font availability must be checked on other hosts"
+}

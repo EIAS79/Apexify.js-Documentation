@@ -1,0 +1,7 @@
+STRICT_NUMERIC_WEIGHT_350_PASS
+STRICT_CURVE_REQUIRED_120_PASS
+STRICT_MEASUREMENT_CANVAS_INTEGER_256_PASS
+BROWSER_FAIL Error: Browser expression: "SyntaxError: missing ) after argument list"
+    at evaluate (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-measurement-browser.cjs:27:36)
+    at async click (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-measurement-browser.cjs:39:16)
+    at async run (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-measurement-browser.cjs:114:3)

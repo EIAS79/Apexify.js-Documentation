@@ -1,0 +1,4008 @@
+{
+  "owner": "TEXT-01",
+  "repository": "EIAS79/Apexify.js-Documentation",
+  "baseline": "3fc0a8bc93e22ec21b28d92ccfb00fe70da2a1fd",
+  "engine": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "strictCertification": "PENDING_AFTER_INTEGRATION",
+  "itemCount": 444,
+  "results": [
+    {
+      "api": "createText.TextProperties.font.size",
+      "model": "layers[].textSettings.properties.font.size",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.font.family",
+      "model": "layers[].textSettings.properties.font.family",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.font.name",
+      "model": "layers[].textSettings.properties.font.name",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.font.weight",
+      "model": "layers[].textSettings.properties.font.weight",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.font.style",
+      "model": "layers[].textSettings.properties.font.style",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.bold",
+      "model": "layers[].textSettings.properties.decorations.bold",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.italic",
+      "model": "layers[].textSettings.properties.decorations.italic",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.underline (boolean)",
+      "model": "layers[].textSettings.properties.decorations.underline",
+      "ui": "TextOptionsEditor union selector",
+      "render": "ApexPainter.createText",
+      "code": "generateSource textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.underline (styled).color",
+      "model": "layers[].textSettings.properties.decorations.underline.color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.type",
+      "model": "layers[].textSettings.properties.decorations.underline.gradient.type",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.startX",
+      "model": "layers[].textSettings.properties.decorations.underline.gradient.startX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.startY",
+      "model": "layers[].textSettings.properties.decorations.underline.gradient.startY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.endX",
+      "model": "layers[].textSettings.properties.decorations.underline.gradient.endX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.endY",
+      "model": "layers[].textSettings.properties.decorations.underline.gradient.endY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.startRadius",
+      "model": "layers[].textSettings.properties.decorations.underline.gradient.startRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.endRadius",
+      "model": "layers[].textSettings.properties.decorations.underline.gradient.endRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.centerX",
+      "model": "layers[].textSettings.properties.decorations.underline.gradient.centerX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.centerY",
+      "model": "layers[].textSettings.properties.decorations.underline.gradient.centerY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.startAngle",
+      "model": "layers[].textSettings.properties.decorations.underline.gradient.startAngle",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.rotate",
+      "model": "layers[].textSettings.properties.decorations.underline.gradient.rotate",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.pivotX",
+      "model": "layers[].textSettings.properties.decorations.underline.gradient.pivotX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.pivotY",
+      "model": "layers[].textSettings.properties.decorations.underline.gradient.pivotY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.repeat",
+      "model": "layers[].textSettings.properties.decorations.underline.gradient.repeat",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.colors[].stop",
+      "model": "layers[].textSettings.properties.decorations.underline.gradient.colors[].stop",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.underline (styled).gradient.colors[].color",
+      "model": "layers[].textSettings.properties.decorations.underline.gradient.colors[].color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.underline (styled).width",
+      "model": "layers[].textSettings.properties.decorations.underline.width",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.overline (boolean)",
+      "model": "layers[].textSettings.properties.decorations.overline",
+      "ui": "TextOptionsEditor union selector",
+      "render": "ApexPainter.createText",
+      "code": "generateSource textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.overline (styled).color",
+      "model": "layers[].textSettings.properties.decorations.overline.color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.overline (styled).gradient.type",
+      "model": "layers[].textSettings.properties.decorations.overline.gradient.type",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.overline (styled).gradient.startX",
+      "model": "layers[].textSettings.properties.decorations.overline.gradient.startX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.overline (styled).gradient.startY",
+      "model": "layers[].textSettings.properties.decorations.overline.gradient.startY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.overline (styled).gradient.endX",
+      "model": "layers[].textSettings.properties.decorations.overline.gradient.endX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.overline (styled).gradient.endY",
+      "model": "layers[].textSettings.properties.decorations.overline.gradient.endY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.overline (styled).gradient.startRadius",
+      "model": "layers[].textSettings.properties.decorations.overline.gradient.startRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.overline (styled).gradient.endRadius",
+      "model": "layers[].textSettings.properties.decorations.overline.gradient.endRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.overline (styled).gradient.centerX",
+      "model": "layers[].textSettings.properties.decorations.overline.gradient.centerX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.overline (styled).gradient.centerY",
+      "model": "layers[].textSettings.properties.decorations.overline.gradient.centerY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.overline (styled).gradient.startAngle",
+      "model": "layers[].textSettings.properties.decorations.overline.gradient.startAngle",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.overline (styled).gradient.rotate",
+      "model": "layers[].textSettings.properties.decorations.overline.gradient.rotate",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.overline (styled).gradient.pivotX",
+      "model": "layers[].textSettings.properties.decorations.overline.gradient.pivotX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.overline (styled).gradient.pivotY",
+      "model": "layers[].textSettings.properties.decorations.overline.gradient.pivotY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.overline (styled).gradient.repeat",
+      "model": "layers[].textSettings.properties.decorations.overline.gradient.repeat",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.overline (styled).gradient.colors[].stop",
+      "model": "layers[].textSettings.properties.decorations.overline.gradient.colors[].stop",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.overline (styled).gradient.colors[].color",
+      "model": "layers[].textSettings.properties.decorations.overline.gradient.colors[].color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.overline (styled).width",
+      "model": "layers[].textSettings.properties.decorations.overline.width",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.strikethrough (boolean)",
+      "model": "layers[].textSettings.properties.decorations.strikethrough",
+      "ui": "TextOptionsEditor union selector",
+      "render": "ApexPainter.createText",
+      "code": "generateSource textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.strikethrough (styled).color",
+      "model": "layers[].textSettings.properties.decorations.strikethrough.color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.type",
+      "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.type",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.startX",
+      "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.startX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.startY",
+      "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.startY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.endX",
+      "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.endX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.endY",
+      "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.endY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.startRadius",
+      "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.startRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.endRadius",
+      "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.endRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.centerX",
+      "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.centerX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.centerY",
+      "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.centerY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.startAngle",
+      "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.startAngle",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.rotate",
+      "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.rotate",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.pivotX",
+      "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.pivotX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.pivotY",
+      "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.pivotY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.repeat",
+      "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.repeat",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.colors[].stop",
+      "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.colors[].stop",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.colors[].color",
+      "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.colors[].color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.decorations.strikethrough (styled).width",
+      "model": "layers[].textSettings.properties.decorations.strikethrough.width",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.highlight.color",
+      "model": "layers[].textSettings.properties.effects.highlight.color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.highlight.gradient.type",
+      "model": "layers[].textSettings.properties.effects.highlight.gradient.type",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.highlight.gradient.startX",
+      "model": "layers[].textSettings.properties.effects.highlight.gradient.startX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.highlight.gradient.startY",
+      "model": "layers[].textSettings.properties.effects.highlight.gradient.startY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.highlight.gradient.endX",
+      "model": "layers[].textSettings.properties.effects.highlight.gradient.endX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.highlight.gradient.endY",
+      "model": "layers[].textSettings.properties.effects.highlight.gradient.endY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.highlight.gradient.startRadius",
+      "model": "layers[].textSettings.properties.effects.highlight.gradient.startRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.highlight.gradient.endRadius",
+      "model": "layers[].textSettings.properties.effects.highlight.gradient.endRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.highlight.gradient.centerX",
+      "model": "layers[].textSettings.properties.effects.highlight.gradient.centerX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.highlight.gradient.centerY",
+      "model": "layers[].textSettings.properties.effects.highlight.gradient.centerY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.highlight.gradient.startAngle",
+      "model": "layers[].textSettings.properties.effects.highlight.gradient.startAngle",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.highlight.gradient.rotate",
+      "model": "layers[].textSettings.properties.effects.highlight.gradient.rotate",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.highlight.gradient.pivotX",
+      "model": "layers[].textSettings.properties.effects.highlight.gradient.pivotX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.highlight.gradient.pivotY",
+      "model": "layers[].textSettings.properties.effects.highlight.gradient.pivotY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.highlight.gradient.repeat",
+      "model": "layers[].textSettings.properties.effects.highlight.gradient.repeat",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.highlight.gradient.colors[].stop",
+      "model": "layers[].textSettings.properties.effects.highlight.gradient.colors[].stop",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.highlight.gradient.colors[].color",
+      "model": "layers[].textSettings.properties.effects.highlight.gradient.colors[].color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.highlight.opacity",
+      "model": "layers[].textSettings.properties.effects.highlight.opacity",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.glow.color",
+      "model": "layers[].textSettings.properties.effects.glow.color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.glow.gradient.type",
+      "model": "layers[].textSettings.properties.effects.glow.gradient.type",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.glow.gradient.startX",
+      "model": "layers[].textSettings.properties.effects.glow.gradient.startX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.glow.gradient.startY",
+      "model": "layers[].textSettings.properties.effects.glow.gradient.startY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.glow.gradient.endX",
+      "model": "layers[].textSettings.properties.effects.glow.gradient.endX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.glow.gradient.endY",
+      "model": "layers[].textSettings.properties.effects.glow.gradient.endY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.glow.gradient.startRadius",
+      "model": "layers[].textSettings.properties.effects.glow.gradient.startRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.glow.gradient.endRadius",
+      "model": "layers[].textSettings.properties.effects.glow.gradient.endRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.glow.gradient.centerX",
+      "model": "layers[].textSettings.properties.effects.glow.gradient.centerX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.glow.gradient.centerY",
+      "model": "layers[].textSettings.properties.effects.glow.gradient.centerY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.glow.gradient.startAngle",
+      "model": "layers[].textSettings.properties.effects.glow.gradient.startAngle",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.glow.gradient.rotate",
+      "model": "layers[].textSettings.properties.effects.glow.gradient.rotate",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.glow.gradient.pivotX",
+      "model": "layers[].textSettings.properties.effects.glow.gradient.pivotX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.glow.gradient.pivotY",
+      "model": "layers[].textSettings.properties.effects.glow.gradient.pivotY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.glow.gradient.repeat",
+      "model": "layers[].textSettings.properties.effects.glow.gradient.repeat",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.glow.gradient.colors[].stop",
+      "model": "layers[].textSettings.properties.effects.glow.gradient.colors[].stop",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.glow.gradient.colors[].color",
+      "model": "layers[].textSettings.properties.effects.glow.gradient.colors[].color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.glow.intensity",
+      "model": "layers[].textSettings.properties.effects.glow.intensity",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.glow.opacity",
+      "model": "layers[].textSettings.properties.effects.glow.opacity",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.color",
+      "model": "layers[].textSettings.properties.effects.shadow.color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.gradient.type",
+      "model": "layers[].textSettings.properties.effects.shadow.gradient.type",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.gradient.startX",
+      "model": "layers[].textSettings.properties.effects.shadow.gradient.startX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.gradient.startY",
+      "model": "layers[].textSettings.properties.effects.shadow.gradient.startY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.gradient.endX",
+      "model": "layers[].textSettings.properties.effects.shadow.gradient.endX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.gradient.endY",
+      "model": "layers[].textSettings.properties.effects.shadow.gradient.endY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.gradient.startRadius",
+      "model": "layers[].textSettings.properties.effects.shadow.gradient.startRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.gradient.endRadius",
+      "model": "layers[].textSettings.properties.effects.shadow.gradient.endRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.gradient.centerX",
+      "model": "layers[].textSettings.properties.effects.shadow.gradient.centerX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.gradient.centerY",
+      "model": "layers[].textSettings.properties.effects.shadow.gradient.centerY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.gradient.startAngle",
+      "model": "layers[].textSettings.properties.effects.shadow.gradient.startAngle",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.gradient.rotate",
+      "model": "layers[].textSettings.properties.effects.shadow.gradient.rotate",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.gradient.pivotX",
+      "model": "layers[].textSettings.properties.effects.shadow.gradient.pivotX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.gradient.pivotY",
+      "model": "layers[].textSettings.properties.effects.shadow.gradient.pivotY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.gradient.repeat",
+      "model": "layers[].textSettings.properties.effects.shadow.gradient.repeat",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.gradient.colors[].stop",
+      "model": "layers[].textSettings.properties.effects.shadow.gradient.colors[].stop",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.gradient.colors[].color",
+      "model": "layers[].textSettings.properties.effects.shadow.gradient.colors[].color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.offsetX",
+      "model": "layers[].textSettings.properties.effects.shadow.offsetX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.offsetY",
+      "model": "layers[].textSettings.properties.effects.shadow.offsetY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.blur",
+      "model": "layers[].textSettings.properties.effects.shadow.blur",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.effects.shadow.opacity",
+      "model": "layers[].textSettings.properties.effects.shadow.opacity",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.layout.lineHeight",
+      "model": "layers[].textSettings.properties.layout.lineHeight",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.layout.letterSpacing",
+      "model": "layers[].textSettings.properties.layout.letterSpacing",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.layout.wordSpacing",
+      "model": "layers[].textSettings.properties.layout.wordSpacing",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.layout.maxWidth",
+      "model": "layers[].textSettings.properties.layout.maxWidth",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.layout.maxHeight",
+      "model": "layers[].textSettings.properties.layout.maxHeight",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.placement.textAlign",
+      "model": "layers[].textSettings.properties.placement.textAlign",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.placement.textBaseline",
+      "model": "layers[].textSettings.properties.placement.textBaseline",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.placement.rotation",
+      "model": "layers[].textSettings.properties.placement.rotation",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.placement.scaleX",
+      "model": "layers[].textSettings.properties.placement.scaleX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.placement.scaleY",
+      "model": "layers[].textSettings.properties.placement.scaleY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.placement.skewX",
+      "model": "layers[].textSettings.properties.placement.skewX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.placement.skewY",
+      "model": "layers[].textSettings.properties.placement.skewY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.placement.perspective.points[].x",
+      "model": "layers[].textSettings.properties.placement.perspective.points[].x",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.placement.perspective.points[].y",
+      "model": "layers[].textSettings.properties.placement.perspective.points[].y",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.placement.perspective.interpolation",
+      "model": "layers[].textSettings.properties.placement.perspective.interpolation",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.placement.perspective.edgeMode",
+      "model": "layers[].textSettings.properties.placement.perspective.edgeMode",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.fill.color",
+      "model": "layers[].textSettings.properties.fill.color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.fill.gradient.type",
+      "model": "layers[].textSettings.properties.fill.gradient.type",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.fill.gradient.startX",
+      "model": "layers[].textSettings.properties.fill.gradient.startX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.fill.gradient.startY",
+      "model": "layers[].textSettings.properties.fill.gradient.startY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.fill.gradient.endX",
+      "model": "layers[].textSettings.properties.fill.gradient.endX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.fill.gradient.endY",
+      "model": "layers[].textSettings.properties.fill.gradient.endY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.fill.gradient.startRadius",
+      "model": "layers[].textSettings.properties.fill.gradient.startRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.fill.gradient.endRadius",
+      "model": "layers[].textSettings.properties.fill.gradient.endRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.fill.gradient.centerX",
+      "model": "layers[].textSettings.properties.fill.gradient.centerX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.fill.gradient.centerY",
+      "model": "layers[].textSettings.properties.fill.gradient.centerY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.fill.gradient.startAngle",
+      "model": "layers[].textSettings.properties.fill.gradient.startAngle",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.fill.gradient.rotate",
+      "model": "layers[].textSettings.properties.fill.gradient.rotate",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.fill.gradient.pivotX",
+      "model": "layers[].textSettings.properties.fill.gradient.pivotX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.fill.gradient.pivotY",
+      "model": "layers[].textSettings.properties.fill.gradient.pivotY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.fill.gradient.repeat",
+      "model": "layers[].textSettings.properties.fill.gradient.repeat",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.fill.gradient.colors[].stop",
+      "model": "layers[].textSettings.properties.fill.gradient.colors[].stop",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.fill.gradient.colors[].color",
+      "model": "layers[].textSettings.properties.fill.gradient.colors[].color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.fill.opacity",
+      "model": "layers[].textSettings.properties.fill.opacity",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.color",
+      "model": "layers[].textSettings.properties.stroke.color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.width",
+      "model": "layers[].textSettings.properties.stroke.width",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.gradient.type",
+      "model": "layers[].textSettings.properties.stroke.gradient.type",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.gradient.startX",
+      "model": "layers[].textSettings.properties.stroke.gradient.startX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.gradient.startY",
+      "model": "layers[].textSettings.properties.stroke.gradient.startY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.gradient.endX",
+      "model": "layers[].textSettings.properties.stroke.gradient.endX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.gradient.endY",
+      "model": "layers[].textSettings.properties.stroke.gradient.endY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.gradient.startRadius",
+      "model": "layers[].textSettings.properties.stroke.gradient.startRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.gradient.endRadius",
+      "model": "layers[].textSettings.properties.stroke.gradient.endRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.gradient.centerX",
+      "model": "layers[].textSettings.properties.stroke.gradient.centerX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.gradient.centerY",
+      "model": "layers[].textSettings.properties.stroke.gradient.centerY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.gradient.startAngle",
+      "model": "layers[].textSettings.properties.stroke.gradient.startAngle",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.gradient.rotate",
+      "model": "layers[].textSettings.properties.stroke.gradient.rotate",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.gradient.pivotX",
+      "model": "layers[].textSettings.properties.stroke.gradient.pivotX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.gradient.pivotY",
+      "model": "layers[].textSettings.properties.stroke.gradient.pivotY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.gradient.repeat",
+      "model": "layers[].textSettings.properties.stroke.gradient.repeat",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.gradient.colors[].stop",
+      "model": "layers[].textSettings.properties.stroke.gradient.colors[].stop",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.gradient.colors[].color",
+      "model": "layers[].textSettings.properties.stroke.gradient.colors[].color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.opacity",
+      "model": "layers[].textSettings.properties.stroke.opacity",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.stroke.style",
+      "model": "layers[].textSettings.properties.stroke.style",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.textOnCurve.sweepAngle",
+      "model": "layers[].textSettings.properties.textOnCurve.sweepAngle",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.textOnCurve.radius",
+      "model": "layers[].textSettings.properties.textOnCurve.radius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.textOnCurve.up",
+      "model": "layers[].textSettings.properties.textOnCurve.up",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.textOnCurve.layoutMode",
+      "model": "layers[].textSettings.properties.textOnCurve.layoutMode",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.textOnCurve.baselineOffset",
+      "model": "layers[].textSettings.properties.textOnCurve.baselineOffset",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.textOnCurve.startAngleDeg",
+      "model": "layers[].textSettings.properties.textOnCurve.startAngleDeg",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.includeCharMetrics",
+      "model": "layers[].textSettings.properties.includeCharMetrics",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.measurementCanvas.width",
+      "model": "layers[].textSettings.properties.measurementCanvas.width",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.measurementCanvas.height",
+      "model": "layers[].textSettings.properties.measurementCanvas.height",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].text",
+      "model": "layers[].textSettings.items[].text",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].x",
+      "model": "layers[].textSettings.items[].x",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].y",
+      "model": "layers[].textSettings.items[].y",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].font.size",
+      "model": "layers[].textSettings.items[].font.size",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].font.family",
+      "model": "layers[].textSettings.items[].font.family",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].font.name",
+      "model": "layers[].textSettings.items[].font.name",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].font.weight",
+      "model": "layers[].textSettings.items[].font.weight",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].font.style",
+      "model": "layers[].textSettings.items[].font.style",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.bold",
+      "model": "layers[].textSettings.items[].decorations.bold",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.italic",
+      "model": "layers[].textSettings.items[].decorations.italic",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.underline (boolean)",
+      "model": "layers[].textSettings.items[].decorations.underline",
+      "ui": "TextOptionsEditor union selector",
+      "render": "ApexPainter.createText",
+      "code": "generateSource textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.underline (styled).color",
+      "model": "layers[].textSettings.items[].decorations.underline.color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.underline (styled).gradient.type",
+      "model": "layers[].textSettings.items[].decorations.underline.gradient.type",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.underline (styled).gradient.startX",
+      "model": "layers[].textSettings.items[].decorations.underline.gradient.startX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.underline (styled).gradient.startY",
+      "model": "layers[].textSettings.items[].decorations.underline.gradient.startY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.underline (styled).gradient.endX",
+      "model": "layers[].textSettings.items[].decorations.underline.gradient.endX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.underline (styled).gradient.endY",
+      "model": "layers[].textSettings.items[].decorations.underline.gradient.endY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.underline (styled).gradient.startRadius",
+      "model": "layers[].textSettings.items[].decorations.underline.gradient.startRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.underline (styled).gradient.endRadius",
+      "model": "layers[].textSettings.items[].decorations.underline.gradient.endRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.underline (styled).gradient.centerX",
+      "model": "layers[].textSettings.items[].decorations.underline.gradient.centerX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.underline (styled).gradient.centerY",
+      "model": "layers[].textSettings.items[].decorations.underline.gradient.centerY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.underline (styled).gradient.startAngle",
+      "model": "layers[].textSettings.items[].decorations.underline.gradient.startAngle",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.underline (styled).gradient.rotate",
+      "model": "layers[].textSettings.items[].decorations.underline.gradient.rotate",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.underline (styled).gradient.pivotX",
+      "model": "layers[].textSettings.items[].decorations.underline.gradient.pivotX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.underline (styled).gradient.pivotY",
+      "model": "layers[].textSettings.items[].decorations.underline.gradient.pivotY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.underline (styled).gradient.repeat",
+      "model": "layers[].textSettings.items[].decorations.underline.gradient.repeat",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.underline (styled).gradient.colors[].stop",
+      "model": "layers[].textSettings.items[].decorations.underline.gradient.colors[].stop",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.underline (styled).gradient.colors[].color",
+      "model": "layers[].textSettings.items[].decorations.underline.gradient.colors[].color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.underline (styled).width",
+      "model": "layers[].textSettings.items[].decorations.underline.width",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.overline (boolean)",
+      "model": "layers[].textSettings.items[].decorations.overline",
+      "ui": "TextOptionsEditor union selector",
+      "render": "ApexPainter.createText",
+      "code": "generateSource textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.overline (styled).color",
+      "model": "layers[].textSettings.items[].decorations.overline.color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.overline (styled).gradient.type",
+      "model": "layers[].textSettings.items[].decorations.overline.gradient.type",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.overline (styled).gradient.startX",
+      "model": "layers[].textSettings.items[].decorations.overline.gradient.startX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.overline (styled).gradient.startY",
+      "model": "layers[].textSettings.items[].decorations.overline.gradient.startY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.overline (styled).gradient.endX",
+      "model": "layers[].textSettings.items[].decorations.overline.gradient.endX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.overline (styled).gradient.endY",
+      "model": "layers[].textSettings.items[].decorations.overline.gradient.endY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.overline (styled).gradient.startRadius",
+      "model": "layers[].textSettings.items[].decorations.overline.gradient.startRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.overline (styled).gradient.endRadius",
+      "model": "layers[].textSettings.items[].decorations.overline.gradient.endRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.overline (styled).gradient.centerX",
+      "model": "layers[].textSettings.items[].decorations.overline.gradient.centerX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.overline (styled).gradient.centerY",
+      "model": "layers[].textSettings.items[].decorations.overline.gradient.centerY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.overline (styled).gradient.startAngle",
+      "model": "layers[].textSettings.items[].decorations.overline.gradient.startAngle",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.overline (styled).gradient.rotate",
+      "model": "layers[].textSettings.items[].decorations.overline.gradient.rotate",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.overline (styled).gradient.pivotX",
+      "model": "layers[].textSettings.items[].decorations.overline.gradient.pivotX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.overline (styled).gradient.pivotY",
+      "model": "layers[].textSettings.items[].decorations.overline.gradient.pivotY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.overline (styled).gradient.repeat",
+      "model": "layers[].textSettings.items[].decorations.overline.gradient.repeat",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.overline (styled).gradient.colors[].stop",
+      "model": "layers[].textSettings.items[].decorations.overline.gradient.colors[].stop",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.overline (styled).gradient.colors[].color",
+      "model": "layers[].textSettings.items[].decorations.overline.gradient.colors[].color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.overline (styled).width",
+      "model": "layers[].textSettings.items[].decorations.overline.width",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.strikethrough (boolean)",
+      "model": "layers[].textSettings.items[].decorations.strikethrough",
+      "ui": "TextOptionsEditor union selector",
+      "render": "ApexPainter.createText",
+      "code": "generateSource textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).color",
+      "model": "layers[].textSettings.items[].decorations.strikethrough.color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.type",
+      "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.type",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.startX",
+      "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.startX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.startY",
+      "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.startY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.endX",
+      "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.endX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.endY",
+      "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.endY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.startRadius",
+      "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.startRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.endRadius",
+      "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.endRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.centerX",
+      "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.centerX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.centerY",
+      "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.centerY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.startAngle",
+      "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.startAngle",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.rotate",
+      "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.rotate",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.pivotX",
+      "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.pivotX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.pivotY",
+      "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.pivotY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.repeat",
+      "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.repeat",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.colors[].stop",
+      "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.colors[].stop",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.colors[].color",
+      "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.colors[].color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].decorations.strikethrough (styled).width",
+      "model": "layers[].textSettings.items[].decorations.strikethrough.width",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.highlight.color",
+      "model": "layers[].textSettings.items[].effects.highlight.color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.highlight.gradient.type",
+      "model": "layers[].textSettings.items[].effects.highlight.gradient.type",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.highlight.gradient.startX",
+      "model": "layers[].textSettings.items[].effects.highlight.gradient.startX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.highlight.gradient.startY",
+      "model": "layers[].textSettings.items[].effects.highlight.gradient.startY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.highlight.gradient.endX",
+      "model": "layers[].textSettings.items[].effects.highlight.gradient.endX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.highlight.gradient.endY",
+      "model": "layers[].textSettings.items[].effects.highlight.gradient.endY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.highlight.gradient.startRadius",
+      "model": "layers[].textSettings.items[].effects.highlight.gradient.startRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.highlight.gradient.endRadius",
+      "model": "layers[].textSettings.items[].effects.highlight.gradient.endRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.highlight.gradient.centerX",
+      "model": "layers[].textSettings.items[].effects.highlight.gradient.centerX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.highlight.gradient.centerY",
+      "model": "layers[].textSettings.items[].effects.highlight.gradient.centerY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.highlight.gradient.startAngle",
+      "model": "layers[].textSettings.items[].effects.highlight.gradient.startAngle",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.highlight.gradient.rotate",
+      "model": "layers[].textSettings.items[].effects.highlight.gradient.rotate",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.highlight.gradient.pivotX",
+      "model": "layers[].textSettings.items[].effects.highlight.gradient.pivotX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.highlight.gradient.pivotY",
+      "model": "layers[].textSettings.items[].effects.highlight.gradient.pivotY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.highlight.gradient.repeat",
+      "model": "layers[].textSettings.items[].effects.highlight.gradient.repeat",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.highlight.gradient.colors[].stop",
+      "model": "layers[].textSettings.items[].effects.highlight.gradient.colors[].stop",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.highlight.gradient.colors[].color",
+      "model": "layers[].textSettings.items[].effects.highlight.gradient.colors[].color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.highlight.opacity",
+      "model": "layers[].textSettings.items[].effects.highlight.opacity",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.glow.color",
+      "model": "layers[].textSettings.items[].effects.glow.color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.glow.gradient.type",
+      "model": "layers[].textSettings.items[].effects.glow.gradient.type",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.glow.gradient.startX",
+      "model": "layers[].textSettings.items[].effects.glow.gradient.startX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.glow.gradient.startY",
+      "model": "layers[].textSettings.items[].effects.glow.gradient.startY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.glow.gradient.endX",
+      "model": "layers[].textSettings.items[].effects.glow.gradient.endX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.glow.gradient.endY",
+      "model": "layers[].textSettings.items[].effects.glow.gradient.endY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.glow.gradient.startRadius",
+      "model": "layers[].textSettings.items[].effects.glow.gradient.startRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.glow.gradient.endRadius",
+      "model": "layers[].textSettings.items[].effects.glow.gradient.endRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.glow.gradient.centerX",
+      "model": "layers[].textSettings.items[].effects.glow.gradient.centerX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.glow.gradient.centerY",
+      "model": "layers[].textSettings.items[].effects.glow.gradient.centerY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.glow.gradient.startAngle",
+      "model": "layers[].textSettings.items[].effects.glow.gradient.startAngle",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.glow.gradient.rotate",
+      "model": "layers[].textSettings.items[].effects.glow.gradient.rotate",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.glow.gradient.pivotX",
+      "model": "layers[].textSettings.items[].effects.glow.gradient.pivotX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.glow.gradient.pivotY",
+      "model": "layers[].textSettings.items[].effects.glow.gradient.pivotY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.glow.gradient.repeat",
+      "model": "layers[].textSettings.items[].effects.glow.gradient.repeat",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.glow.gradient.colors[].stop",
+      "model": "layers[].textSettings.items[].effects.glow.gradient.colors[].stop",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.glow.gradient.colors[].color",
+      "model": "layers[].textSettings.items[].effects.glow.gradient.colors[].color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.glow.intensity",
+      "model": "layers[].textSettings.items[].effects.glow.intensity",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.glow.opacity",
+      "model": "layers[].textSettings.items[].effects.glow.opacity",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.color",
+      "model": "layers[].textSettings.items[].effects.shadow.color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.gradient.type",
+      "model": "layers[].textSettings.items[].effects.shadow.gradient.type",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.gradient.startX",
+      "model": "layers[].textSettings.items[].effects.shadow.gradient.startX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.gradient.startY",
+      "model": "layers[].textSettings.items[].effects.shadow.gradient.startY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.gradient.endX",
+      "model": "layers[].textSettings.items[].effects.shadow.gradient.endX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.gradient.endY",
+      "model": "layers[].textSettings.items[].effects.shadow.gradient.endY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.gradient.startRadius",
+      "model": "layers[].textSettings.items[].effects.shadow.gradient.startRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.gradient.endRadius",
+      "model": "layers[].textSettings.items[].effects.shadow.gradient.endRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.gradient.centerX",
+      "model": "layers[].textSettings.items[].effects.shadow.gradient.centerX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.gradient.centerY",
+      "model": "layers[].textSettings.items[].effects.shadow.gradient.centerY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.gradient.startAngle",
+      "model": "layers[].textSettings.items[].effects.shadow.gradient.startAngle",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.gradient.rotate",
+      "model": "layers[].textSettings.items[].effects.shadow.gradient.rotate",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.gradient.pivotX",
+      "model": "layers[].textSettings.items[].effects.shadow.gradient.pivotX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.gradient.pivotY",
+      "model": "layers[].textSettings.items[].effects.shadow.gradient.pivotY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.gradient.repeat",
+      "model": "layers[].textSettings.items[].effects.shadow.gradient.repeat",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.gradient.colors[].stop",
+      "model": "layers[].textSettings.items[].effects.shadow.gradient.colors[].stop",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.gradient.colors[].color",
+      "model": "layers[].textSettings.items[].effects.shadow.gradient.colors[].color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.offsetX",
+      "model": "layers[].textSettings.items[].effects.shadow.offsetX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.offsetY",
+      "model": "layers[].textSettings.items[].effects.shadow.offsetY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.blur",
+      "model": "layers[].textSettings.items[].effects.shadow.blur",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].effects.shadow.opacity",
+      "model": "layers[].textSettings.items[].effects.shadow.opacity",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].layout.lineHeight",
+      "model": "layers[].textSettings.items[].layout.lineHeight",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].layout.letterSpacing",
+      "model": "layers[].textSettings.items[].layout.letterSpacing",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].layout.wordSpacing",
+      "model": "layers[].textSettings.items[].layout.wordSpacing",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].layout.maxWidth",
+      "model": "layers[].textSettings.items[].layout.maxWidth",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].layout.maxHeight",
+      "model": "layers[].textSettings.items[].layout.maxHeight",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].placement.textAlign",
+      "model": "layers[].textSettings.items[].placement.textAlign",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].placement.textBaseline",
+      "model": "layers[].textSettings.items[].placement.textBaseline",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].placement.rotation",
+      "model": "layers[].textSettings.items[].placement.rotation",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].placement.scaleX",
+      "model": "layers[].textSettings.items[].placement.scaleX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].placement.scaleY",
+      "model": "layers[].textSettings.items[].placement.scaleY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].placement.skewX",
+      "model": "layers[].textSettings.items[].placement.skewX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].placement.skewY",
+      "model": "layers[].textSettings.items[].placement.skewY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].placement.perspective.points[].x",
+      "model": "layers[].textSettings.items[].placement.perspective.points[].x",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].placement.perspective.points[].y",
+      "model": "layers[].textSettings.items[].placement.perspective.points[].y",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].placement.perspective.interpolation",
+      "model": "layers[].textSettings.items[].placement.perspective.interpolation",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].placement.perspective.edgeMode",
+      "model": "layers[].textSettings.items[].placement.perspective.edgeMode",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].fill.color",
+      "model": "layers[].textSettings.items[].fill.color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].fill.gradient.type",
+      "model": "layers[].textSettings.items[].fill.gradient.type",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].fill.gradient.startX",
+      "model": "layers[].textSettings.items[].fill.gradient.startX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].fill.gradient.startY",
+      "model": "layers[].textSettings.items[].fill.gradient.startY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].fill.gradient.endX",
+      "model": "layers[].textSettings.items[].fill.gradient.endX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].fill.gradient.endY",
+      "model": "layers[].textSettings.items[].fill.gradient.endY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].fill.gradient.startRadius",
+      "model": "layers[].textSettings.items[].fill.gradient.startRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].fill.gradient.endRadius",
+      "model": "layers[].textSettings.items[].fill.gradient.endRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].fill.gradient.centerX",
+      "model": "layers[].textSettings.items[].fill.gradient.centerX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].fill.gradient.centerY",
+      "model": "layers[].textSettings.items[].fill.gradient.centerY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].fill.gradient.startAngle",
+      "model": "layers[].textSettings.items[].fill.gradient.startAngle",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].fill.gradient.rotate",
+      "model": "layers[].textSettings.items[].fill.gradient.rotate",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].fill.gradient.pivotX",
+      "model": "layers[].textSettings.items[].fill.gradient.pivotX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].fill.gradient.pivotY",
+      "model": "layers[].textSettings.items[].fill.gradient.pivotY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].fill.gradient.repeat",
+      "model": "layers[].textSettings.items[].fill.gradient.repeat",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].fill.gradient.colors[].stop",
+      "model": "layers[].textSettings.items[].fill.gradient.colors[].stop",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].fill.gradient.colors[].color",
+      "model": "layers[].textSettings.items[].fill.gradient.colors[].color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].fill.opacity",
+      "model": "layers[].textSettings.items[].fill.opacity",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.color",
+      "model": "layers[].textSettings.items[].stroke.color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.width",
+      "model": "layers[].textSettings.items[].stroke.width",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.gradient.type",
+      "model": "layers[].textSettings.items[].stroke.gradient.type",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.gradient.startX",
+      "model": "layers[].textSettings.items[].stroke.gradient.startX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.gradient.startY",
+      "model": "layers[].textSettings.items[].stroke.gradient.startY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.gradient.endX",
+      "model": "layers[].textSettings.items[].stroke.gradient.endX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.gradient.endY",
+      "model": "layers[].textSettings.items[].stroke.gradient.endY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.gradient.startRadius",
+      "model": "layers[].textSettings.items[].stroke.gradient.startRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.gradient.endRadius",
+      "model": "layers[].textSettings.items[].stroke.gradient.endRadius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.gradient.centerX",
+      "model": "layers[].textSettings.items[].stroke.gradient.centerX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.gradient.centerY",
+      "model": "layers[].textSettings.items[].stroke.gradient.centerY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.gradient.startAngle",
+      "model": "layers[].textSettings.items[].stroke.gradient.startAngle",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.gradient.rotate",
+      "model": "layers[].textSettings.items[].stroke.gradient.rotate",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.gradient.pivotX",
+      "model": "layers[].textSettings.items[].stroke.gradient.pivotX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.gradient.pivotY",
+      "model": "layers[].textSettings.items[].stroke.gradient.pivotY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.gradient.repeat",
+      "model": "layers[].textSettings.items[].stroke.gradient.repeat",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.gradient.colors[].stop",
+      "model": "layers[].textSettings.items[].stroke.gradient.colors[].stop",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.gradient.colors[].color",
+      "model": "layers[].textSettings.items[].stroke.gradient.colors[].color",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.opacity",
+      "model": "layers[].textSettings.items[].stroke.opacity",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].stroke.style",
+      "model": "layers[].textSettings.items[].stroke.style",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].textOnCurve.sweepAngle",
+      "model": "layers[].textSettings.items[].textOnCurve.sweepAngle",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].textOnCurve.radius",
+      "model": "layers[].textSettings.items[].textOnCurve.radius",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].textOnCurve.up",
+      "model": "layers[].textSettings.items[].textOnCurve.up",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].textOnCurve.layoutMode",
+      "model": "layers[].textSettings.items[].textOnCurve.layoutMode",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].textOnCurve.baselineOffset",
+      "model": "layers[].textSettings.items[].textOnCurve.baselineOffset",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].textOnCurve.startAngleDeg",
+      "model": "layers[].textSettings.items[].textOnCurve.startAngleDeg",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].includeCharMetrics",
+      "model": "layers[].textSettings.items[].includeCharMetrics",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].measurementCanvas.width",
+      "model": "layers[].textSettings.items[].measurementCanvas.width",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties[].measurementCanvas.height",
+      "model": "layers[].textSettings.items[].measurementCanvas.height",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.CreateTextOptions.isGrouped",
+      "model": "layers[].textSettings.group.isGrouped",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.CreateTextOptions.groupTransform.rotation",
+      "model": "layers[].textSettings.group.groupTransform.rotation",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.CreateTextOptions.groupTransform.translateX",
+      "model": "layers[].textSettings.group.groupTransform.translateX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.CreateTextOptions.groupTransform.translateY",
+      "model": "layers[].textSettings.group.groupTransform.translateY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.CreateTextOptions.groupTransform.scaleX",
+      "model": "layers[].textSettings.group.groupTransform.scaleX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.CreateTextOptions.groupTransform.scaleY",
+      "model": "layers[].textSettings.group.groupTransform.scaleY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.CreateTextOptions.groupTransform.skewX",
+      "model": "layers[].textSettings.group.groupTransform.skewX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.CreateTextOptions.groupTransform.skewY",
+      "model": "layers[].textSettings.group.groupTransform.skewY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.CreateTextOptions.groupTransform.pivotX",
+      "model": "layers[].textSettings.group.groupTransform.pivotX",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.CreateTextOptions.groupTransform.pivotY",
+      "model": "layers[].textSettings.group.groupTransform.pivotY",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.CreateTextOptions.groupTransform.opacity",
+      "model": "layers[].textSettings.group.groupTransform.opacity",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.CreateTextOptions.groupTransform.blendMode",
+      "model": "layers[].textSettings.group.groupTransform.blendMode",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.CreateTextOptions.groupTransform.perspective.points[].x",
+      "model": "layers[].textSettings.group.groupTransform.perspective.points[].x",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.CreateTextOptions.groupTransform.perspective.points[].y",
+      "model": "layers[].textSettings.group.groupTransform.perspective.points[].y",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.CreateTextOptions.groupTransform.perspective.interpolation",
+      "model": "layers[].textSettings.group.groupTransform.perspective.interpolation",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.CreateTextOptions.groupTransform.perspective.edgeMode",
+      "model": "layers[].textSettings.group.groupTransform.perspective.edgeMode",
+      "ui": "TextOptionsEditor schema field",
+      "render": "native painter.createText",
+      "code": "composition->textProps",
+      "graph": "Graph/TextOptionsEditor",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.text",
+      "model": "layers[].text",
+      "ui": "Inspector and VisualCanvas",
+      "render": "native painter.createText",
+      "code": "generateSource",
+      "graph": "ordered text node",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.x",
+      "model": "layers[].x",
+      "ui": "Inspector and VisualCanvas",
+      "render": "native painter.createText",
+      "code": "generateSource",
+      "graph": "ordered text node",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties.y",
+      "model": "layers[].y",
+      "ui": "Inspector and VisualCanvas",
+      "render": "native painter.createText",
+      "code": "generateSource",
+      "graph": "ordered text node",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties/font.size baseline",
+      "model": "layers[].fontSize",
+      "ui": "Inspector and VisualCanvas",
+      "render": "native painter.createText",
+      "code": "generateSource",
+      "graph": "ordered text node",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties/font.weight baseline",
+      "model": "layers[].weight",
+      "ui": "Inspector and VisualCanvas",
+      "render": "native painter.createText",
+      "code": "generateSource",
+      "graph": "ordered text node",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties/fill.color baseline",
+      "model": "layers[].color",
+      "ui": "Inspector and VisualCanvas",
+      "render": "native painter.createText",
+      "code": "generateSource",
+      "graph": "ordered text node",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties/fill.opacity baseline",
+      "model": "layers[].opacity",
+      "ui": "Inspector and VisualCanvas",
+      "render": "native painter.createText",
+      "code": "generateSource",
+      "graph": "ordered text node",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "createText.TextProperties/placement.rotation baseline",
+      "model": "layers[].rotation",
+      "ui": "Inspector and VisualCanvas",
+      "render": "native painter.createText",
+      "code": "generateSource",
+      "graph": "ordered text node",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "text selection bounds.width",
+      "model": "layers[].width",
+      "ui": "Inspector and VisualCanvas",
+      "render": "native painter.createText",
+      "code": "generateSource",
+      "graph": "ordered text node",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "text selection bounds.height",
+      "model": "layers[].height",
+      "ui": "Inspector and VisualCanvas",
+      "render": "native painter.createText",
+      "code": "generateSource",
+      "graph": "ordered text node",
+      "status": "WORKSPACE_READY"
+    },
+    {
+      "api": "measureText.TextMetrics.width",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.actualBoundingBoxAscent",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.actualBoundingBoxDescent",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.actualBoundingBoxLeft",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.actualBoundingBoxRight",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.fontBoundingBoxAscent",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.fontBoundingBoxDescent",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.alphabeticBaseline",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.emHeightAscent",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.emHeightDescent",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.hangingBaseline",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.ideographicBaseline",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.height",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lineHeight",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.baseline",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.top",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.bottom",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.centerX",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.centerY",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lines[]",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.totalHeight",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lineCount",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.charWidths[]",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.charPositions[]",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lines[].text",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lines[].width",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lines[].height",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lines[].metrics.width",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lines[].metrics.height",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lines[].metrics.lineHeight",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lines[].metrics.actualBoundingBoxAscent",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lines[].metrics.actualBoundingBoxDescent",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lines[].metrics.actualBoundingBoxLeft",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lines[].metrics.actualBoundingBoxRight",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lines[].metrics.fontBoundingBoxAscent",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lines[].metrics.fontBoundingBoxDescent",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lines[].metrics.baseline",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lines[].metrics.top",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lines[].metrics.bottom",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lines[].metrics.centerX",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.lines[].metrics.centerY",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.charPositions[].x",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "measureText.TextMetrics.charPositions[].width",
+      "model": "transient measurement result",
+      "ui": "Native metrics pane / complete JSON details",
+      "render": "painter.measureText(textProps) per text run",
+      "code": "generated source when includeCharMetrics",
+      "graph": "TextOptionsEditor measurement pane",
+      "status": "WORKSPACE_READY_RESULT"
+    },
+    {
+      "api": "createText.TextProperties.font.path",
+      "model": "not persisted",
+      "ui": "excluded; cannot supply arbitrary server file path",
+      "render": "excluded by Workspace security",
+      "code": "none",
+      "graph": "none",
+      "status": "BLOCKED_SECURITY",
+      "notes": "The engine accepts a local font path; Workspace cannot expose arbitrary filesystem reads or unlicensed uploads."
+    },
+    {
+      "api": "createText.TextProperties (deprecated flat aliases)",
+      "model": "canonical nested equivalents",
+      "ui": "nested control preferred",
+      "render": "native nested options",
+      "code": "nested API",
+      "graph": "nested editor",
+      "status": "MIGRATED_EQUIVALENT",
+      "notes": "Legacy document fields fontSize/weight/color remain reversible; arbitrary legacy aliases are not authored as separate no-op controls."
+    }
+  ]
+}

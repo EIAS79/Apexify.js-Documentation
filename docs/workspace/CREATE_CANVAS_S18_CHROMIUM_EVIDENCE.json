@@ -1,0 +1,374 @@
+{
+  "campaign": "S18 exact 43 previously READY but strict PARTIAL paths",
+  "sourceRuns": [
+    "S18_CHROME_43_REPORT_INITIAL_41_OF_43.json",
+    "S18_2_PATTERN_COLOR_BROWSER_REPORT.json"
+  ],
+  "explanation": "Initial 43-path real Chromium run passed 41/43. Two matching Inspector/Graph input labels made Playwright locator ambiguous; a focused corrected-selector run independently passed the two remaining paths with actual edits, canonical project saving, code export, history and reload. Do not claim one all-green 43-path monolithic Chromium execution.",
+  "count": 43,
+  "passed": 43,
+  "failedFunctionalPaths": [],
+  "initialSelectorTestFailures": [
+    "canvas.bgLayers.pattern.color",
+    "canvas.bgLayers.pattern.secondaryColor"
+  ],
+  "s18SecondRunEnvironment": "Full monolithic rerun exited Windows/Node -1073740791 before generating fresh browser evidence; focused same-live-project browser run passed remaining two paths.",
+  "chromiumVersion": "155.0.8059.85",
+  "initialScreenshots": 6,
+  "focusedScreenshots": 2,
+  "sourceCodeExportVerified": true,
+  "GraphStateVerified": true,
+  "historyUndoRedoVerified": true,
+  "IndexedDBReloadVerified": true,
+  "nativeCodeRawPixelVerifiedSeparately": true,
+  "pathChecks": [
+    {
+      "path": "canvas.bgLayers",
+      "revision": 30,
+      "nativeImageHashBefore": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "nativeImageHashAfter": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.bgLayers.pattern",
+      "revision": 36,
+      "nativeImageHashBefore": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "nativeImageHashAfter": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.bgLayers.pattern.color",
+      "revision": 3,
+      "value": "#b523a9",
+      "history": true,
+      "Graph": true,
+      "Code": true,
+      "reload": true,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.bgLayers.pattern.customPatternImage",
+      "revision": 44,
+      "nativeImageHashBefore": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "nativeImageHashAfter": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.bgLayers.pattern.offsetX",
+      "revision": 42,
+      "nativeImageHashBefore": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "nativeImageHashAfter": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.bgLayers.pattern.offsetY",
+      "revision": 43,
+      "nativeImageHashBefore": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "nativeImageHashAfter": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.bgLayers.pattern.rotation",
+      "revision": 40,
+      "nativeImageHashBefore": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "nativeImageHashAfter": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.bgLayers.pattern.scale",
+      "revision": 41,
+      "nativeImageHashBefore": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "nativeImageHashAfter": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.bgLayers.pattern.secondaryColor",
+      "revision": 4,
+      "value": "#1adab3",
+      "history": true,
+      "Graph": true,
+      "Code": true,
+      "reload": true,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.bgLayers.pattern.size",
+      "revision": 38,
+      "nativeImageHashBefore": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "nativeImageHashAfter": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.bgLayers.pattern.spacing",
+      "revision": 39,
+      "nativeImageHashBefore": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "nativeImageHashAfter": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.bgLayers.pattern.type",
+      "revision": 37,
+      "nativeImageHashBefore": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "nativeImageHashAfter": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.bgLayers.repeat",
+      "revision": 35,
+      "nativeImageHashBefore": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "nativeImageHashAfter": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.bgLayers.source",
+      "revision": 33,
+      "nativeImageHashBefore": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "nativeImageHashAfter": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.bgLayers.type",
+      "revision": 32,
+      "nativeImageHashBefore": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "nativeImageHashAfter": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.bgLayers.value",
+      "revision": 31,
+      "nativeImageHashBefore": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "nativeImageHashAfter": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.blur",
+      "revision": 6,
+      "nativeImageHashBefore": null,
+      "nativeImageHashAfter": null,
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.borderPosition",
+      "revision": 8,
+      "nativeImageHashBefore": null,
+      "nativeImageHashAfter": null,
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.borderRadius",
+      "revision": 7,
+      "nativeImageHashBefore": null,
+      "nativeImageHashAfter": null,
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.colorBg",
+      "revision": 11,
+      "nativeImageHashBefore": "fe55752cecfea2650d3e0b3b83998742cb9c15ae1ba335826e06aa4ffc736f48",
+      "nativeImageHashAfter": "fe55752cecfea2650d3e0b3b83998742cb9c15ae1ba335826e06aa4ffc736f48",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.customBg",
+      "revision": 25,
+      "nativeImageHashBefore": "2ec8cb365f97838fc661dc211921754177ddbb83599a1a5b21f1c76149bc163b",
+      "nativeImageHashAfter": "2ec8cb365f97838fc661dc211921754177ddbb83599a1a5b21f1c76149bc163b",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.customBg.inherit",
+      "revision": 26,
+      "nativeImageHashBefore": "2ec8cb365f97838fc661dc211921754177ddbb83599a1a5b21f1c76149bc163b",
+      "nativeImageHashAfter": "2ec8cb365f97838fc661dc211921754177ddbb83599a1a5b21f1c76149bc163b",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.customBg.source",
+      "revision": 28,
+      "nativeImageHashBefore": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "nativeImageHashAfter": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.gradientBg",
+      "revision": 12,
+      "nativeImageHashBefore": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "nativeImageHashAfter": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.gradientBg.colors",
+      "revision": 13,
+      "nativeImageHashBefore": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "nativeImageHashAfter": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.gradientBg.repeat",
+      "revision": 14,
+      "nativeImageHashBefore": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "nativeImageHashAfter": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.height",
+      "revision": 3,
+      "nativeImageHashBefore": null,
+      "nativeImageHashAfter": null,
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.patternBg",
+      "revision": 15,
+      "nativeImageHashBefore": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "nativeImageHashAfter": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.patternBg.customPatternImage",
+      "revision": 29,
+      "nativeImageHashBefore": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "nativeImageHashAfter": "60c43a55f56b3c06f72c75d1156a851d5e31c7379db4746ec8bf864c3f148d98",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.rotation",
+      "revision": 9,
+      "nativeImageHashBefore": null,
+      "nativeImageHashAfter": "0c405a2c3f34266109de6d05789632d3a552245a7a0cf8bee8537a1aa796944a",
+      "changed": true,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.shadow",
+      "revision": 19,
+      "nativeImageHashBefore": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "nativeImageHashAfter": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.shadow.blur",
+      "revision": 21,
+      "nativeImageHashBefore": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "nativeImageHashAfter": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.shadow.color",
+      "revision": 20,
+      "nativeImageHashBefore": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "nativeImageHashAfter": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.shadow.offsetX",
+      "revision": 22,
+      "nativeImageHashBefore": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "nativeImageHashAfter": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.shadow.offsetY",
+      "revision": 23,
+      "nativeImageHashBefore": "29480a1850885a39fd1c4db3100c985f60982ef3999af753b4ecb41e83ae630d",
+      "nativeImageHashAfter": "601ca1e4377c04a15933c42f3a966b4dbcaea24339d2dfd2a432d8fc3a364158",
+      "changed": true,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.shadow.opacity",
+      "revision": 24,
+      "nativeImageHashBefore": "29480a1850885a39fd1c4db3100c985f60982ef3999af753b4ecb41e83ae630d",
+      "nativeImageHashAfter": "2ec8cb365f97838fc661dc211921754177ddbb83599a1a5b21f1c76149bc163b",
+      "changed": true,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.stroke",
+      "revision": 16,
+      "nativeImageHashBefore": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "nativeImageHashAfter": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.stroke.borderRadius",
+      "revision": 18,
+      "nativeImageHashBefore": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "nativeImageHashAfter": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.stroke.color",
+      "revision": 17,
+      "nativeImageHashBefore": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "nativeImageHashAfter": "7945355f38c73027edad50edc142cf5bfe977eca90990192daf103a508fc96e1",
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.width",
+      "revision": 2,
+      "nativeImageHashBefore": null,
+      "nativeImageHashAfter": null,
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.x",
+      "revision": 4,
+      "nativeImageHashBefore": null,
+      "nativeImageHashAfter": null,
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.y",
+      "revision": 5,
+      "nativeImageHashBefore": null,
+      "nativeImageHashAfter": null,
+      "changed": false,
+      "nativeNodePixelChanged": true
+    },
+    {
+      "path": "canvas.zoom",
+      "revision": 10,
+      "nativeImageHashBefore": "0c405a2c3f34266109de6d05789632d3a552245a7a0cf8bee8537a1aa796944a",
+      "nativeImageHashAfter": "fe55752cecfea2650d3e0b3b83998742cb9c15ae1ba335826e06aa4ffc736f48",
+      "changed": true,
+      "nativeNodePixelChanged": true
+    }
+  ]
+}

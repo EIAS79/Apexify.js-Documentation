@@ -1,0 +1,52 @@
+
+<--- Last few GCs --->
+
+[25476:0000024C5CFD1000]      318 ms: Scavenge 10.3 (13.3) -> 8.9 (17.8) MB, pooled: 0 MB, 0.84 / 0.00 ms  (average mu = 1.000, current mu = 1.000) allocation failure; 
+[25476:0000024C5CFD1000]      372 ms: Scavenge 12.8 (17.8) -> 9.0 (18.5) MB, pooled: 0 MB, 0.42 / 0.00 ms  (average mu = 1.000, current mu = 1.000) allocation failure; 
+[25476:0000024C5CFD1000]      437 ms: Scavenge 13.3 (18.8) -> 9.9 (18.8) MB, pooled: 0 MB, 0.41 / 0.00 ms  (average mu = 1.000, current mu = 1.000) allocation failure; 
+
+FATAL ERROR: Zone Allocation failed - process out of memory
+----- Native stack trace -----
+
+ 1: 00007FF6271590C6 
+ 2: 00007FF627159604 
+ 3: 00007FF625D63617 
+ 4: 00007FF6256DB506 
+ 5: 00007FF626C6C3F8 
+ 6: 00007FF626C6BA3D 
+ 7: 00007FF626C6B7C9 
+ 8: 00007FF626C6A47A 
+ 9: 00007FF626C697BD 
+10: 00007FF626865DCD 
+11: 00007FF62679FE49 
+12: 00007FF626866678 
+13: 00007FF62686633C 
+14: 00007FF6268660A8 
+15: 00007FF6267A0B17 
+16: 00007FF626779D40 
+17: 00007FF626776C3F 
+18: 00007FF62677658D 
+19: 00007FF625CD72CF 
+20: 00007FF625C9C31D 
+21: 00007FF625C9C015 
+22: 00007FF626562CEF 
+23: 00007FF627099BDB 
+24: 00007FF625DB8A26 
+25: 00007FF62749F483 
+26: 00007FF803A6DDA7 
+27: 00007FF804B9EE4C 
+✖ tests\workspace\text-strict-native.test.ts (531.7769ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 544.9826
+
+✖ failing tests:
+
+test at tests\workspace\text-strict-native.test.ts:1:1
+✖ tests\workspace\text-strict-native.test.ts (531.7769ms)
+  'test failed'

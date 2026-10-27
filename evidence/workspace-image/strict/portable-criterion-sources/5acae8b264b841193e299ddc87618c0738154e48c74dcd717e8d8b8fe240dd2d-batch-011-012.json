@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "pin": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "start": 11,
+  "end": 12,
+  "results": [
+    {
+      "index": 11,
+      "path": "images.boxBackground.gradient.endX",
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.endX",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-11",
+        "IMG01-E-INSPECTOR-11",
+        "IMG01-E-HISTORY-11",
+        "IMG01-E-GRAPH-11",
+        "IMG01-E-PERSIST-11",
+        "IMG01-E-EXPORT-11"
+      ],
+      "issues": [],
+      "control": "Image box end X",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "32",
+        "checked": false,
+        "options": null,
+        "min": "-8192",
+        "max": "8192",
+        "step": "1",
+        "visible": true
+      },
+      "diag": {
+        "canonical": 33,
+        "controlDOM": {
+          "tag": "INPUT",
+          "value": "33",
+          "display": 20
+        }
+      },
+      "before": 32,
+      "after": 33,
+      "graphAfter": 34,
+      "elapsedMs": 3894
+    }
+  ]
+}

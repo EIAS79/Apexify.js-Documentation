@@ -1,0 +1,10 @@
+tests/workspace/canvas-image-layout-s13.test.ts(25,56): error TS2367: This comparison appears to be unintentional because the types 'boolean' and 'string' have no overlap.
+tests/workspace/canvas-image-layout-s13.test.ts(42,29): error TS7034: Variable 'records' implicitly has type 'any[]' in some locations where its type cannot be determined.
+tests/workspace/canvas-image-layout-s13.test.ts(50,56): error TS7005: Variable 'records' implicitly has an 'any[]' type.
+tests/workspace/canvas-union-certification-s13.test.ts(48,121): error TS2537: Type 'CanvasLayer[] | undefined' has no matching index signature for type 'number'.
+tests/workspace/canvas-union-certification-s13.test.ts(61,94): error TS2339: Property 'opacity' does not exist on type 'CanvasLayer'.
+  Property 'opacity' does not exist on type '{ type: "noise"; intensity?: number | undefined; blendMode?: "color" | "source-over" | "source-in" | "source-out" | "source-atop" | "destination-over" | "destination-in" | "destination-out" | ... 18 more ... | undefined; } & { ...; }'.
+tests/workspace/text-final-four-code.test.ts(46,15): error TS2345: Argument of type '{ family: string; name?: undefined; } | { family: string; name: string; }' is not assignable to parameter of type 'Record<string, string>'.
+  Type '{ family: string; name?: undefined; }' is not assignable to type 'Record<string, string>'.
+    Property 'name' is incompatible with index signature.
+      Type 'undefined' is not assignable to type 'string'.

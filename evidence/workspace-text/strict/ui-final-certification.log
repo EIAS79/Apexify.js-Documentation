@@ -1,0 +1,42 @@
+{
+  "counts": {
+    "FULL": 438,
+    "PARTIAL": 4,
+    "BLOCKED": 1,
+    "EXCLUDED": 1
+  },
+  "checks": {
+    "records": 444,
+    "uiAuthoring": 399,
+    "lifecycleAuthoring": 399,
+    "nativeAuthoring": 399,
+    "codeAuthoring": 399,
+    "observableMetrics": 41,
+    "explicitExcluded": 2,
+    "unproven": 4,
+    "arrays": 2
+  },
+  "unproven": [
+    {
+      "id": "TEXT01-STRICT-0002",
+      "api": "createText.TextProperties.font.family",
+      "reason": "Native effective output or documented nonpixel semantics false"
+    },
+    {
+      "id": "TEXT01-STRICT-0003",
+      "api": "createText.TextProperties.font.name",
+      "reason": "Native effective output or documented nonpixel semantics false"
+    },
+    {
+      "id": "TEXT01-STRICT-0410",
+      "api": "measureText.TextMetrics.hangingBaseline",
+      "reason": "Optional number in pinned TypeScript engine, absent from actual engine results including explicit baseline modes. No synthesized value"
+    },
+    {
+      "id": "TEXT01-STRICT-0411",
+      "api": "measureText.TextMetrics.ideographicBaseline",
+      "reason": "Optional number in pinned TypeScript engine, absent from actual engine results including explicit baseline modes. No synthesized value"
+    }
+  ],
+  "ledgerSha256": "81807c8703828aaa7a67d97a6006b7dc501ad0745ed290c8135b5472d1b95881"
+}
