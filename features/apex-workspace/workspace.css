@@ -2361,3 +2361,14 @@
   .aw-graph-scroll {padding:8px}
 }
 @media(prefers-reduced-motion:reduce) {.aw-property-tabs button {transition:none}}
+
+/* Fit controls make enlarged Graph panels behave like actual editing canvases. */
+.aw-graph-fit {
+  order:1;flex:0 0 auto;padding:7px 10px!important;border:1px solid #355572!important;
+  background:#142a42!important;color:#c9ddf4!important;border-radius:8px!important;
+  font-weight:650;font-size:11px;min-height:32px;cursor:pointer;
+}
+.aw-graph-fit:hover {color:#fff!important;background:#1b4065!important;border-color:#70acdc!important}
+.aw-graph-fit:focus-visible {outline:2px solid #87d5ff;outline-offset:2px}
+.aw-graph-toolbar .aw-run-graph {order:2}
+.aw-graph-inputs {order:3}
