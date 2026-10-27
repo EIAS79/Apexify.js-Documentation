@@ -2642,3 +2642,6 @@
 @container (max-width:310px) {
  .aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field-row {grid-template-columns:minmax(0,1fr)}
 }
+
+/* Typed connection failures are visible without expanding technical wiring. */
+.aw-graph-wiring-error {margin:8px 13px!important;padding:10px 12px;border:1px solid #b4675c;border-radius:8px;background:#38201f;color:#ffd3c8;font-size:11px;line-height:1.5;overflow-wrap:anywhere}
