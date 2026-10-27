@@ -83,7 +83,7 @@ export default function Inspector({
         </nav>
         <p className="aw-property-description">{sectionDescription}</p>
       </div>}
-      <div className="aw-inspector-scroll">
+      <div className={"aw-inspector-scroll" + (tab === "Properties" && !layer ? " aw-inspector-canvas-scroll" : "")}>
         {tab === "Presets" ? (
           <div className="aw-preset-grid">
             <button className="aw-template-card" onClick={onPreset}>
