@@ -18,7 +18,7 @@ export type DockTree =
 export const DEFAULT_DOCK: DockTree = {
   id: "root",
   direction: "row",
-  weights: [14, 86],
+  weights: [15, 85],
   children: [
     { panel: "tools" },
     {
@@ -29,23 +29,23 @@ export const DEFAULT_DOCK: DockTree = {
         {
           id: "upper",
           direction: "row",
-          weights: [75, 25],
+          weights: [69, 31],
           children: [
             {
               id: "center",
               direction: "column",
-              weights: [64, 36],
+              weights: [60, 40],
               children: [
                 { panel: "visual" },
                 {
                   id: "editorStack",
                   direction: "column",
-                  weights: [75, 25],
+                  weights: [88, 12],
                   children: [
                     {
                       id: "editors",
                       direction: "row",
-                      weights: [53, 47],
+                      weights: [48, 52],
                       children: [{ panel: "code" }, { panel: "graph" }],
                     },
                     { panel: "terminal" },
