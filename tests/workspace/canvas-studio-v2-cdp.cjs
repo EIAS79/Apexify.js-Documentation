@@ -68,6 +68,11 @@ async function main(){
     if(expected==="background")assert(state.base,"Background base controls missing");
     else assert(state.sections.includes(expected),"Missing active controls: "+expected);
     assert(!state.fieldWidths.some(w=>w<65),"Collapsed field in "+name);
+    if(name==="Effects"){
+      const toggleOverflow=await evaluate("([...document.querySelectorAll('.aw-canvas-advanced .aw-canvas-properties input[type=checkbox]')].filter(x=>x.getClientRects().length).map(x=>({right:Math.round(x.getBoundingClientRect().right),fieldsetRight:Math.round(x.closest('fieldset').getBoundingClientRect().right)})))");
+      console.log("EFFECT_TOGGLE_BOUNDS",JSON.stringify(toggleOverflow));
+      assert(toggleOverflow.every(x=>x.right<=x.fieldsetRight+2),"Stroke/shadow switch overflows its fieldset");
+    }
     await screenshot("02-"+name.toLowerCase());
   }
   await tabClick("Setup");
