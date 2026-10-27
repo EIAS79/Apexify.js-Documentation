@@ -22,9 +22,9 @@ const readableTextLabel = (raw: string) => {
     fontFamily: "Font family",
   };
   if (aliases[raw]) return aliases[raw];
-  const normalized = raw.replace(/([a-z\\d])([A-Z])/g, "$1 $2")
-    .replace(/[_-]/g, " ").replace(/\\[(\\d+)\\]/g, " · $1")
-    .replace(/\\s+/g, " ").trim();
+  const normalized = raw.replace(/([a-z\d])([A-Z])/g, "$1 $2")
+    .replace(/[_-]/g, " ").replace(/\[(\d+)\]/g, " · $1")
+    .replace(/\s+/g, " ").trim();
   return normalized.charAt(0).toUpperCase() + normalized.slice(1);
 };
 const object=(spec:TextSpec):Record<string,TextSpec>=>spec.kind==="object"?spec.fields:{};
