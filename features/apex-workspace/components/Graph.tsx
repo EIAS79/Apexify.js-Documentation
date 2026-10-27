@@ -225,6 +225,79 @@ export default function Graph({
           Run Graph
         </button>
       </div>
+      <div className="aw-graph-scroll" ref={viewportRef}>
+        <div
+          style={{ width: (650 * zoom) / 100, height: (height * zoom) / 100 }}
+        >
+          <div
+            className="aw-graph-stage"
+            style={{ width: 650, height, transform: `scale(${zoom / 100})` }}
+          >
+            <canvas
+              ref={canvas}
+              style={{ width: 650, height }}
+              aria-hidden="true"
+            />
+            <button
+              className="aw-graph-node aw-node-canvas"
+              style={{ left: 10, top: height / 2 - 27 }}
+              onClick={() => onSelect(null)}
+            >
+              <strong>
+                <Square2StackIcon />
+                Canvas
+              </strong>
+              <span>
+                {document.width} × {document.height}
+              </span>
+            </button>
+            {document.layers.map((layer, i) => {
+              const Icon = kindIcons[layer.kind];
+              return (
+                <button
+                  key={layer.id}
+                  className={`aw-graph-node aw-node-${layer.kind}${selected === layer.id ? " selected" : ""}${!layer.visible ? " aw-node-hidden" : ""}`}
+                  style={{ left: 170, top: i * 64 + 27 }}
+                  onClick={() => onSelect(layer.id)}
+                >
+                  <strong>
+                    <Icon />
+                    {layer.kind[0].toUpperCase() + layer.kind.slice(1)}
+                  </strong>
+                  <span>{layer.name}</span>
+                </button>
+              );
+            })}
+            <div
+              className="aw-graph-node aw-node-composite"
+              style={{ left: 368, top: height / 2 - 27 }}
+            >
+              <strong>
+                <Square2StackIcon />
+                Composite
+              </strong>
+              <span>
+                Ordered · {document.layers.filter((l) => l.visible).length}{" "}
+                layers
+              </span>
+            </div>
+            <div
+              className="aw-graph-node aw-node-output"
+              style={{ left: 522, top: height / 2 - 43 }}
+            >
+              <strong>
+                <PhotoIcon />
+                Output
+              </strong>
+              {preview ? (
+                <img src={preview} alt="Current graph render" />
+              ) : (
+                <span>Awaiting render</span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
       <details className="aw-graph-wiring" aria-label="Typed canvas graph wiring">
         <summary>Connect / disconnect typed node ports</summary>
         <p className="aw-muted">Graph ports are derived from the saved canvas and SHA-256 assets; connections update the same project as Visual and Code.</p>
@@ -419,79 +492,6 @@ export default function Graph({
           onChange={transform=>onDocument({...document,imageGroups:(document.imageGroups??[]).map(g=>g.id===imageGroup.id?{...g,transform}:g)})}/>}
         </details>;
       })()}
-      <div className="aw-graph-scroll" ref={viewportRef}>
-        <div
-          style={{ width: (650 * zoom) / 100, height: (height * zoom) / 100 }}
-        >
-          <div
-            className="aw-graph-stage"
-            style={{ width: 650, height, transform: `scale(${zoom / 100})` }}
-          >
-            <canvas
-              ref={canvas}
-              style={{ width: 650, height }}
-              aria-hidden="true"
-            />
-            <button
-              className="aw-graph-node aw-node-canvas"
-              style={{ left: 10, top: height / 2 - 27 }}
-              onClick={() => onSelect(null)}
-            >
-              <strong>
-                <Square2StackIcon />
-                Canvas
-              </strong>
-              <span>
-                {document.width} × {document.height}
-              </span>
-            </button>
-            {document.layers.map((layer, i) => {
-              const Icon = kindIcons[layer.kind];
-              return (
-                <button
-                  key={layer.id}
-                  className={`aw-graph-node aw-node-${layer.kind}${selected === layer.id ? " selected" : ""}${!layer.visible ? " aw-node-hidden" : ""}`}
-                  style={{ left: 170, top: i * 64 + 27 }}
-                  onClick={() => onSelect(layer.id)}
-                >
-                  <strong>
-                    <Icon />
-                    {layer.kind[0].toUpperCase() + layer.kind.slice(1)}
-                  </strong>
-                  <span>{layer.name}</span>
-                </button>
-              );
-            })}
-            <div
-              className="aw-graph-node aw-node-composite"
-              style={{ left: 368, top: height / 2 - 27 }}
-            >
-              <strong>
-                <Square2StackIcon />
-                Composite
-              </strong>
-              <span>
-                Ordered · {document.layers.filter((l) => l.visible).length}{" "}
-                layers
-              </span>
-            </div>
-            <div
-              className="aw-graph-node aw-node-output"
-              style={{ left: 522, top: height / 2 - 43 }}
-            >
-              <strong>
-                <PhotoIcon />
-                Output
-              </strong>
-              {preview ? (
-                <img src={preview} alt="Current graph render" />
-              ) : (
-                <span>Awaiting render</span>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
       <div className="aw-graph-caption">
         Shared composition · typed nodes: {graph.nodes.length} · connected ports: {graph.edges.length}
         {(document.canvasExtras?.bgLayers??[]).map((layer,index)=>

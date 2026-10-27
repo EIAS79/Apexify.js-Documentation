@@ -2372,3 +2372,59 @@
 .aw-graph-fit:focus-visible {outline:2px solid #87d5ff;outline-offset:2px}
 .aw-graph-toolbar .aw-run-graph {order:2}
 .aw-graph-inputs {order:3}
+
+
+/* Canvas Studio v2: legible, responsive category navigation and controls. */
+.aw-property-nav{padding:16px 15px 13px;background:linear-gradient(155deg,#0f2943,#08192c);border-bottom:1px solid #2a4964}
+.aw-property-context{align-items:flex-start;margin-bottom:14px}
+.aw-property-eyebrow{font-size:10px;letter-spacing:.09em;color:#8fc3eb}
+.aw-property-context strong{font-size:15px;line-height:1.45;letter-spacing:-.015em}
+.aw-property-count{border-radius:6px;background:#133856;border-color:#356080;color:#c6e4fc}
+.aw-property-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;padding:4px;border-radius:11px;border:1px solid #2b4a64;background:#06172a}
+.aw-property-tabs button{min-width:0!important;min-height:39px;padding:8px 5px!important;border:1px solid transparent!important;border-radius:7px!important;box-shadow:none!important;background:transparent!important;color:#bdd3e8!important;font-size:11px!important;overflow:hidden;text-overflow:ellipsis}
+.aw-property-tabs button:hover{background:#1c3956!important;color:#f1f9ff!important}
+.aw-property-tabs button.selected,.aw-property-tabs button[aria-selected=true]{background:#1e4b70!important;border-color:#468cb7!important;box-shadow:inset 0 1px 0 #cff4ff22!important;color:#fff!important}
+.aw-property-description{font-size:11px;line-height:1.5;margin:11px 2px 0;color:#acc6de}
+@media(min-width:700px){.aw-property-tabs{grid-template-columns:repeat(6,minmax(0,1fr))}}
+@media(max-width:350px){.aw-property-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.aw-inspector-canvas-scroll{padding:16px!important;min-width:0}
+.aw-inspector-canvas-scroll>.aw-field-row{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+.aw-inspector-canvas-scroll>.aw-field-row>.aw-field{display:flex;flex-direction:column;align-items:stretch;gap:6px;margin:0;min-width:0}
+.aw-inspector-canvas-scroll>.aw-field-row>.aw-field>span{flex:none;max-width:100%;font-size:11px!important;line-height:1.4}
+.aw-inspector-canvas-scroll>.aw-field-row>.aw-field>input{width:100%!important}
+.aw-inspector-canvas-scroll>.aw-field{display:flex;flex-direction:column;align-items:stretch;gap:8px;min-width:0}
+.aw-inspector-canvas-scroll>.aw-field>input:not([type=checkbox]){width:100%!important}
+.aw-canvas-advanced{display:grid;gap:13px;min-width:0}
+.aw-canvas-advanced>.aw-section-heading:first-child{display:none}
+.aw-canvas-advanced>.aw-muted{margin:0;font-size:11px;line-height:1.55}
+.aw-canvas-advanced .aw-canvas-section{margin:0!important;padding:0 0 13px!important;border:1px solid #2b4a63!important;border-radius:12px!important;background:linear-gradient(175deg,#0e263e,#0a1e33);min-width:0}
+.aw-canvas-advanced .aw-canvas-section>summary{min-height:48px;padding:12px 14px;font-size:12px;color:#e9f4fe;gap:9px}
+.aw-canvas-advanced .aw-canvas-section>summary strong{font-size:12px}
+.aw-canvas-advanced .aw-canvas-section>summary span{font-size:10px;max-width:48%;color:#9ebfd6}
+.aw-canvas-advanced .aw-canvas-section[open]>summary{background:#102a43;border-bottom:1px solid #294660;margin-bottom:12px}
+.aw-canvas-advanced .aw-canvas-section>.aw-field-row,.aw-canvas-advanced .aw-canvas-section>.aw-field,.aw-canvas-advanced .aw-canvas-section>.aw-muted,.aw-canvas-advanced .aw-canvas-section>.aw-canvas-properties{margin-left:14px!important;margin-right:14px!important}
+.aw-canvas-advanced .aw-canvas-section>.aw-section-heading{margin:10px 14px!important;padding:0!important;border:0!important;font-size:11px;color:#a8c6de}
+.aw-canvas-advanced .aw-field-row,.aw-graph-semantic-properties .aw-field-row{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr))!important;gap:12px!important;align-items:start!important;min-width:0}
+.aw-canvas-advanced .aw-field-row>.aw-field,.aw-graph-semantic-properties .aw-field-row>.aw-field,.aw-canvas-advanced .aw-field-row>.aw-value,.aw-graph-semantic-properties .aw-field-row>.aw-value{flex:none!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start;gap:7px!important;min-width:0!important;max-width:100%!important;padding:0!important;margin:0!important;border:0!important;font-size:11px!important;line-height:1.4}
+.aw-canvas-advanced .aw-field-row>.aw-field>span:first-child,.aw-graph-semantic-properties .aw-field-row>.aw-field>span:first-child{flex:none!important;width:100%;font-size:11px!important;line-height:1.4;color:#bfdaed;min-width:0!important;overflow-wrap:normal!important;word-break:normal}
+.aw-canvas-advanced .aw-field-row input:not([type=checkbox]),.aw-canvas-advanced .aw-field-row select,.aw-graph-semantic-properties .aw-field-row input:not([type=checkbox]),.aw-graph-semantic-properties .aw-field-row select{display:block!important;width:100%!important;min-width:0!important;max-width:100%!important;height:40px!important;padding:8px 11px!important;border-radius:8px!important;border:1px solid #345b7a!important;background:#081b30!important;color:#edf7ff!important;font-size:12px!important;font-variant-numeric:tabular-nums}
+.aw-canvas-advanced .aw-field-row input:focus-visible,.aw-canvas-advanced .aw-field-row select:focus-visible{outline:2px solid #85ddff!important;outline-offset:1px}
+.aw-canvas-advanced .aw-canvas-note,.aw-graph-semantic-properties .aw-canvas-note{display:block!important;width:100%!important;max-width:75ch!important;margin:6px 0!important;font-size:11px!important;line-height:1.55!important;color:#dcc18f!important;white-space:normal!important;overflow-wrap:break-word!important}
+.aw-canvas-advanced .aw-canvas-properties,.aw-graph-semantic-properties .aw-canvas-properties{min-width:0;padding:14px!important;border:1px solid #2d4e67!important;border-radius:10px!important;background:#081b2d}
+.aw-canvas-advanced .aw-canvas-properties legend{font-size:12px!important;color:#daecfb!important;font-weight:720;padding:0 6px}
+.aw-canvas-advanced .aw-field-row>.aw-canvas-properties{grid-column:1/-1}
+.aw-canvas-advanced input[type=checkbox],.aw-graph-semantic-properties input[type=checkbox]{appearance:none!important;width:38px!important;height:22px!important;min-height:22px!important;flex:none;border:1px solid #4d748c!important;border-radius:30px!important;background:#1d3953!important;position:relative;cursor:pointer}
+.aw-canvas-advanced input[type=checkbox]::before,.aw-graph-semantic-properties input[type=checkbox]::before{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;background:#ddeaf2;border-radius:50%;transition:transform .16s}
+.aw-canvas-advanced input[type=checkbox]:checked,.aw-graph-semantic-properties input[type=checkbox]:checked{background:#087caf!important;border-color:#5edbff!important}
+.aw-canvas-advanced input[type=checkbox]:checked::before,.aw-graph-semantic-properties input[type=checkbox]:checked::before{transform:translateX(16px);background:#fff}
+.aw-canvas-advanced .aw-field:has(input[type=checkbox]){justify-content:space-between!important;flex-direction:row!important;align-items:center!important}
+.aw-canvas-advanced input[type=file]{height:auto!important;min-height:44px!important;padding:7px!important;color:#bad6e8;font-size:11px!important}
+.aw-canvas-advanced input[type=file]::file-selector-button{background:#164969;border:1px solid #4586b1;color:#eef8ff;padding:8px 12px;border-radius:7px;margin-right:10px;cursor:pointer}
+.aw-canvas-advanced input[type=color]{height:40px!important;padding:5px!important;cursor:pointer}
+.aw-graph-semantic-properties,.aw-graph-wiring{margin:10px 13px!important;border:1px solid #2b4b65;border-radius:10px;background:#0b1e32;min-width:0}
+.aw-graph-semantic-properties>summary,.aw-graph-wiring>summary{min-height:44px;padding:10px 13px;background:#122e49;border-radius:10px;color:#d9efff;font-size:12px;cursor:pointer}
+.aw-graph-wiring>:not(summary),.aw-graph-semantic-properties>:not(summary){margin-left:13px;margin-right:13px}
+.aw-graph-connections{display:grid;gap:7px;margin:11px 0;max-height:220px;overflow:auto;overflow-wrap:anywhere;white-space:normal}
+.aw-graph-connections>div{padding:8px;border-radius:7px;background:#102d46;border:1px solid #31536b}
+@media(max-width:600px){.aw-canvas-advanced .aw-field-row,.aw-graph-semantic-properties .aw-field-row{grid-template-columns:minmax(0,1fr)!important}}
+@media(prefers-reduced-motion:reduce){.aw-canvas-advanced input[type=checkbox]::before{transition:none}}
