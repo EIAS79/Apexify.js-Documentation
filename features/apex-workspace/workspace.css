@@ -2610,3 +2610,35 @@
  .aw-graph-toolbar-modern {grid-template-columns:minmax(0,1fr) auto!important}
  .aw-graph-toolbar-modern .aw-graph-heading {grid-column:1/-1}
 }
+
+
+/* The Canvas tabpanel is a wrapper: style fields inside it, not only scroll direct children. */
+.aw-property-context>div {display:flex;flex-direction:column;gap:4px;min-width:0}
+.aw-property-context strong {display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.aw-property-count {flex:none;align-self:flex-start;white-space:nowrap}
+.aw-inspector-canvas-scroll #aw-canvas-category-panel {display:block;min-width:0}
+.aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field-row {
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:12px;margin:13px 0;
+}
+.aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field-row>.aw-field {
+ display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:7px!important;
+ min-width:0;margin:0!important;
+}
+.aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field-row>.aw-field>span:first-child {flex:none;width:100%;font-size:11px;line-height:1.4}
+.aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field-row>.aw-field>input:not([type=checkbox]),
+.aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field-row>.aw-field>select {
+ width:100%!important;min-width:0!important;height:39px!important;
+}
+.aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field:not(:has(input[type=checkbox])) {
+ display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:7px!important;min-width:0;
+}
+.aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field:not(:has(input[type=checkbox]))>input,
+.aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field:not(:has(input[type=checkbox]))>select {
+ width:100%!important;min-width:0!important;height:39px!important;
+}
+.aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field:has(input[type=checkbox]) {
+ display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important;
+}
+@container (max-width:310px) {
+ .aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field-row {grid-template-columns:minmax(0,1fr)}
+}
