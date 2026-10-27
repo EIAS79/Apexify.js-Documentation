@@ -1,19 +1,13 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import {
   PlayIcon,
-  MinusIcon,
-  PlusIcon,
-  Square2StackIcon,
-  PhotoIcon,
-  ChatBubbleBottomCenterTextIcon,
-  CubeIcon,
-  ChartBarIcon,
 } from "@heroicons/react/24/outline";
 import type { WorkspaceDocument } from "../model";
 import type { CanvasExtras } from "../canvas-options";
 import {projectCanvasGraph,editCanvasGraph,editCanvasGraphDocument,canvasGraphPortId} from '../canvas-graph';
-import { IconButton, NumberField } from "./ui";
+import { NumberField } from "./ui";
+import CanvasGraphFlow from "./CanvasGraphFlow";
 import {CanvasBlendModes,CanvasImageAlignModes} from "../canvas-options";
 import {GradientControls,PatternControls} from './CanvasNestedControls';
 import {StrokeControls,ShadowControls} from './CanvasEffectsEditor';
@@ -21,12 +15,6 @@ import ImageOptionsEditor,{GroupTransformEditor} from './ImageOptionsEditor';
 import {CanvasFiltersEditor} from './CanvasFiltersEditor';
 import {validateCanvasExtras} from '../canvas-options';
 import TextOptionsEditor from './TextOptionsEditor';
-const kindIcons = {
-  text: ChatBubbleBottomCenterTextIcon,
-  image: PhotoIcon,
-  shape: CubeIcon,
-  chart: ChartBarIcon,
-};
 /** A derived graph of the real ordered composition. Nodes select the same visual layers. */
 export default function Graph({
   document,
@@ -51,9 +39,11 @@ export default function Graph({
   const [wiringError,setWiringError]=useState('');
   const outputPorts=graph.ports.filter(p=>p.direction==='output');
   const inputPorts=graph.ports.filter(p=>p.direction==='input');
-  function applyConnection(op:'connect'|'disconnect'){
+  function applyConnection(op:'connect'|'disconnect',portFrom?:string,portTo?:string){
     try{
-      const target=targetPort||inputPorts.find(p=>p.type==='image-asset')?.id;
+      const resolvedSource=portFrom??sourcePort;
+      const resolvedTarget=portTo??targetPort;
+      const target=resolvedTarget||inputPorts.find(p=>p.type==='image-asset')?.id;
       if(!target)throw new Error('Select an existing typed input port');
       // Image source, image mask and group ports operate on canonical Workspace layers.
       const selectedTarget=graph.ports.find(p=>p.id===target);
@@ -61,7 +51,7 @@ export default function Graph({
         const layerId=selectedTarget.nodeId.slice('canvas:image-layer:'.length);
         const layer=document.layers.find(l=>l.id===layerId);
         if(!layer||!(layer.kind==='image'||layer.kind==='shape'))throw Error('Stale image graph destination');
-        const sourceNode=graph.ports.find(p=>p.id===sourcePort&&p.direction==='output');
+        const sourceNode=graph.ports.find(p=>p.id===resolvedSource&&p.direction==='output');
         if(op==='connect'&&(!sourceNode||sourceNode.type!==selectedTarget.type))throw Error('Typed image port mismatch');
         const assetId=sourceNode?.nodeId.startsWith('canvas:image:')?sourceNode.nodeId.slice('canvas:image:'.length):'';
         if(op==='connect'&&selectedTarget.type!=='group-transform'&&!document.assets?.some(a=>a.id===assetId))
@@ -82,96 +72,19 @@ export default function Graph({
       const colorPort=canvasGraphPortId('canvas:background','input','color');
       if(target===colorPort){
         if(op==='disconnect')onDocument(editCanvasGraphDocument(document,{op:'disconnect-color',toPort:target}));
-        else onDocument(editCanvasGraphDocument(document,{op:'connect-color',fromPort:sourcePort,toPort:target}));
+        else onDocument(editCanvasGraphDocument(document,{op:'connect-color',fromPort:resolvedSource,toPort:target}));
         setWiringError('');return;
       }
       const value=op==='connect'?
-        editCanvasGraph(document,{op:'connect',fromPort:sourcePort,toPort:target}):
+        editCanvasGraph(document,{op:'connect',fromPort:resolvedSource,toPort:target}):
         editCanvasGraph(document,{op:'disconnect',toPort:target});
       onCanvas(value);setWiringError('');
     }catch(e){setWiringError(e instanceof Error?e.message:'Invalid graph connection');}
   }
-  const canvas = useRef<HTMLCanvasElement>(null);
-  const [zoom, setZoom] = useState(65);
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const manualZoomRef = useRef(false);
-  const height = Math.max(180, document.layers.length * 64 + 40);
-  const fitGraph = useCallback(() => {
-    const viewport = viewportRef.current;
-    if (!viewport) return;
-    const availableWidth = Math.max(240, viewport.clientWidth - 32);
-    const availableHeight = Math.max(170, viewport.clientHeight - 24);
-    const fit = Math.round(Math.min(availableWidth / 650, availableHeight / height) * 100);
-    setZoom(Math.max(55, Math.min(180, fit)));
-  }, [height]);
-  useEffect(() => {
-    const viewport = viewportRef.current;
-    if (!viewport || typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(() => { if (!manualZoomRef.current) fitGraph(); });
-    observer.observe(viewport);
-    fitGraph();
-    return () => observer.disconnect();
-  }, [fitGraph]);
-  useEffect(() => {
-    const ctx = canvas.current?.getContext("2d");
-    if (!ctx) return;
-    const dpr = window.devicePixelRatio || 1;
-    canvas.current!.width = 650 * dpr;
-    canvas.current!.height = height * dpr;
-    ctx.scale(dpr, dpr);
-    ctx.clearRect(0, 0, 650, height);
-    const link = (
-      x1: number,
-      y1: number,
-      x2: number,
-      y2: number,
-      color: string,
-    ) => {
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 1.3;
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.bezierCurveTo(x1 + 45, y1, x2 - 45, y2, x2, y2);
-      ctx.stroke();
-    };
-    document.layers.forEach((l, i) => {
-      link(
-        115,
-        height / 2,
-        170,
-        i * 64 + 54,
-        l.visible ? "#7eacd1" : "#27374b",
-      );
-      link(
-        300,
-        i * 64 + 54,
-        368,
-        height / 2,
-        l.visible ? "#8ed7ca" : "#27374b",
-      );
-    });
-    link(468, height / 2, 522, height / 2, "#55ffbf");
-  }, [document.layers, height]);
   return (
     <div className="aw-graph">
-      <div className="aw-graph-toolbar">
-        <div className="aw-zoom">
-          <IconButton
-            label="Zoom graph out"
-            onClick={() => { manualZoomRef.current = true; setZoom(Math.max(40, zoom - 20)); }}
-          >
-            <MinusIcon />
-          </IconButton>
-          <span>{zoom}%</span>
-          <IconButton
-            label="Zoom graph in"
-            onClick={() => { manualZoomRef.current = true; setZoom(Math.min(180, zoom + 20)); }}
-          >
-            <PlusIcon />
-          </IconButton>
-        </div>
-        <button type="button" className="aw-graph-fit" aria-label="Fit graph to view"
-          onClick={() => { manualZoomRef.current = false; fitGraph(); }}>Fit view</button>
+      <div className="aw-graph-toolbar aw-graph-toolbar-modern">
+        <div className="aw-graph-heading"><strong>Canvas node graph</strong><span>Drag to pan · scroll to zoom · connect typed ports</span></div>
         <details className="aw-graph-inputs">
 
           <summary>Inputs & assets</summary>
@@ -220,11 +133,15 @@ export default function Graph({
           </select>
         </label>
         </div></details>
-         <button className="aw-button aw-run-graph" onClick={onRender}>
-          <PlayIcon />
-          Run Graph
+        
+        <button className="aw-button aw-run-graph" onClick={onRender}>
+          <PlayIcon /> Run Graph
         </button>
       </div>
+      <CanvasGraphFlow graph={graph} document={document} preview={preview} selected={selected}
+        onSelect={onSelect}
+        onConnect={(source,target)=>applyConnection('connect',source,target)}
+        onDisconnect={target=>applyConnection('disconnect',undefined,target)}/>
       <details className="aw-graph-wiring" aria-label="Typed canvas graph wiring">
         <summary>Connect / disconnect typed node ports</summary>
         <p className="aw-muted">Graph ports are derived from the saved canvas and SHA-256 assets; connections update the same project as Visual and Code.</p>
@@ -419,79 +336,6 @@ export default function Graph({
           onChange={transform=>onDocument({...document,imageGroups:(document.imageGroups??[]).map(g=>g.id===imageGroup.id?{...g,transform}:g)})}/>}
         </details>;
       })()}
-      <div className="aw-graph-scroll" ref={viewportRef}>
-        <div
-          style={{ width: (650 * zoom) / 100, height: (height * zoom) / 100 }}
-        >
-          <div
-            className="aw-graph-stage"
-            style={{ width: 650, height, transform: `scale(${zoom / 100})` }}
-          >
-            <canvas
-              ref={canvas}
-              style={{ width: 650, height }}
-              aria-hidden="true"
-            />
-            <button
-              className="aw-graph-node aw-node-canvas"
-              style={{ left: 10, top: height / 2 - 27 }}
-              onClick={() => onSelect(null)}
-            >
-              <strong>
-                <Square2StackIcon />
-                Canvas
-              </strong>
-              <span>
-                {document.width} × {document.height}
-              </span>
-            </button>
-            {document.layers.map((layer, i) => {
-              const Icon = kindIcons[layer.kind];
-              return (
-                <button
-                  key={layer.id}
-                  className={`aw-graph-node aw-node-${layer.kind}${selected === layer.id ? " selected" : ""}${!layer.visible ? " aw-node-hidden" : ""}`}
-                  style={{ left: 170, top: i * 64 + 27 }}
-                  onClick={() => onSelect(layer.id)}
-                >
-                  <strong>
-                    <Icon />
-                    {layer.kind[0].toUpperCase() + layer.kind.slice(1)}
-                  </strong>
-                  <span>{layer.name}</span>
-                </button>
-              );
-            })}
-            <div
-              className="aw-graph-node aw-node-composite"
-              style={{ left: 368, top: height / 2 - 27 }}
-            >
-              <strong>
-                <Square2StackIcon />
-                Composite
-              </strong>
-              <span>
-                Ordered · {document.layers.filter((l) => l.visible).length}{" "}
-                layers
-              </span>
-            </div>
-            <div
-              className="aw-graph-node aw-node-output"
-              style={{ left: 522, top: height / 2 - 43 }}
-            >
-              <strong>
-                <PhotoIcon />
-                Output
-              </strong>
-              {preview ? (
-                <img src={preview} alt="Current graph render" />
-              ) : (
-                <span>Awaiting render</span>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
       <div className="aw-graph-caption">
         Shared composition · typed nodes: {graph.nodes.length} · connected ports: {graph.edges.length}
         {(document.canvasExtras?.bgLayers??[]).map((layer,index)=>
