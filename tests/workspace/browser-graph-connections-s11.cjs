@@ -23,7 +23,7 @@ async function run(){
   }throw Error(name+' not committed');
  }
  const image=()=>page.evaluate(async()=>{
-  const a=document.querySelector('.aw-node-output img'),b=document.querySelector('.aw-visual .aw-render-image');
+  const a=document.querySelector('.aw-flow-card-preview, .aw-node-output img'),b=document.querySelector('.aw-visual .aw-render-image');
   if(!a||!b||!a.complete||!b.complete||!a.naturalWidth||!b.naturalWidth||a.currentSrc!==b.currentSrc)return null;
   try{await Promise.all([a.decode(),b.decode()]);}catch{return null;}
   const c=document.createElement('canvas');c.width=a.naturalWidth;c.height=a.naturalHeight;
@@ -76,7 +76,7 @@ async function run(){
   const beforeNew=await committed();
   await page.getByRole('button',{name:'New Project'}).click();
   await waitCommitted(x=>x.revision>(beforeNew?.revision??0),'new project');
-  await page.waitForFunction(()=>{const g=document.querySelector('.aw-node-output img'),v=document.querySelector('.aw-visual .aw-render-image');return g?.complete&&v?.complete&&g.naturalWidth===1280&&v.naturalWidth===1280&&g.currentSrc===v.currentSrc;},null,{timeout:22000});
+  await page.waitForFunction(()=>{const g=document.querySelector('.aw-flow-card-preview, .aw-node-output img'),v=document.querySelector('.aw-visual .aw-render-image');return g?.complete&&v?.complete&&g.naturalWidth===1280&&v.naturalWidth===1280&&g.currentSrc===v.currentSrc;},null,{timeout:22000});
   const blank=await image();
   assert.ok(blank,'Canvas preview must decode before stroke authoring');
   const makeImage=async(name,r,g,b)=>{

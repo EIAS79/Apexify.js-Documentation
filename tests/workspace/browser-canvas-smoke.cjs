@@ -37,7 +37,7 @@ async function run(){
     await page.waitForTimeout(10000);
     console.log('BROWSER_UI_ALERTS='+await page.locator('.aw-app [role=alert]').allTextContents());
     console.log('BROWSER_PREVIEW_IMG='+await page.locator('.aw-app img').count());
-    const rendered=await page.locator('.aw-graph-node.aw-node-output img').count();
+    const rendered=await page.locator('.aw-flow-card-preview').count();
     console.log('CHROME_RENDER_OUTPUT_IMAGE_COUNT='+rendered);
     if(rendered<1) throw Error('Graph render did not produce a preview image');
     if(errors.length)throw Error('Unhandled browser exceptions: '+errors.join('|'));

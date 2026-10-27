@@ -8,7 +8,7 @@ The new App Router page is `/workspace`. Its files live in `app/workspace`, `app
 
 - Workspace follows the current Frame homepage/documentation palette and canonical wordmark. The site theme preference also controls Workspace and its code editor.
 - New layouts focus on Tools, Visual Canvas, Inspector, and Code. All other panels remain available through **Panels**. Existing saved layouts are preserved; **Panels → Reset layout** applies the new arrangement.
-- The Inspector view selector switches between Design, Presets, and Assets. Canvas and typography options use collapsible sections instead of another row of sub-navigation. Image options retain grouped, collapsible controls.
+- The Inspector view selector switches between Design, Presets, and Assets. Canvas retains the six accessible categories and typed graph from PR #170, with no extra jump-navigation row. Typography uses collapsible groups. Image options retain grouped, collapsible controls.
 - Info buttons explain controls, units, effects, and limits. Help supports click/touch, Escape, keyboard focus, and narrow screens; cards appear outside clipped panel content.
 - The Create group prioritizes Canvas, Text, and Image. Other tools are under More Tools; editors not implemented are marked Planned. This refresh does not implement media, path, or component editors.
 

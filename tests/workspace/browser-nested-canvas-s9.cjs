@@ -28,7 +28,7 @@ async function run(){
  }
  async function pixels(){
   return page.evaluate(async()=>{
-   const imgs=['.aw-visual .aw-render-image','.aw-node-output img'].map(q=>document.querySelector(q));
+   const imgs=['.aw-visual .aw-render-image','.aw-flow-card-preview, .aw-node-output img'].map(q=>document.querySelector(q));
    if(imgs.some(i=>!i||!i.complete||i.naturalWidth!==1280)||imgs[0].currentSrc!==imgs[1].currentSrc)return null;
    try{await Promise.all(imgs.map(i=>i.decode()));}catch{return null;} // expected during superseded object-URL swap
    const canvas=document.createElement('canvas');canvas.width=1280;canvas.height=720;
@@ -78,7 +78,7 @@ async function run(){
  }
  async function preview(previous,description){
   await page.waitForFunction(previous=>{
-   const v=document.querySelector('.aw-visual .aw-render-image'),g=document.querySelector('.aw-node-output img');
+   const v=document.querySelector('.aw-visual .aw-render-image'),g=document.querySelector('.aw-flow-card-preview, .aw-node-output img');
    return v?.complete&&g?.complete&&v.naturalWidth===1280&&g.naturalWidth===1280&&v.currentSrc===g.currentSrc&&
     (!previous||v.currentSrc!==previous);
   },previous?.src??null,{timeout:25000});

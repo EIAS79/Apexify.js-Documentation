@@ -46,6 +46,21 @@ async function run() {
     assert.equal(await desktop.locator('.aw-panel').count(), 4);
 
     console.log('Theme and default layout verified');
+    assert.deepEqual(await inspector.getByRole('tab').allTextContents(),['Setup','Background','Styling','Effects','Advanced','Layers']);
+    const categoryChecks=[
+      ['Background',inspector.locator('.aw-segmented')],
+      ['Styling',inspector.getByLabel('Canvas gradient type',{exact:true})],
+      ['Effects',inspector.getByLabel('Canvas stroke enabled',{exact:true})],
+      ['Advanced',inspector.getByLabel('Import canvas background image',{exact:true})],
+      ['Layers',inspector.getByRole('button',{name:'Add color layer',exact:true})],
+    ];
+    for(const [name,control] of categoryChecks){
+      const tab=inspector.getByRole('tab',{name,exact:true});
+      await tab.click();await control.waitFor({state:'visible'});
+      assert.equal(await tab.getAttribute('aria-selected'),'true');
+    }
+    await inspector.getByRole('tab',{name:'Setup',exact:true}).click();
+
     const help = inspector.getByRole('button', {name:'About Width', exact:true});
     await help.click();
     await page.getByRole('note', {name:'Width help',exact:true}).waitFor();
@@ -55,7 +70,7 @@ async function run() {
     assert.equal(await help.evaluate(el => el === document.activeElement), true);
 
     console.log('Help verified');
-    await inspector.locator('#aw-canvas-gradients > summary').click();
+    await inspector.getByRole('tab',{name:'Styling',exact:true}).click();
     await inspector.getByLabel('Canvas gradient type').selectOption('linear');
     // CodeMirror virtualizes off-screen lines; inspect the actual source download.
     const readSource = async () => {
@@ -100,6 +115,8 @@ async function run() {
     await page.locator('.aw-topbar').getByRole('button', {name:'Panels',exact:true}).click();
     await page.locator('#aw-panels-menu').getByLabel('Visual Graph',{exact:true}).check();
     await page.keyboard.press('Escape');
+    await desktop.locator('.react-flow__node').first().waitFor();
+    assert.ok(await desktop.locator('.react-flow__handle').count()>0);
     await desktop.getByRole('button', {name:'Close Visual Graph',exact:true}).click();
     assert.equal(await desktop.locator('.aw-panel-graph').count(), 0);
     await page.screenshot({path:process.env.WORKSPACE_DARK_SCREENSHOT || '/tmp/workspace-frame-dark.png'});
