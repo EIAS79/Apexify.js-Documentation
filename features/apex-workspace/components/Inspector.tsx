@@ -473,6 +473,7 @@ export default function Inspector({
                 </>}
                   </>
                 ) : (
+                  <>
                 {activeSection === "source" && <>
                   <UploadImage
                     onUpload={(source,_name,asset)=>onDocument({
@@ -483,6 +484,7 @@ export default function Inspector({
                     Replace image
                   </UploadImage>
                 </>}
+                  </>
                 )}
                 {(layer.kind==='image'||layer.kind==='shape') && ['source','styling','effects','advanced','group'].includes(activeSection) && <section aria-label="Image authoring inspector">
                   {layer.kind==='image' && activeSection==='source' && <>
