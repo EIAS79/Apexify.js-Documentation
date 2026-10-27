@@ -29,7 +29,7 @@ export const DEFAULT_DOCK: DockTree = {
         {
           id: "upper",
           direction: "row",
-          weights: [75, 25],
+          weights: [68, 32],
           children: [
             {
               id: "center",

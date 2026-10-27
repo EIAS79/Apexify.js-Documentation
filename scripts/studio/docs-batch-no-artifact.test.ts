@@ -20,7 +20,7 @@ if (!snippet) throw new Error('Batch documentation Studio entrypoint is missing'
 
 test('the published batch example is valid TypeScript and declares its entrypoint', () => {
   const source = ts.createSourceFile('docs-batch.ts', snippet, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
-  assert.deepEqual(source.parseDiagnostics, []);
+  assert.deepEqual(ts.transpileModule(snippet, { reportDiagnostics: true }).diagnostics, []);
   const main = source.statements.find(
     (statement): statement is ts.FunctionDeclaration => ts.isFunctionDeclaration(statement) &&
       statement.name?.text === 'main',

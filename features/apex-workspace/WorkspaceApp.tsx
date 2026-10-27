@@ -15,6 +15,7 @@ import {
   QueueListIcon,
   Squares2X2Icon,
   SunIcon,
+  MoonIcon,
   XMarkIcon,
   PhotoIcon,
   AdjustmentsHorizontalIcon,
@@ -57,6 +58,7 @@ import {
   type LogEntry,
 } from "./components/Results";
 import "./workspace.css";
+import {useTheme} from '@/components/ThemeProvider';
 
 let idCounter = 0;
 function workspaceId() {
@@ -73,10 +75,10 @@ const DEFAULT_VISIBLE: Record<PanelId, boolean> = {
   visual: true,
   inspector: true,
   code: true,
-  graph: true,
-  queue: true,
-  preview: true,
-  output: true,
+  graph: false,
+  queue: false,
+  preview: false,
+  output: false,
   terminal: false,
 };
 interface HistoryState {
@@ -132,6 +134,7 @@ const capabilityNotes: Record<
 };
 
 export default function WorkspaceApp() {
+  const {theme,toggleTheme}=useTheme();
   const [history, setHistory] = useState<HistoryState>(() => ({
     past: [],
     present: createHeroDocument(),
@@ -146,6 +149,10 @@ export default function WorkspaceApp() {
   const [selected, setSelected] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState("canvas");
   const [inspectorTab, setInspectorTab] = useState("Properties");
+  const selectedKind=document.layers.find(layer=>layer.id===selected)?.kind;
+  useEffect(()=>{
+    if(inspectorTab==='Properties')setActiveTool(selectedKind??'canvas');
+  },[selected,selectedKind,inspectorTab]);
   const [panelMenu, setPanelMenu] = useState(false);
   const [search, setSearch] = useState("");
   const [commandMenu, setCommandMenu] = useState(false);
@@ -949,21 +956,18 @@ export default function WorkspaceApp() {
   }
   return (
     <main
-      className={`aw-app${contrast ? " aw-contrast" : ""}`}
+      className={`aw-app frame-palette${contrast ? " aw-contrast" : ""}`}
       aria-label="Apexify creative workspace"
       aria-busy={!ready}
     >
       <header className="aw-topbar">
         <a className="aw-brand" href="/" aria-label="Apexify home">
-          <img src="/workspace/assets/apex-mark.webp" alt="" />
-          <span>
-            Apexify<span className="aw-brand-js">.js</span>
-          </span>
+          <img src="/brand/apexify-lockup-v2.avif" width={145} height={48} alt="Apexify.js"/>
         </a>
+        <span className="aw-workspace-label">Workspace <span>Studio</span></span>
         <nav className="aw-topnav" aria-label="Main navigation">
           <a href="/">Home</a>
           <a href="/docs/getting-started">Docs</a>
-          <a href="/api-reference">API</a>
           <a href="/gallery">Gallery</a>
           <a href="/workspace" aria-current="page">
             Workspace
@@ -978,12 +982,15 @@ export default function WorkspaceApp() {
           <kbd>⌘K</kbd>
         </button>
         <div className="aw-topbar-actions">
+          <IconButton label={`Switch to ${theme==='dark'?'light':'dark'} theme`} onClick={toggleTheme}>
+            {theme==='dark'?<SunIcon/>:<MoonIcon/>}
+          </IconButton>
           <IconButton
             label="Increase interface contrast"
             active={contrast}
             onClick={() => setContrast(!contrast)}
           >
-            <SunIcon />
+            <AdjustmentsHorizontalIcon />
           </IconButton>
           <div className="aw-panels-wrapper">
             <button

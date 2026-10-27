@@ -23,56 +23,47 @@ import {
 import type { WorkspaceDocument, WorkspaceLayer } from "../model";
 import {importImageAsset,type WorkspaceImageAsset} from '../asset-store';
 import type { IconType } from "./ui";
-type Tool = { name: string; icon: IconType; color?: string; action: string };
+import ControlHelp from "./ControlHelp";
+type Tool = { name: string; icon: IconType; color?: string; action: string; pending?:boolean };
 const groups: { title?: string; tools: Tool[] }[] = [
-  {
-    tools: [
-      { name: "Canvas", icon: Square2StackIcon, action: "canvas" },
-      { name: "Text", icon: ChatBubbleBottomCenterTextIcon, action: "text" },
-      { name: "Image", icon: PhotoIcon, action: "image" },
-      { name: "Shape", icon: CubeIcon, action: "shape" },
-      { name: "Path", icon: CircleStackIcon, action: "path" },
-      { name: "Chart", icon: ChartBarIcon, action: "chart" },
-      { name: "Component", icon: Squares2X2Icon, action: "component" },
-    ],
-  },
-  {
-    title: "MEDIA",
-    tools: [
-      { name: "Assets", icon: FolderIcon, action: "assets", color: "pink" },
-      { name: "GIF", icon: FilmIcon, action: "gif", color: "purple" },
-      {
-        name: "Audio",
-        icon: MusicalNoteIcon,
-        action: "audio",
-        color: "purple",
-      },
-      { name: "Video", icon: FilmIcon, action: "video", color: "blue" },
-    ],
-  },
-  {
-    title: "TOOLS",
-    tools: [
-      {
-        name: "Templates",
-        icon: SparklesIcon,
-        action: "templates",
-        color: "pink",
-      },
-      { name: "Examples", icon: BeakerIcon, action: "examples" },
-      { name: "Presets", icon: Squares2X2Icon, action: "presets" },
-      { name: "Layers", icon: Square2StackIcon, action: "layers" },
-    ],
-  },
-  {
-    title: "PROJECT",
-    tools: [
-      { name: "Open project", icon: FolderIcon, action: "open" },
-      { name: "Files", icon: DocumentIcon, action: "files" },
-      { name: "Settings", icon: AdjustmentsHorizontalIcon, action: "settings" },
-    ],
-  },
+  {title:"CREATE",tools:[
+    {name:"Canvas",icon:Square2StackIcon,action:"canvas"},
+    {name:"Text",icon:ChatBubbleBottomCenterTextIcon,action:"text"},
+    {name:"Image",icon:PhotoIcon,action:"image"},
+  ]},
+  {title:"ORGANIZE",tools:[
+    {name:"Layers",icon:Square2StackIcon,action:"layers"},
+    {name:"Assets",icon:FolderIcon,action:"assets"},
+    {name:"Presets",icon:SparklesIcon,action:"presets"},
+  ]},
+  {title:"PROJECT",tools:[
+    {name:"Open project",icon:FolderIcon,action:"open"},
+    {name:"Export files",icon:DocumentIcon,action:"files"},
+    {name:"Panel layout",icon:AdjustmentsHorizontalIcon,action:"settings"},
+  ]},
+  {title:"MORE TOOLS",tools:[
+    {name:"Shape",icon:CubeIcon,action:"shape"},
+    {name:"Chart",icon:ChartBarIcon,action:"chart"},
+    {name:"Path",icon:CircleStackIcon,action:"path",pending:true},
+    {name:"Component",icon:Squares2X2Icon,action:"component",pending:true},
+    {name:"GIF",icon:FilmIcon,action:"gif",pending:true},
+    {name:"Audio",icon:MusicalNoteIcon,action:"audio",pending:true},
+    {name:"Video",icon:FilmIcon,action:"video",pending:true},
+  ]},
 ];
+const toolHelp:Record<string,string>={
+  canvas:"Select the canvas to edit output size, background, gradients, patterns, and effects.",
+  text:"Add an editable text layer, then adjust typography and effects in Design.",
+  image:"Open Assets to import a PNG, JPEG, or WebP image, then edit its appearance in Design.",
+  layers:"Open Design to select, reorder, hide, and edit layers.",
+  assets:"Import images and select existing image layers.",
+  presets:"Load an editable composition. Undo restores the previous composition.",
+  open:"Import a previously exported Workspace project JSON file.",
+  files:"Open the export panel to download output, source code, or project data.",
+  settings:"Choose visible panels or restore the default layout.",
+  shape:"Add a procedural shape layer. This editor is outside the current text, canvas, and image polish scope.",
+  chart:"Add the existing chart layer. This editor is outside the current text, canvas, and image polish scope.",
+};
 export function UploadImage({
   onUpload,
   onError,
@@ -130,7 +121,7 @@ export default function Tools({
   const fileRef = useRef<HTMLInputElement>(null);
   return (
     <div className="aw-tools">
-      <div className="aw-tool-tagline">Design. Visualize. Generate.</div>
+      <div className="aw-tool-tagline">Create with Apexify.js</div>
       <label className="aw-search aw-tool-search">
         <MagnifyingGlassIcon />
         <input
@@ -139,23 +130,25 @@ export default function Tools({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <kbd>⌘K</kbd>
+
       </label>
       <nav className="aw-tool-list" aria-label="Workspace tools">
-        {groups.map((group, i) => (
-          <div className="aw-tool-group" key={group.title ?? i}>
+        {groups.filter(group=>group.tools.some(t=>t.name.toLowerCase().includes(query.toLowerCase()))).map((group, i) => (
+          <details className="aw-tool-group" key={group.title ?? i} open={!!query||group.title!=="MORE TOOLS"}>
             {group.title ? (
-              <div className="aw-tool-group-title">
+              <summary className="aw-tool-group-title">
                 {group.title}
                 <ChevronDownIcon />
-              </div>
+              </summary>
             ) : null}
             {group.tools
               .filter((t) => t.name.toLowerCase().includes(query.toLowerCase()))
               .map((tool) => (
-                <button
+                <div className="aw-tool-row" key={tool.action}><button
                   type="button"
                   key={tool.action}
+                  aria-pressed={active===tool.action}
+                  title={tool.pending?"Editor not implemented — view details":toolHelp[tool.action]}
                   className={`aw-tool ${active === tool.action ? "selected" : ""}`}
                   onClick={() =>
                     tool.action === "open"
@@ -166,10 +159,10 @@ export default function Tools({
                   <tool.icon
                     className={tool.color ? `aw-icon-${tool.color}` : ""}
                   />
-                  <span>{tool.name}</span>
-                </button>
+                  <span>{tool.name}</span>{tool.pending&&<small>Planned</small>}
+                </button><ControlHelp label={tool.name} description={tool.pending?"The Apexify.js API exists, but its Workspace editor is not implemented. Select this tool to read its current status.":toolHelp[tool.action]}/></div>
               ))}
-          </div>
+          </details>
         ))}
       </nav>
       <div className="aw-tool-bottom">
@@ -181,7 +174,7 @@ export default function Tools({
           <img src="/workspace/assets/crystal-lake.webp" alt="" />
           <div>
             <strong>{document.name}</strong>
-            <span>Saved on this device</span>
+            <span>Local project</span>
           </div>
         </div>
       </div>

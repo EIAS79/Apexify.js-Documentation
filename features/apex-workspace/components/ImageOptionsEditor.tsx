@@ -53,16 +53,18 @@ function Points({label,items,onChange,max=24,min=3}:{label:string;items:Pt[];onC
 }
 function LocalAsset({label,value,assets,onChange,onAsset,onError}:{label:string;value:string;assets:readonly WorkspaceImageAsset[];onChange:(v:string)=>void;onAsset:(asset:WorkspaceImageAsset)=>void;onError:(error:string)=>void}){
  return <fieldset className="aw-canvas-properties"><legend>{label}</legend>
- <Enum label={label+' SHA-256 source'} value={value} options={[...assets.map(a=>a.id)]} onChange={onChange}/>
+ <Field label={label+' image'}><select aria-label={label+' SHA-256 source'} value={value} onChange={e=>onChange(e.target.value)}>
+   {assets.map((a,i)=><option key={a.id} value={a.id}>Image {i+1} · {a.width} × {a.height} · {a.mime.replace('image/','').toUpperCase()}</option>)}
+ </select></Field>
  <Field label={'Import verified '+label}><input type="file" aria-label={'Import verified '+label} accept="image/png,image/jpeg,image/webp" onChange={async e=>{
  const input=e.currentTarget,file=input.files?.[0];input.value='';if(!file)return;
  try{const asset=await importImageAsset(file);onAsset(asset);}catch(err){onError(err instanceof Error?err.message:'Image upload failed');}
- }}/></Field><small>Local images only. SHA-256 validated. No external URLs or filesystem paths.</small></fieldset>;
+ }}/></Field><small>Import a PNG, JPEG, or WebP image. It is saved with your project.</small></fieldset>;
 }
 function FilterList({filters,onChange}:{filters:NonNullable<ImageEditorOptions['filters']>;onChange:(v:NonNullable<ImageEditorOptions['filters']>)=>void}){
  const list=filters as unknown as Array<Record<string,unknown>>;
  const edit=(i:number,patch:Record<string,unknown>)=>onChange(list.map((x,j)=>j===i?{...x,...patch}:x) as unknown as typeof filters);
- return <fieldset className="aw-canvas-properties"><legend>Ordered native image filters ({filters.length}/8)</legend>
+ return <fieldset className="aw-canvas-properties"><legend>Image filters ({filters.length}/8)</legend>
  {list.map((f,i)=><details key={i} open={i===list.length-1}><summary>{i+1}. {String(f.type)}</summary>
    <Enum label={'Filter '+(i+1)+' type'} value={String(f.type)} options={IMAGE_FILTERS} onChange={type=>onChange(list.map((x,j)=>j===i?{type,...Object.fromEntries(IMAGE_FILTER_FIELDS[type].map(k=>[k,k==='levels'?4:k==='size'?8:1]))}:x) as unknown as typeof filters)}/>
    {IMAGE_FILTER_FIELDS[String(f.type)]?.map(k=>{
@@ -131,7 +133,7 @@ export default function ImageOptionsEditor({options,onChange,assets,onAsset,onEr
  const clear=(key:keyof ImageEditorOptions)=>{const v={...options};delete v[key];onChange(v)};
  const mask=options.mask;
  return <div className="aw-image-options">
- <div className="aw-section-heading"><strong>CreateImage · native v6 controls</strong></div>
+ <div className="aw-section-heading"><strong>Image appearance</strong></div>
  <details open><summary>Placement, fit & compositing</summary>
  <Toggle label="Use intrinsic dimensions" checked={options.inherit??false} onChange={inherit=>edit({inherit})}/>
  <Enum label="Image fit" value={options.fit??'cover'} options={IMAGE_FITS} onChange={v=>edit({fit:v as ImageProperties['fit']})}/>
@@ -168,7 +170,7 @@ export default function ImageOptionsEditor({options,onChange,assets,onAsset,onEr
  {options.boxBackground.gradient&&<GradientControls id="Image box" gradient={options.boxBackground.gradient as CanvasGradient} onChange={gradient=>edit({boxBackground:{...options.boxBackground,gradient}})}/>}
  </>}
  </details>
- <details><summary>Filters · ordered native pipeline</summary>
+ <details><summary>Filters & color</summary>
  <Enum label="Filter ordering" value={options.filterOrder??'pre'} options={['pre','post']} onChange={v=>edit({filterOrder:v as ImageProperties['filterOrder']})}/>
  <Num label="Filter intensity" value={options.filterIntensity??1} min={0} max={50} step={0.1} onChange={filterIntensity=>edit({filterIntensity})}/>
  <FilterList filters={options.filters??[]} onChange={filters=>edit({filters})}/>

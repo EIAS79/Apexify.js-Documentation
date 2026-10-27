@@ -1,0 +1,71 @@
+/* Frame palette shared by Workspace surfaces, including portalled help.
+   Values match the current homepage (frame-home.css) and docs (docs-frame.css). */
+@font-face {
+  font-family: 'Frame Inter';
+  src: url('/fonts/inter-latin-wght-normal.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+.frame-palette {
+  --bg-base: #111210;
+  --bg-canvas: #161714;
+  --bg-raised: #1b1d18;
+  --bg-elevated: #22251e;
+  --bg-sunken: #11130f;
+  --bg-overlay: #111210ed;
+  --border-subtle: #272b23;
+  --border-default: #34382e;
+  --border-strong: #596248;
+  --border-accent: #d5ff5f;
+  --text-primary: #f3f4ec;
+  --text-secondary: #bdc2b3;
+  --text-tertiary: #929a86;
+  --text-muted: #929a86;
+  --text-inverse: #172000;
+  --accent-iris: #d5ff5f;
+  --accent-iris-soft: #dcff81;
+  --accent-magenta: #c4b5ef;
+  --accent-amber: #efd092;
+  --success: #c9ed94;
+  --danger: #f1a6ac;
+  --warning: #efd092;
+  --info: #d5ff5f;
+  --ring: #d5ff5f66;
+  --gradient-iris: linear-gradient(#d5ff5f, #d5ff5f);
+  --gradient-sunset: var(--gradient-iris);
+  --gradient-aurora: var(--gradient-iris);
+  --shadow-sm: 0 1px 2px #0002;
+  --shadow-lg: 0 16px 48px #0005;
+  color-scheme: dark;
+}
+.light .frame-palette {
+  --bg-base: #f4f5ed;
+  --bg-canvas: #fffef8;
+  --bg-raised: #fffef8;
+  --bg-elevated: #e6ebda;
+  --bg-sunken: #ebeee1;
+  --bg-overlay: #f4f5eded;
+  --border-subtle: #dbe0d1;
+  --border-default: #c9d0bc;
+  --border-strong: #a6b396;
+  --border-accent: #456500;
+  --text-primary: #202619;
+  --text-secondary: #4b5641;
+  --text-tertiary: #647054;
+  --text-muted: #647054;
+  --text-inverse: #fff;
+  --accent-iris: #456500;
+  --accent-iris-soft: #405d00;
+  --accent-magenta: #655095;
+  --accent-amber: #77520c;
+  --success: #386216;
+  --danger: #a33743;
+  --warning: #77520c;
+  --info: #456500;
+  --ring: #45650066;
+  --gradient-iris: linear-gradient(#456500, #456500);
+  --shadow-sm: 0 1px 2px #20261908;
+  --shadow-lg: 0 16px 48px #20261926;
+  color-scheme: light;
+}

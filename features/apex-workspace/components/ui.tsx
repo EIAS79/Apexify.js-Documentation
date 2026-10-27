@@ -1,7 +1,9 @@
 "use client";
 import { XMarkIcon, ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
-import {useEffect,useState} from "react";
-import type { ComponentType, ReactNode, SVGProps } from "react";
+import {cloneElement, isValidElement, useEffect,useId,useState} from "react";
+import type { ComponentType, ReactNode, SVGProps, ReactElement } from "react";
+import ControlHelp from './ControlHelp';
+import {controlHelp,readableLabel} from '../control-help';
 export type IconType = ComponentType<SVGProps<SVGSVGElement>>;
 export function IconButton({
   label,
@@ -73,15 +75,19 @@ export function Panel({
 export function Field({
   label,
   children,
+  help,
 }: {
   label: string;
   children: ReactNode;
+  help?: string;
 }) {
+  const id=useId();
+  const directControl=isValidElement(children)&&typeof children.type==='string'&&['input','select','textarea'].includes(children.type);
   return (
-    <label className="aw-field">
-      <span>{label}</span>
-      {children}
-    </label>
+    <div className="aw-field">
+      <div className="aw-field-label"><label htmlFor={directControl?id:undefined}>{readableLabel(label)}</label><ControlHelp label={label} description={help}/></div>
+      {directControl?cloneElement(children as ReactElement,{id}):children}
+    </div>
   );
 }
 export function NumberField({
@@ -110,7 +116,7 @@ export function NumberField({
     return Number.isFinite(n)&&n>=min&&n<=max?n:undefined;
   };
   return (
-    <Field label={label}>
+    <Field label={label} help={`${controlHelp(label)} Supported range: ${min} to ${max}${step!==1?`; step ${step}`:''}.`}>
       <input
         aria-label={label}
         type="number"

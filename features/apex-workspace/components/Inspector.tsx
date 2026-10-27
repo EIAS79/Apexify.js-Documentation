@@ -58,18 +58,15 @@ export default function Inspector({
     onDocument({ background: { ...bg, ...patch } });
   return (
     <div className="aw-inspector">
-      <div className="aw-inspector-tabs">
-        {["Properties", "Presets", "Assets"].map((t) => (
-          <button
-            key={t}
-            className={tab === t ? "selected" : ""}
-            onClick={() => setTab(t)}
-          >
-            {t}
-          </button>
-        ))}
+      <div className="aw-inspector-navigation">
+        <Field label="Inspector view" help="Design edits the selected layer or canvas. Presets loads an editable composition. Assets imports and selects images.">
+          <select aria-label="Inspector view" value={tab} onChange={e=>setTab(e.target.value)}>
+            <option value="Properties">Design</option><option value="Presets">Presets</option><option value="Assets">Assets</option>
+          </select>
+        </Field>
       </div>
-      <div className="aw-inspector-scroll">
+      <div className="aw-inspector-scroll" key={tab+":"+(layer?.id??"canvas")}>
+        <div className="aw-inspector-context"><span>{tab==="Properties"?(layer?.kind??"Canvas"):tab}</span><p>{tab==="Properties"?(layer?"Edit this layer. Select Canvas to return to the background.":"Set the output size, then build your background and layers."):tab==="Assets"?"Import an image, then select it to edit its appearance.":"Start from an editable composition."}</p></div>
         {tab === "Presets" ? (
           <div className="aw-preset-grid">
             <button className="aw-template-card" onClick={onPreset}>
@@ -78,7 +75,7 @@ export default function Inspector({
                 alt="Crystal lake composition preset"
               />
               <strong>Crystal Lake</strong>
-              <span>Editable text · image · shapes</span>
+              <span>Editable canvas · text · images</span>
             </button>
             <p className="aw-muted">
               Loads the reference composition into the current project. Undo
@@ -95,7 +92,7 @@ export default function Inspector({
             />
             <strong>Background artwork</strong>
             <p className="aw-muted">
-              PNG, JPEG, WebP · up to 2 MB, verified by SHA-256. Uploaded assets travel with your
+              PNG, JPEG, WebP · up to 2 MB. Uploaded images travel with your
               project JSON.
             </p>
             {document.layers
@@ -454,14 +451,14 @@ export default function Inspector({
                 )}
                 {(layer.kind==='image'||layer.kind==='shape')&&<section aria-label="Image authoring inspector">
                   {layer.kind==='image'&&<>
-                    <Field label="Verified source">
+                    <Field label="Source image">
                       <select aria-label="Image layer source" value={layer.source}
                         onChange={e=>onLayer(layer.id,{source:e.target.value})}>
                         <option value="/workspace/assets/crystal-lake.webp">Bundled lake artwork</option>
-                        {(document.assets??[]).map(asset=><option key={asset.id} value={asset.id}>SHA-256 {asset.sha256.slice(0,12)} · {asset.width} × {asset.height}</option>)}
+                        {(document.assets??[]).map((asset,index)=><option key={asset.id} value={asset.id}>Image {index+1} · {asset.width} × {asset.height} · {asset.mime.replace('image/','').toUpperCase()}</option>)}
                       </select>
                     </Field>
-                    <Field label="Upload verified image source"><input type="file" aria-label="Upload verified image source" accept="image/png,image/jpeg,image/webp"
+                    <Field label="Import replacement image"><input type="file" aria-label="Upload verified image source" accept="image/png,image/jpeg,image/webp"
                       onChange={async e=>{const input=e.currentTarget,file=input.files?.[0];input.value='';if(!file)return;
                         try{const asset=await importImageAsset(file);
                           onDocument({assets:document.assets?.some(a=>a.id===asset.id)?document.assets:[...(document.assets??[]),asset],

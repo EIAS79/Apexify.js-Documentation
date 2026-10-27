@@ -9,7 +9,7 @@ export function StrokeControls({value,onChange,id}:Props<CanvasStroke>){
  const color=value?.color??"#ff783d";
  const radius=value?.borderRadius==="circular"?"circular":"numeric";
  return <fieldset className="aw-canvas-properties" aria-label={id+" stroke properties"}>
-  <legend>Canvas stroke</legend>
+  <legend>Stroke</legend>
   <Field label="Enable stroke"><input type="checkbox" aria-label={id+" stroke enabled"}
     checked={value!==undefined} onChange={e=>onChange(e.target.checked?{color:"#ff783d",width:8,opacity:1,style:"solid"}:undefined)}/></Field>
   {value?<div>
@@ -55,7 +55,7 @@ export function ShadowControls({value,onChange,id,ownerRadius=0}:Props<CanvasSha
  const roundedEffective=ownerRadius==='circular'||ownerRadius>0||value?.borderRadius==='circular'||(typeof value?.borderRadius==='number'&&value.borderRadius>0);
  const edit=(patch:Partial<CanvasShadow>)=>onChange({...value,...patch});
  return <fieldset className="aw-canvas-properties" aria-label={id+" shadow properties"}>
-  <legend>Canvas shadow</legend>
+  <legend>Shadow</legend>
   <Field label="Enable shadow"><input type="checkbox" aria-label={id+" shadow enabled"}
     checked={value!==undefined} onChange={e=>onChange(e.target.checked?{color:"#e0a4ff",blur:8,offsetX:6,offsetY:6,opacity:1}:undefined)}/></Field>
   {value?<div>

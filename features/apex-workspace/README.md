@@ -6,6 +6,12 @@ The new App Router page is `/workspace`. Its files live in `app/workspace`, `app
 
 ## Current behavior
 
+- Workspace follows the current Frame homepage/documentation palette and canonical wordmark. The site theme preference also controls Workspace and its code editor.
+- New layouts focus on Tools, Visual Canvas, Inspector, and Code. All other panels remain available through **Panels**. Existing saved layouts are preserved; **Panels → Reset layout** applies the new arrangement.
+- The Inspector view selector switches between Design, Presets, and Assets. Canvas and typography options use collapsible sections instead of another row of sub-navigation. Image options retain grouped, collapsible controls.
+- Info buttons explain controls, units, effects, and limits. Help supports click/touch, Escape, keyboard focus, and narrow screens; cards appear outside clipped panel content.
+- The Create group prioritizes Canvas, Text, and Image. Other tools are under More Tools; editors not implemented are marked Planned. This refresh does not implement media, path, or component editors.
+
 - Nine independent panels: tools, visual canvas, properties, code, graph, terminal, render queue, preview, and output/export. Close, reopen, maximize, reset, and resize them. Hidden branches disappear from the split tree and adjacent windows reclaim the space. The header can restore panels even when every panel is closed.
 - One versioned composition drives visual selection and dragging, the inspector, generated code, the graph, live renders, and render jobs. History supports undo/redo. Project, layout, and unsynchronized code drafts persist locally; JSON project downloads provide a portable backup.
 - Canvas backgrounds support color, gradient, and uploaded/bundled images. Text, rectangle/circle shapes, image layers, bar charts, and pie charts have real Apexify rendering. PNG/JPEG/WebP image upload is limited to 4 MB per file.
@@ -24,7 +30,7 @@ Future adapters should extend this workspace-owned model and public v6 renderer.
 
 ## Runtime and boundaries
 
-Uses the repository's existing `apexify.js` Git dependency pinned at `379a5248f09ed39c1b1734fe104b6bd73a77857f` (v6 source). No package manifest or dependency pin was changed. The renderer uses public `ApexPainter` APIs, including `createCanvas`, `createImage`, `createText`, and `createChart`.
+Uses the repository's existing `apexify.js` Git dependency pinned at `b6ca97cfc675b16a52c2c7b5d0ff881b87b911be` (v6 source). The Frame refresh leaves this engine pin unchanged. The renderer uses public `ApexPainter` APIs, including `createCanvas`, `createImage`, `createText`, and `createChart`.
 
 `POST /api/workspace/render` accepts validated composition JSON, never user code. Validation rebuilds a whitelist model, rejects arbitrary URLs/files/SVG, limits dimensions to 2048, limits layer count to 64, and bounds request bodies to 6 MB. The route uses Node, caps active renders at two per process, checks origin, and observes request cancellation and a 25-second render deadline between operations. This concurrency bound is local to an instance, not a distributed quota. Native rendering operations already in progress are not forcibly terminated.
 

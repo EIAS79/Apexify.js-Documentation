@@ -49,16 +49,8 @@ export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onErr
     update({bgLayers:tagged});
   }
   return <section className="aw-canvas-advanced" aria-label="Advanced canvas authoring">
-    <div className="aw-section-heading"><strong>Canvas Settings · Apexify.js v6</strong></div>
-    <p className="aw-muted">All supported edits update the same native-rendered canvas, generated Code and saved project. Select a section to navigate its actual controls.</p>
-    <nav className="aw-canvas-jump" aria-label="Canvas settings sections">
-      {([['fundamentals','Fundamentals'],['gradients','Gradients'],['patterns','Patterns'],
-         ['layers','Layers'],['effects','Effects'],['images','Images']] as const).map(([id,label])=>
-        <button type="button" key={id} onClick={()=>{
-          const target=globalThis.document.getElementById('aw-canvas-'+id);
-          if(target){(target as HTMLDetailsElement).open=true;target.scrollIntoView({block:'nearest'});}
-        }}>{label}</button>)}
-    </nav>
+    <div className="aw-section-heading"><strong>Advanced canvas</strong></div>
+    <p className="aw-muted">Open a section to edit. Use the info icons for guidance; changes sync with code and the rendered canvas.</p>
     <details id="aw-canvas-fundamentals" className="aw-canvas-section" open>
       <summary><strong>Fundamentals</strong><span>Geometry · opacity · zoom · corners</span></summary>
     <div className="aw-section-heading"><strong>Canvas fundamentals · geometry</strong></div>
@@ -95,7 +87,7 @@ export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onErr
     </div>
     <p className="aw-muted">Zoom centers default to the canvas midpoint; changing the center affects painted pixels only when zoom scale differs from 1.</p>
     </details>
-    <details id="aw-canvas-gradients" className="aw-canvas-section" open>
+    <details id="aw-canvas-gradients" className="aw-canvas-section">
       <summary><strong>Gradients</strong><span>Linear · radial · conic · stops · pivots</span></summary>
 <div className="aw-section-heading"><strong>Gradient background · native v6</strong></div>
     <Field label="Gradient variant">
@@ -110,7 +102,7 @@ export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onErr
     </Field>
     {gradient?<GradientControls gradient={gradient} onChange={setGradient} id="Root" />:null}
     </details>
-    <details id="aw-canvas-patterns" className="aw-canvas-section" open>
+    <details id="aw-canvas-patterns" className="aw-canvas-section">
       <summary><strong>Patterns</strong><span>13 types · paint · noise · repeat caveats</span></summary>
     <div className="aw-section-heading"><strong>Procedural background</strong></div>
     <Field label="Pattern">
@@ -139,7 +131,7 @@ export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onErr
     </Field>
     {options.noiseBg?<NumberField label="Noise intensity" value={options.noiseBg.intensity??0.05} min={0} max={1} step={0.02} onChange={intensity=>update({noiseBg:{intensity}})}/>:null}
     </details>
-    <details id="aw-canvas-layers" className="aw-canvas-section" open>
+    <details id="aw-canvas-layers" className="aw-canvas-section">
       <summary><strong>Background layers</strong><span>6 layer types · reorder · compositing</span></summary>
     <div className="aw-section-heading"><strong>Ordered background layers</strong></div>
     {backgroundLayers.map((layer,index)=><fieldset aria-label={"Background layer "+(index+1)} key={index} className="aw-canvas-properties">
@@ -220,13 +212,13 @@ export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onErr
       </button>
     </div>
     </details>
-    <details id="aw-canvas-effects" className="aw-canvas-section" open>
+    <details id="aw-canvas-effects" className="aw-canvas-section">
       <summary><strong>Strokes & shadows</strong><span>Styles · radius · gradients · offsets</span></summary>
     <div className="aw-section-heading"><strong>Stroke, shadow and borders</strong></div>
     <StrokeControls id="Canvas" value={options.stroke} onChange={stroke=>update({stroke})}/>
     <ShadowControls id="Canvas" ownerRadius={options.borderRadius??0} value={options.shadow} onChange={shadow=>update({shadow})}/>
     </details>
-    <details id="aw-canvas-images" className="aw-canvas-section" open>
+    <details id="aw-canvas-images" className="aw-canvas-section">
       <summary><strong>Verified images</strong><span>Import · select · fit · alignment</span></summary>
     <div className="aw-section-heading"><strong>Verified local images</strong></div>
     <p className="aw-muted">Only local PNG/JPEG/WebP files, verified by content hash and decoded pixels. No remote URLs, arbitrary paths or live video.</p>
