@@ -286,7 +286,14 @@ export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onErr
     </div>:null}
     </details>
     </>}
-    {focus==="advanced"&&<section className="aw-canvas-section"><strong>Resolved Canvas options</strong><p className="aw-canvas-note">Read-only configuration. No duplicate settings or destructive reset.</p><pre className="aw-canvas-options-readout">{JSON.stringify(options,null,2)}</pre></section>}
+    {focus==="advanced"&&<section className="aw-canvas-section">
+      <strong>Resolved Canvas options</strong>
+      <p className="aw-canvas-note">Read-only effective overrides. Use the other tabs to edit each option once.</p>
+      <pre className="aw-canvas-options-readout">{JSON.stringify(options,null,2)}</pre>
+      <button type="button" className="aw-text-button" onClick={()=>{
+        if(window.confirm("Reset all Canvas overrides? This clears background layers, gradients, patterns, transforms, stroke and shadows. You can undo the change."))onChange({});
+      }}>Reset all Canvas overrides…</button>
+    </section>}
     {focus==='all'&&<p className="aw-muted">Changes sync with Code and Visual Graph.</p>}
   </section>;
 }
