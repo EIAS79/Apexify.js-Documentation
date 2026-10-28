@@ -3210,3 +3210,51 @@ body:has(.aw-app) .custom-cursor-pointer__shape,body:has(.aw-app) .custom-cursor
 .aw-layer-editor .aw-image-source-settings { margin-bottom:16px; }
 .aw-layer-editor .aw-text-editor { gap:0; }
 .aw-text-editor-compact > .aw-editor-intro { display:none; }
+
+/* Unified Canvas inspector: a single focused authoring surface per option family. */
+.aw-app .aw-canvas-icon-nav {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
+  gap:5px;
+  padding:6px;
+  margin:9px 0 15px;
+  border:1px solid var(--border-default);
+  border-radius:9px;
+  background:var(--bg-canvas);
+}
+.aw-app .aw-canvas-icon-nav > button {
+  min-width:0;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:10px 7px;
+  border:1px solid transparent;
+  border-radius:6px;
+  background:transparent;
+  color:var(--text-secondary);
+  font-size:11px;font-weight:650;cursor:pointer;
+  overflow-wrap:anywhere;
+}
+.aw-app .aw-canvas-icon-nav > button svg { width:16px;height:16px;flex:none; }
+.aw-app .aw-canvas-icon-nav > button:hover {background:var(--bg-raised);color:var(--text-primary);}
+.aw-app .aw-canvas-icon-nav > button.selected,
+.aw-app .aw-canvas-icon-nav > button[aria-selected="true"] {
+  border-color:var(--accent-iris);
+  background:color-mix(in srgb,var(--accent-iris) 10%,var(--bg-canvas));
+  color:var(--text-primary);
+}
+.aw-app .aw-canvas-icon-nav > button:focus-visible {outline:2px solid var(--accent-iris);outline-offset:2px;}
+.aw-app .aw-canvas-options-readout {
+  max-height:260px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;
+  border:1px solid var(--border-default);border-radius:6px;
+  padding:12px;font-size:11px;color:var(--text-secondary);
+}
+.aw-app .aw-canvas-section:not(details) {padding:12px;min-width:0;}
+.aw-app .aw-canvas-section .aw-gradient-preview{margin:8px 10px 14px;}
+.aw-app .aw-canvas-section .aw-canvas-icon-nav {margin:0 0 10px;}
+@media(max-width:580px) {
+ .aw-app .aw-canvas-icon-nav {grid-template-columns:repeat(2,minmax(0,1fr));}
+ .aw-app .aw-canvas-icon-nav > button {padding:9px 5px;font-size:10px;}
+}
+@container (max-width:290px) {
+ .aw-app .aw-canvas-icon-nav {grid-template-columns:repeat(2,minmax(0,1fr));}
+ .aw-app .aw-canvas-icon-nav > button {flex-direction:column;}
+}
