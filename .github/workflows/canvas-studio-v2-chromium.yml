@@ -36,7 +36,8 @@ jobs:
             tests/workspace/canvas-paint-graph-s12.test.ts \
             tests/workspace/canvas-effects-enums-s13.test.ts \
             tests/workspace/canvas-nested-families-s15.test.ts \
-            tests/workspace/canvas-union-certification-s13.test.ts
+            tests/workspace/canvas-union-certification-s13.test.ts \
+            tests/workspace/canvas-unified-inspector.test.tsx
       - uses: browser-actions/setup-chrome@v1
         id: chrome
         with:
