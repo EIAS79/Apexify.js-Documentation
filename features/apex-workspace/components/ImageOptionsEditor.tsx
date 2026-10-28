@@ -6,7 +6,10 @@ import type {WorkspaceImageAsset} from '../asset-store';
 import {importImageAsset} from '../asset-store';
 import {IMAGE_FILTERS,IMAGE_FILTER_FIELDS,IMAGE_DISTORTIONS,IMAGE_FITS,IMAGE_ALIGNS,IMAGE_COMPOSITES,IMAGE_EDGES,IMAGE_INTERPOLATIONS} from '../image-options';
 import BorderMultiSelect from './BorderMultiSelect';
+import type {LayerInspectorSection} from '../inspector-sections';
+import {readableLabel} from '../control-help';
 import ImageFilePicker from './ImageFilePicker';
+import LayerColorPicker from './LayerColorPicker';
 import {Field,NumberField} from './ui';
 import {GradientControls} from './CanvasNestedControls';
 import {StrokeControls,ShadowControls} from './CanvasEffectsEditor';
@@ -34,10 +37,7 @@ function HexColor({label,value,onChange}:{label:string;value:string;onChange:(v:
   }} onBlur={()=>setDraft(value)}/>;
 }
 function Color({label,value,onChange}:{label:string;value:string;onChange:(v:string)=>void}){
- return <Field label={label}><div className="aw-field-row">
-  <input type="color" aria-label={label} value={value.slice(0,7)} onChange={e=>onChange(e.target.value)}/>
-  <HexColor label={label+" hex"} value={value} onChange={onChange}/>
- </div></Field>;
+ return <LayerColorPicker label={label} value={value} onChange={onChange} alpha/>;
 }
 function AddRemove({label,onAdd,onRemove}:{label:string;onAdd?:()=>void;onRemove?:()=>void}){
  return <div className="aw-field-row"><strong>{label}</strong>{onAdd&&<button type="button" className="aw-text-button" onClick={onAdd}>+ Add</button>}{onRemove&&<button type="button" className="aw-text-button" onClick={onRemove}>Remove</button>}</div>;
@@ -126,25 +126,35 @@ function Mesh({value,onChange,width,height}:{value:ImageMeshWarpOptions;onChange
  <Enum label="Mesh edge mode" value={value.edgeMode??'transparent'} options={IMAGE_EDGES} onChange={s=>onChange({...value,edgeMode:s as ImageMeshWarpOptions['edgeMode']})}/>
  <button type="button" onClick={()=>onChange(undefined)}>Remove mesh</button></fieldset>;
 }
-export default function ImageOptionsEditor({options,onChange,assets,onAsset,onError,width,height,isShape=false,shapeType}:{
+export default function ImageOptionsEditor({options,onChange,assets,onAsset,onError,width,height,isShape=false,shapeType,focus="all"}:{
  options:ImageEditorOptions;onChange:(v:ImageEditorOptions)=>void;assets:readonly WorkspaceImageAsset[];
- onAsset:(a:WorkspaceImageAsset)=>void;onError:(s:string)=>void;width:number;height:number;isShape?:boolean;shapeType?:string;
+ onAsset:(a:WorkspaceImageAsset)=>void;onError:(s:string)=>void;width:number;height:number;isShape?:boolean;shapeType?:string;focus?:LayerInspectorSection|"all";
 }){
  const edit=(patch:Partial<ImageEditorOptions>)=>onChange({...options,...patch});
  const clear=(key:keyof ImageEditorOptions)=>{const v={...options};delete v[key];onChange(v)};
  const mask=options.mask;
  return <div className="aw-image-options">
- <div className="aw-section-heading"><strong>Image appearance</strong></div>
- <details open><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Placement, fit & compositing</summary>
+
+ {(focus==='all'||focus==='primary')&&<details open className="aw-editor-section"><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Image fit & alignment</summary>
+ <p className="aw-editor-description">Cover fills the layer; Contain preserves the whole image; Fill stretches it. Intrinsic dimensions use the original image size.</p>
  <Toggle label="Use intrinsic dimensions" checked={options.inherit??false} onChange={inherit=>edit({inherit})}/>
- <Enum label="Image fit" value={options.fit??'cover'} options={IMAGE_FITS} onChange={v=>edit({fit:v as ImageProperties['fit']})}/>
- <Enum label="Image alignment" value={options.align??'center'} options={IMAGE_ALIGNS} onChange={v=>edit({align:v as ImageProperties['align']})}/>
- <Num label="Blur" value={options.blur??0} min={0} max={50} step={0.5} onChange={blur=>edit({blur})}/>
- <Enum label="Composite / blend mode" value={options.blendMode??'source-over'} options={IMAGE_COMPOSITES} onChange={v=>edit({blendMode:v as GlobalCompositeOperation})}/>
+ <Field label="Image fit"><select aria-label="Image fit" disabled={options.inherit} value={options.fit??'cover'} onChange={event=>edit({fit:event.target.value as ImageProperties['fit']})}>
+  {IMAGE_FITS.map(value=><option key={value} value={value}>{readableLabel(value)}</option>)}
+ </select></Field>
+ <Field label="Image alignment"><select aria-label="Image alignment" disabled={options.inherit} value={options.align??'center'} onChange={event=>edit({align:event.target.value as ImageProperties['align']})}>
+  {IMAGE_ALIGNS.map(value=><option key={value} value={value}>{readableLabel(value)}</option>)}
+ </select></Field>
+ </details>}
+ {(focus==='all'||focus==='layout')&&<details open className="aw-editor-section"><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Rounded corners</summary>
+ <p className="aw-editor-description">Set a radius, then choose the corners to round. Circular mode clips the complete image to an ellipse.</p>
  <Toggle label="Circular border radius" checked={options.borderRadius==='circular'} onChange={v=>edit({borderRadius:v?'circular':0})}/>
  {options.borderRadius!=='circular'&&<Num label="Border radius" value={options.borderRadius??0} min={0} max={2048} onChange={borderRadius=>edit({borderRadius})}/>}
  <BorderMultiSelect label="Image rounded corners" ariaLabel="Border position" kind="corners" value={options.borderPosition??'all'} onChange={borderPosition=>edit({borderPosition})}/>
- </details>
+ </details>}
+ {(focus==='all'||focus==='appearance')&&<details open className="aw-editor-section"><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Compositing & blur</summary>
+ <Num label="Blur" value={options.blur??0} min={0} max={50} step={0.5} onChange={blur=>edit({blur})}/>
+ <Enum label="Composite / blend mode" value={options.blendMode??'source-over'} options={IMAGE_COMPOSITES} onChange={v=>edit({blendMode:v as GlobalCompositeOperation})}/>
+ </details>}
  {isShape&&<details open><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Procedural shape parameters</summary>
  <Toggle label="Shape fill" checked={options.shape?.fill??true} onChange={fill=>edit({shape:{...options.shape,fill}})}/>
  {!options.shape?.gradient&&<Color label="Shape color" value={options.shape?.color??'#6739e8'} onChange={color=>edit({shape:{...options.shape,color}})}/>}
@@ -156,7 +166,7 @@ export default function ImageOptionsEditor({options,onChange,assets,onAsset,onEr
  {(['radius','sides','innerRadius','outerRadius','startAngle','endAngle','centerX','centerY'] as const).map(k=><Num key={k} label={'Shape '+k} min={k==='sides'?3:0} max={k==='sides'?64:2048} value={options.shape?.[k]??(k==='sides'?5:k==='radius'?50:0)} onChange={n=>edit({shape:{...options.shape,[k]:n}})}/>)}
  {shapeType==='polygon'&&<Points label="Polygon points" items={options.shape?.points??[{x:0,y:0},{x:width,y:0},{x:width/2,y:height}]} max={32} onChange={points=>edit({shape:{...options.shape,points}})}/>}
  </details>}
- <details><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Stroke, shadow & background paint</summary>
+ {(focus==='all'||focus==='appearance')&&<details className="aw-editor-section"><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Stroke, shadow & background paint</summary>
  <StrokeControls id="Image" value={options.stroke as CanvasStroke|undefined} onChange={stroke=>edit({stroke})}/>
   {options.stroke&&!options.stroke.gradient&&<HexColor label="Image stroke color hex" value={options.stroke.color??'#000000'} onChange={color=>edit({stroke:{...options.stroke,color}})}/>}
  <ShadowControls id="Image" value={options.shadow as CanvasShadow|undefined} onChange={shadow=>edit({shadow})}/>
@@ -170,35 +180,35 @@ export default function ImageOptionsEditor({options,onChange,assets,onAsset,onEr
  }}/>
  {options.boxBackground.gradient&&<GradientControls id="Image box" gradient={options.boxBackground.gradient as CanvasGradient} onChange={gradient=>edit({boxBackground:{...options.boxBackground,gradient}})}/>}
  </>}
- </details>
- <details><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Filters & color</summary>
+ </details>}
+ {(focus==='all'||focus==='appearance')&&<details className="aw-editor-section"><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Filters & color</summary>
  <Enum label="Filter ordering" value={options.filterOrder??'pre'} options={['pre','post']} onChange={v=>edit({filterOrder:v as ImageProperties['filterOrder']})}/>
  <Num label="Filter intensity" value={options.filterIntensity??1} min={0} max={50} step={0.1} onChange={filterIntensity=>edit({filterIntensity})}/>
  <FilterList filters={options.filters??[]} onChange={filters=>edit({filters})}/>
- </details>
- <details><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Image masks & polygon clipping</summary>
+ </details>}
+ {(focus==='all'||focus==='advanced')&&<details className="aw-editor-section" open={focus==="advanced"}><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Image masks & polygon clipping</summary>
  <Toggle label="Enable image mask" checked={!!mask} onChange={enabled=>enabled?assets[0]?edit({mask:{source:assets[0].id,mode:'alpha'}}):onError('Import a verified image asset before enabling a mask'):clear('mask')}/>
  {mask&&<><LocalAsset label="Mask" value={mask.source} assets={assets} onChange={source=>edit({mask:{...mask,source}})} onAsset={onAsset} onError={onError}/>
  <Enum label="Mask mode" value={mask.mode??'alpha'} options={['alpha','luminance','inverse']} onChange={mode=>edit({mask:{...mask,mode:mode as NonNullable<ImageEditorOptions['mask']>['mode']}})}/></>}
  <Toggle label="Enable polygon clip" checked={!!options.clipPath} onChange={enabled=>enabled?edit({clipPath:[{x:0,y:0},{x:width,y:0},{x:width,y:height},{x:0,y:height}]}):clear('clipPath')}/>
  {options.clipPath&&<Points label="Clip polygon" items={options.clipPath} onChange={clipPath=>edit({clipPath})}/>}
- </details>
- <details><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Distortion & mesh warping</summary>
+ </details>}
+ {(focus==='all'||focus==='advanced')&&<details className="aw-editor-section"><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Distortion & mesh warping</summary>
  <Toggle label="Enable distortion" checked={!!options.distortion} onChange={enabled=>enabled?edit({distortion:{type:'bulge',intensity:0.3}}):clear('distortion')}/>
  {options.distortion&&<Distortion width={width} height={height} value={options.distortion} onChange={distortion=>distortion?edit({distortion}):clear('distortion')}/>}
  <Toggle label="Enable mesh warp" checked={!!options.meshWarp} onChange={enabled=>enabled?edit({meshWarp:{gridX:2,gridY:2,controlPoints:Array.from({length:3},(_,j)=>Array.from({length:3},(_,i)=>({x:i*width/2,y:j*height/2})))}}):clear('meshWarp')}/>
  {options.meshWarp&&<Mesh width={width} height={height} value={options.meshWarp} onChange={meshWarp=>meshWarp?edit({meshWarp}):clear('meshWarp')}/>}
- </details>
- <details><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Photographic effects</summary>
+ </details>}
+ {(focus==='all'||focus==='appearance')&&<details className="aw-editor-section"><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Photographic effects</summary>
  {([['vignette',['intensity','size']],['lensFlare',['x','y','intensity']],['chromaticAberration',['intensity']],['filmGrain',['intensity']]] as const).map(([k,fields])=>{
  const eff=options.effects??{},present=eff[k],values=present as Record<string,number>|undefined;
  const change=(next:Record<string,number>|undefined)=>{const effects={...eff,[k]:next};edit({effects});};
- return <fieldset key={k} className="aw-canvas-properties"><legend>{k}</legend>
+ return <fieldset key={k} className="aw-canvas-properties"><legend>{readableLabel(k)}</legend>
  <Toggle label={'Enable '+k} checked={!!present} onChange={v=>change(v?Object.fromEntries(fields.map(f=>[f,f==='size'?0.6:f==='x'?width/2:f==='y'?height/2:0.4])):undefined)}/>
  {present&&fields.map(f=><Num key={f} label={k+' '+f} value={values?.[f]} min={f==='intensity'?0:-2048} max={f==='intensity'?5:4096} step={0.1} onChange={n=>change({...values,[f]:n})}/>)}
  </fieldset>;
  })}
- </details>
+ </details>}
  </div>;
 }
 export function GroupTransformEditor({value,onChange,assets,onAsset,onError,width,height}:{value:GroupTransformOptions;onChange:(v:GroupTransformOptions)=>void;assets:readonly WorkspaceImageAsset[];onAsset:(a:WorkspaceImageAsset)=>void;onError:(s:string)=>void;width:number;height:number}){

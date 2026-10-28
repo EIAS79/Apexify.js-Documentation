@@ -24,6 +24,9 @@ import {importImageAsset,resolveImageReference} from '../asset-store';
 import {IMAGE_SHAPES} from '../image-options';
 import ImageOptionsEditor,{GroupTransformEditor} from './ImageOptionsEditor';
 import ImageFilePicker from './ImageFilePicker';
+import LayerInspectorNavigation from './LayerInspectorNavigation';
+import LayerColorPicker from './LayerColorPicker';
+import {TEXT_INSPECTOR_SECTIONS,IMAGE_INSPECTOR_SECTIONS,type LayerInspectorSection} from '../inspector-sections';
 export default function Inspector({
   document,
   layersRequest = 0,
@@ -57,6 +60,12 @@ export default function Inspector({
 }) {
   const inspectorId=useId();
   const layer = document.layers.find((l) => l.id === selected);
+  const hasLayerSections=layer?.kind==='text'||layer?.kind==='image';
+  const [layerSectionState,setLayerSectionState]=useState<{layerId:string;section:LayerInspectorSection}>({layerId:'',section:'primary'});
+  const layerSection=layerSectionState.layerId===layer?.id?layerSectionState.section:'primary';
+  const setLayerSection=(section:LayerInspectorSection)=>setLayerSectionState({layerId:layer?.id??'',section});
+  const layerSections=layer?.kind==='text'?TEXT_INSPECTOR_SECTIONS:IMAGE_INSPECTOR_SECTIONS;
+  const activeLayerSection=layerSections.find(([key])=>key===layerSection)!;
   const bg = document.background;
   const imageBg=document.canvasExtras?.customBg;
   const backgroundSource=imageBg?.source??bg.image;
@@ -129,9 +138,11 @@ export default function Inspector({
           </label>
         </div>
       )}
-      <div id={inspectorId+"-view-panel"} role="tabpanel" aria-labelledby={inspectorId+"-view-"+tab} className={"aw-inspector-scroll" + (tab === "Properties" && !layer ? " aw-inspector-canvas-scroll" : "")} key={tab+":"+(layer?.id??"canvas:"+canvasCategory)}>
+      {tab==='Properties'&&layer&&hasLayerSections&&<LayerInspectorNavigation layer={layer} section={layerSection}
+        onChange={setLayerSection} onCanvas={()=>onSelect(null)} id={inspectorId}/>}
+      <div id={inspectorId+"-view-panel"} role="tabpanel" aria-labelledby={inspectorId+"-view-"+tab} className={"aw-inspector-scroll" + (tab === "Properties" && !layer ? " aw-inspector-canvas-scroll" : hasLayerSections?" aw-inspector-layer-scroll":"")} key={tab+":"+(layer?layer.id+":"+layerSection:"canvas:"+canvasCategory)}>
 
-        {(layer||tab!=="Properties")&&<div className="aw-inspector-context"><span>{tab==="Properties"?layer?.kind:tab}</span><p>{tab==="Properties"?"Edit this layer. Select Canvas to return to the background.":tab==="Assets"?"Import an image, then select it to edit its appearance.":"Start from an editable composition."}</p></div>}
+        {((layer&&!hasLayerSections)||tab!=="Properties")&&<div className="aw-inspector-context"><span>{tab==="Properties"?layer?.kind:tab}</span><p>{tab==="Properties"?"Edit this layer. Select Canvas to return to the background.":tab==="Assets"?"Import an image, then select it to edit its appearance.":"Start from an editable composition."}</p></div>}
         {tab === "Presets" ? (
           <div className="aw-preset-grid">
             <button className="aw-template-card" onClick={onPreset}>
@@ -178,7 +189,7 @@ export default function Inspector({
           </div>
         ) : (
           <>
-            <div className={"aw-section-heading"+(!layer?" aw-canvas-section-title":"")}>
+            {!hasLayerSections&&<div className={"aw-section-heading"+(!layer?" aw-canvas-section-title":"")}>
               <Square2StackIcon />
               <strong>{layer ? layer.name : canvasCategories.find(([id])=>id===canvasCategory)?.[1]}</strong>
               {!layer&&<ControlHelp label={"Canvas "+canvasCategory} description={canvasCategories.find(([id])=>id===canvasCategory)?.[2]+". Changes update your project, generated source, and native rendered preview."}/>}
@@ -190,7 +201,7 @@ export default function Inspector({
                   Canvas
                 </button>
               ) : null}
-            </div>
+            </div>}
             {!layer ? (
               <div id={inspectorId+"-canvas-category-panel"} data-canvas-category-panel role="tabpanel" aria-labelledby={inspectorId+"-canvas-tab-"+canvasCategory}>
                 {canvasCategory==="layout" && <>
@@ -354,6 +365,12 @@ export default function Inspector({
               </div>
             ) : (
               <>
+                <section className={hasLayerSections?'aw-layer-editor':undefined}
+                  role={hasLayerSections?'tabpanel':undefined} id={hasLayerSections?inspectorId+'-layer-category-panel':undefined}
+                  aria-labelledby={hasLayerSections?inspectorId+'-layer-tab-'+layerSection:undefined}>
+                {hasLayerSections&&<div className="aw-layer-section-heading"><strong>{activeLayerSection[1]}</strong>
+                  <p>{activeLayerSection[2]}</p></div>}
+                {(!hasLayerSections||layerSection==='layout')&&<div className="aw-layer-transform">
                 <Field label="Name">
                   <input
                     value={layer.name}
@@ -410,11 +427,10 @@ export default function Inspector({
                     onChange={(opacity) => onLayer(layer.id, { opacity })}
                   />
                 </div>
+                </div>}
                 {layer.kind === "text" ? (
                   <>
-                    <div className="aw-section-heading">
-                      <strong>Text style</strong>
-                    </div>
+                    {layerSection==='primary'&&<div className="aw-text-basics">
                     <Field label="Text">
                       <textarea
                         aria-label="Text content"
@@ -425,6 +441,12 @@ export default function Inspector({
                           })
                         }
                       />
+                    </Field>
+                    <Field label="Font family" help="Choose an installed DejaVu font family. Font overrides below can set a different family or face.">
+                      <select aria-label="Text font family" value={layer.textSettings?.properties?.font?.family??layer.textSettings?.properties?.font?.name??'DejaVu Sans'}
+                        onChange={event=>onLayer(layer.id,{textSettings:{...layer.textSettings,properties:{...layer.textSettings?.properties,font:{...layer.textSettings?.properties?.font,family:event.target.value}}}})}>
+                        {[...new Set(['DejaVu Sans','DejaVu Serif','DejaVu Sans Mono',layer.textSettings?.properties?.font?.family??layer.textSettings?.properties?.font?.name??'DejaVu Sans'])].map(family=><option key={family} value={family}>{family}</option>)}
+                      </select>
                     </Field>
                     <div className="aw-field-row">
                       <NumberField
@@ -449,16 +471,11 @@ export default function Inspector({
                         </select>
                       </Field>
                     </div>
-                    <Field label="Color">
-                      <input
-                        type="color"
-                        value={layer.color}
-                        onChange={(e) =>
-                          onLayer(layer.id, { color: e.target.value })
-                        }
-                      />
-                    </Field>
-                    <TextOptionsEditor layer={layer}
+                    <LayerColorPicker label="Color" value={layer.color} onChange={color=>onLayer(layer.id,{color})} alpha/>
+                    {layer.textSettings?.properties?.fill&&<p className="aw-editor-description">Appearance contains a fill override which takes priority over this base color.</p>}
+                    {layer.textSettings?.properties?.font&&<p className="aw-editor-description">Font overrides are configured below and take priority over the base font controls.</p>}
+                    </div>}
+                    <TextOptionsEditor layer={layer} focus={layerSection}
                       onChange={textSettings=>onLayer(layer.id,{textSettings})}
                       onBounds={(width,height)=>onLayer(layer.id,{width,height})}/>
                   </>
@@ -544,18 +561,11 @@ export default function Inspector({
                       />
                     ))}
                   </>
-                ) : (
-                  <UploadImage
-                    onUpload={(source,_name,asset)=>onDocument({
-                      assets:document.assets?.some(a=>a.id===asset.id)?document.assets:[...(document.assets??[]),asset],
-                      layers:document.layers.map(l=>l.id===layer.id?{...l,source}:l)})}
-                    onError={onError}
-                  >
-                    Replace image
-                  </UploadImage>
-                )}
+                ) : null}
                 {(layer.kind==='image'||layer.kind==='shape')&&<section aria-label="Image authoring inspector">
-                  {layer.kind==='image'&&<>
+                  {layer.kind==='image'&&layerSection==='primary'&&<>
+                    <div className="aw-layer-source-preview"><img alt="Selected image source" src={layer.source.startsWith('asset:')?resolveImageReference(layer.source,document.assets??[]):layer.source}/><span>{layer.source.startsWith('asset:')?'Imported image':'Bundled lake artwork'}</span></div>
+                    <details className="aw-editor-section aw-image-source-settings"><summary><PhotoIcon aria-hidden="true"/><strong>Replace source image</strong></summary>
                     <Field label="Source image">
                       <select aria-label="Image layer source" value={layer.source}
                         onChange={e=>onLayer(layer.id,{source:e.target.value})}>
@@ -568,15 +578,17 @@ export default function Inspector({
                           onDocument({assets:document.assets?.some(a=>a.id===asset.id)?document.assets:[...(document.assets??[]),asset],
                             layers:document.layers.map(l=>l.id===layer.id?{...l,source:asset.id}:l) as WorkspaceLayer[]});
                       }}/></Field>
+                    </details>
                   </>}
-                  <ImageOptionsEditor options={layer.imageOptions??{}} width={layer.width} height={layer.height} isShape={layer.kind==='shape'} shapeType={layer.kind==='shape'?layer.shape:undefined}
+                  <ImageOptionsEditor focus={hasLayerSections?layerSection:"all"} options={layer.imageOptions??{}} width={layer.width} height={layer.height} isShape={layer.kind==='shape'} shapeType={layer.kind==='shape'?layer.shape:undefined}
                     assets={document.assets??[]} onError={onError}
                     onChange={imageOptions=>onLayer(layer.id,{imageOptions})}
                     onAsset={asset=>onDocument({
                       assets:document.assets?.some(a=>a.id===asset.id)?document.assets:[...(document.assets??[]),asset],
                       layers:document.layers.map(l=>l.id===layer.id?{...l,imageOptions:{...layer.imageOptions,mask:{...layer.imageOptions?.mask,source:asset.id}}}:l) as WorkspaceLayer[]
                     })}/>
-                  <div className="aw-section-heading"><strong>Image grouping</strong></div>
+                  {(!hasLayerSections||layerSection==='advanced')&&<details className="aw-editor-section aw-image-group-section"><summary><Square2StackIcon aria-hidden="true"/><strong>Image groups</strong></summary>
+                  <p className="aw-editor-description">Assign images to a group to transform them together. Native group effects require at least two adjacent visible image or shape layers.</p>
                   <Field label="Image group">
                     <select aria-label="Image group selection" value={layer.imageGroupId??''}
                       onChange={e=>onLayer(layer.id,{imageGroupId:e.target.value||undefined})}>
@@ -592,7 +604,7 @@ export default function Inspector({
                   {layer.imageGroupId&&(()=>{
                     const group=(document.imageGroups??[]).find(g=>g.id===layer.imageGroupId);
                     if(!group)return null;
-                    return <details open><summary>Group: {group.name}</summary>
+                    return <details className="aw-editor-section" open><summary>Group: {group.name}</summary>
                       <Field label="Group name"><input aria-label="Image group name" value={group.name} onChange={e=>onDocument({
                         imageGroups:(document.imageGroups??[]).map(g=>g.id===group.id?{...g,name:e.target.value}:g)
                       })}/></Field>
@@ -609,6 +621,7 @@ export default function Inspector({
                       })}>Delete group and release members</button>
                     </details>
                   })()}
+                  </details>}
                 </section>}
                 <div className="aw-layer-commands">
                   <IconButton
@@ -630,9 +643,10 @@ export default function Inspector({
                     <TrashIcon />
                   </IconButton>
                 </div>
+                </section>
               </>
             )}
-            {(layer || canvasCategory==="layout") && <>
+            {((layer&&(!hasLayerSections||layerSection==='layout')) || (!layer&&canvasCategory==="layout")) && <>
             <button
               className="aw-inspector-section-toggle"
               onClick={() => setShowLayers(!showLayers)}
@@ -663,7 +677,7 @@ export default function Inspector({
               </div>
             ) : null}
             </>}
-            {(layer || canvasCategory==="advanced") && <details className="aw-runtime-info">
+            {((layer&&(!hasLayerSections||layerSection==="advanced")) || (!layer&&canvasCategory==="advanced")) && <details className="aw-runtime-info">
               <summary>Rendering details</summary>
               <p>
                 Preview and export use the installed Apexify.js v6 Node

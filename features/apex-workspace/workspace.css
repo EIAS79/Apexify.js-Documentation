@@ -3144,3 +3144,69 @@ body:has(.aw-app) .custom-cursor-pointer__shape,body:has(.aw-app) .custom-cursor
  .aw-file-picker-button > svg { width:15px; height:15px; }
  .aw-app .aw-image-file-picker .aw-file-picker-button { font-size:11px!important; padding:7px!important; }
 }
+
+/* Text and Image inspectors share the Canvas navigation and form rhythm. */
+.aw-layer-property-nav { padding-top:14px; }
+.aw-layer-property-nav .aw-property-context { margin-bottom:6px!important; }
+.aw-back-to-canvas { display:inline-flex; align-items:center; gap:6px; min-height:30px; margin:0 0 5px; padding:4px 0!important; color:var(--text-secondary); font-size:11px; }
+.aw-back-to-canvas:hover { color:var(--accent-iris); }
+.aw-back-to-canvas svg { width:14px; height:14px; }
+.aw-layer-section-heading { padding-bottom:14px; margin-bottom:16px; border-bottom:1px solid var(--border-default); }
+.aw-layer-section-heading strong { font-size:13px; color:var(--text-primary); }
+.aw-layer-section-heading p,.aw-editor-description,.aw-editor-intro { margin:7px 0 12px; color:var(--text-secondary); font-size:11px; line-height:1.65; overflow-wrap:break-word; }
+.aw-layer-editor { min-width:0; }
+.aw-layer-source-preview { display:grid; gap:8px; margin-bottom:18px; }
+.aw-layer-source-preview img { width:100%; height:130px; object-fit:contain; background:var(--bg-sunken); border:1px solid var(--border-default); border-radius:8px; }
+.aw-layer-source-preview span { color:var(--text-secondary); font-size:11px; }
+.aw-layer-editor .aw-text-editor { border:0; padding:0; gap:10px; }
+.aw-layer-editor .aw-editor-section { margin:12px 0; overflow:visible; }
+.aw-layer-editor .aw-editor-section > summary { min-height:44px; gap:7px; padding:12px; font-size:12px; line-height:1.5; }
+.aw-layer-editor .aw-editor-section > summary strong { min-width:0; overflow-wrap:break-word; }
+.aw-layer-editor .aw-editor-section > summary > span { flex-shrink:0; font-size:9px; }
+.aw-layer-editor .aw-editor-section > summary > svg { width:16px; height:16px; flex-shrink:0; }
+.aw-layer-editor .aw-text-nested { border-left:1px solid var(--border-default); padding:8px 0 8px 8px; }
+.aw-layer-editor .aw-text-nested .aw-section-heading { gap:6px; }
+.aw-layer-editor .aw-text-nested .aw-section-heading strong { font-size:11px; overflow-wrap:break-word; }
+.aw-layer-editor .aw-text-nested-fields { gap:12px; }
+.aw-layer-editor .aw-text-array-entry { border-color:var(--border-default); padding:8px; }
+.aw-layer-editor .aw-field-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,105px),1fr)); gap:10px; align-items:start; }
+.aw-layer-editor .aw-field-row > .aw-field { min-width:0; margin:0; width:100%; }
+.aw-layer-editor .aw-field-label > label { overflow-wrap:break-word; word-break:normal; }
+.aw-layer-editor .aw-field input:not([type=checkbox]):not([type=range]),.aw-layer-editor .aw-field select { width:100%; min-width:0; }
+.aw-layer-editor .aw-field textarea { min-height:110px; resize:vertical; }
+.aw-layer-editor .aw-text-editor .aw-field > .aw-field-row { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+.aw-layer-editor .aw-text-editor .aw-field > .aw-field-row > input:not([type=checkbox]),.aw-layer-editor .aw-text-editor .aw-field > .aw-field-row > select { flex:1 1 80px; width:0; min-width:0; }
+.aw-layer-editor .aw-text-editor .aw-text-optional { display:flex; align-items:center; flex-wrap:nowrap; gap:8px; margin:0; padding:6px 0; border-bottom:1px solid var(--border-subtle); }
+.aw-layer-editor .aw-text-optional > .aw-field-label { flex:1 1 auto; width:auto; }
+.aw-layer-editor .aw-text-optional > button { flex:0 0 auto; }
+.aw-layer-editor .aw-canvas-properties { width:auto; margin:12px; padding:10px; border-color:var(--border-default); }
+.aw-layer-editor .aw-canvas-properties .aw-field { margin:12px 0; }
+.aw-layer-editor .aw-field:has(> input[type=checkbox]) { display:grid; grid-template-columns:minmax(0,1fr) 18px; align-items:center; gap:8px; }
+.aw-layer-editor input[type=checkbox] { accent-color:var(--accent-iris); }
+.aw-layer-editor .aw-border-selection { width:100%; margin:12px 0!important; }
+.aw-layer-editor .aw-text-button { min-height:30px; padding:5px 8px!important; border:1px solid var(--border-default); border-radius:5px; background:var(--bg-raised); font-size:11px; line-height:1.5; }
+.aw-layer-editor .aw-layer-commands { margin-top:18px; padding-top:12px; border-top:1px solid var(--border-default); }
+.aw-layer-editor .aw-text-metrics { padding:12px; border:1px solid var(--border-default); border-radius:6px; background:var(--bg-raised); gap:8px; }
+.aw-layer-editor .aw-text-metrics pre { max-width:100%; }
+.aw-image-group-section > summary svg { color:var(--accent-iris); }
+@container(max-width:250px) {
+ .aw-layer-editor .aw-field-row { grid-template-columns:minmax(0,1fr); }
+ .aw-layer-editor .aw-editor-section > summary { flex-wrap:wrap; padding:10px; }
+ .aw-layer-editor .aw-editor-section > summary > span { width:100%; text-align:left; margin-left:22px; }
+ .aw-layer-editor .aw-editor-section > :not(summary) { margin-left:8px; margin-right:8px; }
+ .aw-layer-editor .aw-canvas-properties { padding:8px; }
+ .aw-layer-editor .aw-text-nested { padding-left:6px; }
+ .aw-layer-editor .aw-text-nested .aw-section-heading { align-items:flex-start; }
+ .aw-layer-editor .aw-field:has(> input[type=checkbox]) { grid-template-columns:minmax(0,1fr); gap:6px; }
+ .aw-layer-editor .aw-text-editor .aw-text-optional { flex-wrap:wrap; }
+ .aw-layer-source-preview img { height:100px; }
+}
+.aw-layer-color-picker { display:grid; grid-template-columns:42px minmax(0,1fr); gap:9px; align-items:center; }
+.aw-layer-color-swatch { position:relative; display:block; height:38px; border:1px solid var(--border-strong); border-radius:6px; overflow:hidden; }
+.aw-app .aw-layer-color-swatch input[type=color] { position:absolute; inset:0; width:100%!important; height:100%!important; padding:0!important; opacity:0; cursor:pointer; }
+.aw-layer-color-swatch:focus-within { outline:2px solid var(--accent-iris); outline-offset:2px; }
+.aw-layer-color-picker > input { width:100%; min-width:0; font-family:ui-monospace,monospace; }
+.aw-layer-source-preview img { height:110px; }
+.aw-layer-editor .aw-image-source-settings { margin-bottom:16px; }
+.aw-layer-editor .aw-text-editor { gap:0; }
+.aw-text-editor-compact > .aw-editor-intro { display:none; }

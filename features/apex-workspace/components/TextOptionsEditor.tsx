@@ -10,6 +10,7 @@ import {
 import {Field} from './ui';
 import ControlHelp from './ControlHelp';
 import {controlHelp,readableLabel} from '../control-help';
+import {TEXT_PROPERTY_SECTIONS,TEXT_PROPERTY_LABELS,type LayerInspectorSection} from '../inspector-sections';
 
 type TextLayer=Extract<WorkspaceLayer,{kind:"text"}>;
 const object=(spec:TextSpec):Record<string,TextSpec>=>spec.kind==="object"?spec.fields:{};
@@ -135,8 +136,8 @@ function TextField({spec,value,label,onChange,depth=0,helpPath=label}:{
     </span>
   </Field>;
 }
-export default function TextOptionsEditor({layer,onChange,onBounds,compact=false}:{
-  layer:TextLayer;onChange:(settings:TextSettings)=>void;onBounds?:(width:number,height:number)=>void;compact?:boolean;
+export default function TextOptionsEditor({layer,onChange,onBounds,compact=false,focus="all"}:{
+  layer:TextLayer;onChange:(settings:TextSettings)=>void;onBounds?:(width:number,height:number)=>void;compact?:boolean;focus?:LayerInspectorSection|"all";
 }){
   const [error,setError]=useState("");
   const [measureError,setMeasureError]=useState("");
@@ -173,19 +174,20 @@ export default function TextOptionsEditor({layer,onChange,onBounds,compact=false
     finally{if(revision===measurementRevision.current)setBusy(false);}
   }
   return <section className={"aw-text-editor"+(compact?" aw-text-editor-compact":"")} aria-label="Advanced typography editor">
-    <div className="aw-section-heading"><strong>Advanced typography</strong></div>
-    <p className="aw-muted">Open a group, then enable the options you need. Unset options use the renderer’s defaults.</p>
-    {Object.entries(object(textPropertiesSpec)).map(([key,spec])=><details className="aw-editor-section" key={key}>
-      <summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>{readableLabel(key)}</strong><span>{settings.properties?.[key as keyof typeof settings.properties]!==undefined?'Configured':'Optional'}</span></summary>
+    <p className="aw-muted aw-editor-intro">Enable only the overrides you need. Unset options use the base text style and renderer defaults.</p>
+    {Object.entries(object(textPropertiesSpec)).filter(([key])=>focus==="all"||TEXT_PROPERTY_SECTIONS[key]===focus).map(([key,spec])=><details className="aw-editor-section" key={key}>
+      <summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>{TEXT_PROPERTY_LABELS[key]??readableLabel(key)}</strong><span>{settings.properties?.[key as keyof typeof settings.properties]!==undefined?'Configured':'Optional'}</span></summary>
+      <p className="aw-editor-description">{controlHelp(key)}</p>
       <TextField spec={spec} value={settings.properties?.[key as keyof typeof settings.properties]} label={key}
         onChange={value=>{const props={...settings.properties} as Record<string,unknown>;if(value===undefined)delete props[key];else props[key]=value;edit("properties",props);}}/>
     </details>)}
-    <details className="aw-editor-section"><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>Text runs & groups</strong><span>Multi-item layout</span></summary>
+    {(focus==="all"||focus==="advanced")&&<details className="aw-editor-section"><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>Text runs & groups</strong><span>Multi-item layout</span></summary>
       <TextField spec={{kind:"array",max:32,item:textRunSpec}} value={settings.items} label="Text array items" onChange={v=>edit("items",v)}/>
       <TextField spec={textGroupSpec} value={settings.group} label="Grouped text options" onChange={v=>edit("group",v)}/>
-    </details>
+    </details>}
     {error?<p role="alert" className="aw-error">{error}</p>:null}
-    <details className="aw-editor-section"><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>Measure text</strong><span>Bounds & character metrics</span></summary>
+    {(focus==="all"||focus==="advanced")&&<details className="aw-editor-section" open={focus==="advanced"}><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>Measure text</strong><span>Bounds & character metrics</span></summary>
+    <p className="aw-editor-description">Measure the current text with the native renderer. Apply the result to resize its selection box.</p>
     <button type="button" className="aw-text-button" onClick={()=>void measure()} disabled={busy}>
       {busy?"Measuring…":"Measure text"}
     </button>
@@ -208,6 +210,6 @@ export default function TextOptionsEditor({layer,onChange,onBounds,compact=false
       </details>:null}
       <details><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Complete native TextMetrics result</summary><pre>{JSON.stringify(metrics,null,2)}</pre></details>
     </div>:null}
-    </details>
+    </details>}
   </section>;
 }
