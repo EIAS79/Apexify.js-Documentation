@@ -279,7 +279,7 @@ export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onErr
           onChange={e=>update({customBg:{...options.customBg!,inherit:e.target.checked}})}/>
       </Field>
       {options.customBg.inherit?<p className="aw-canvas-note">Intrinsic dimensions place verified source pixels at (0,0); fit and alignment are ignored by the native renderer until this option is disabled.</p>:null}
-      <Field label="Image fit"><select aria-label="Imported background fit" disabled={options.customBg.inherit} value={options.customBg.fit??'fill'} onChange={e=>
+      {focus==="all"&&<Field label="Image fit"><select aria-label="Imported background fit" disabled={options.customBg.inherit} value={options.customBg.fit??'fill'} onChange={e=>
         update({customBg:{...options.customBg!,fit:e.target.value as 'fill'|'contain'|'cover'}})}>
         <option value="fill">Fill</option><option value="contain">Contain</option><option value="cover">Cover</option>
       </select></Field>}
