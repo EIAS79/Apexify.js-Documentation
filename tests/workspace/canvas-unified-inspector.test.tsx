@@ -28,6 +28,8 @@ test("Canvas tab and icon navigation assigns options to single editing scopes",(
   assert.match(canvas,/focus==="advanced"/);
   assert.doesNotMatch(inspector,/canvasCategory==="effects" && <div className="aw-field-row"/);
   assert.doesNotMatch(canvas,/Reset canvas effects and advanced options/);
+  assert.match(inspector,/const baseMode=imageBg/);
+  assert.match(canvas,/Reset all Canvas overrides/);
   assert.match(canvas,/Enable Canvas pattern/);
   assert.doesNotMatch(canvas,/<Field label="Pattern">/);
   assert.match(canvas,/<PatternControls id="Root"/);
