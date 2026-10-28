@@ -1,10 +1,16 @@
 "use client";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import {useEffect,useRef,useState} from "react";
 import type {WorkspaceLayer} from "../model";
 import {
   textPropertiesSpec,textGroupSpec,textRunSpec,gradientSpec,perspectiveSpec,decorationSpec,
   validateTextSettings,type TextSettings,type TextSpec,
 } from "../domain/text";
+
+import {Field} from './ui';
+import ControlHelp from './ControlHelp';
+import {controlHelp,readableLabel} from '../control-help';
+import {TEXT_PROPERTY_SECTIONS,TEXT_PROPERTY_LABELS,type LayerInspectorSection} from '../inspector-sections';
 
 type TextLayer=Extract<WorkspaceLayer,{kind:"text"}>;
 const object=(spec:TextSpec):Record<string,TextSpec>=>spec.kind==="object"?spec.fields:{};
@@ -33,8 +39,8 @@ function initial(spec:TextSpec,label:string):unknown{
     default:return {};
   }
 }
-function TextField({spec,value,label,onChange,depth=0}:{
-  spec:TextSpec;value:unknown;label:string;onChange:(next:unknown)=>void;depth?:number;
+function TextField({spec,value,label,onChange,depth=0,helpPath=label}:{
+  spec:TextSpec;value:unknown;label:string;onChange:(next:unknown)=>void;depth?:number;helpPath?:string;
 }) {
   const shown=value!==undefined;
   if(spec.kind==="object") {
@@ -42,7 +48,7 @@ function TextField({spec,value,label,onChange,depth=0}:{
     const data=values(value);
     return <div className="aw-text-nested" data-text-path={label}>
       <div className="aw-section-heading">
-        <strong>{label}</strong>
+        <strong>{readableLabel(label)}</strong><ControlHelp label={readableLabel(label)} description={controlHelp(helpPath)}/>
         {shown?<button className="aw-text-button" type="button" onClick={()=>onChange(undefined)}>Remove</button>:
           <button className="aw-text-button" type="button" onClick={()=>onChange(initial(spec,label))}>Enable</button>}
       </div>
@@ -52,7 +58,7 @@ function TextField({spec,value,label,onChange,depth=0}:{
         return key==="type"||key==="colors"||(t==="linear"?["startX","startY","endX","endY","rotate","pivotX","pivotY","repeat"].includes(key):
           t==="radial"?["startX","startY","startRadius","endX","endY","endRadius","rotate","pivotX","pivotY","repeat"].includes(key):
           ["centerX","centerY","startAngle","rotate","pivotX","pivotY"].includes(key));
-      }).map(([key,child])=><TextField key={key} spec={child} value={data[key]} label={key} depth={depth+1}
+      }).map(([key,child])=><TextField key={key} spec={child} value={data[key]} label={key} depth={depth+1} helpPath={helpPath+'.'+key}
         onChange={next=>{
           if(spec===gradientSpec&&key==="type"&&typeof next==="string"&&next!==data.type){
             const replacement=next==="conic"?{type:next,colors:data.colors??gradientDefault().colors}:
@@ -66,7 +72,7 @@ function TextField({spec,value,label,onChange,depth=0}:{
   if(spec.kind==="array"){
     const entries=Array.isArray(value)?value:[];
     return <div className="aw-text-nested" data-text-path={label}>
-      <div className="aw-section-heading"><strong>{label} ({entries.length})</strong>
+      <div className="aw-section-heading"><strong>{readableLabel(label)} ({entries.length})</strong><ControlHelp label={readableLabel(label)} description={controlHelp(helpPath)}/>
         {shown?<button type="button" className="aw-text-button" onClick={()=>onChange(undefined)}>Remove</button>:null}
         <button type="button" className="aw-text-button" disabled={entries.length>=spec.max}
           onClick={()=>{
@@ -86,7 +92,7 @@ function TextField({spec,value,label,onChange,depth=0}:{
           <button type="button" className="aw-text-button" aria-label={label+" remove item "+index}
             disabled={entries.length<=(spec.min??0)} onClick={()=>onChange(entries.filter((_,i)=>i!==index))}>×</button>
         </div>
-        <TextField spec={spec.item} value={entry} label={label+"["+index+"]"} depth={depth+1}
+        <TextField spec={spec.item} value={entry} label={label+"["+index+"]"} depth={depth+1} helpPath={helpPath+'['+index+']'}
           onChange={next=>onChange(entries.map((value,i)=>i===index?next:value))}/>
       </div>)}
     </div>;
@@ -94,16 +100,16 @@ function TextField({spec,value,label,onChange,depth=0}:{
   if(spec.kind==="decoration"){
     const mode=value===undefined?"unset":value===false?"off":value===true?"on":"styled";
     return <div className="aw-text-nested">
-      <label className="aw-field">{label}<select aria-label={"Text "+label} value={mode} onChange={e=>onChange(
+      <Field label={readableLabel(label)} help={controlHelp(helpPath)}><select aria-label={"Text "+label} value={mode} onChange={e=>onChange(
         e.target.value==="unset"?undefined:e.target.value==="off"?false:e.target.value==="on"?true:{color:"#ffffff"}
-      )}>{["unset","off","on","styled"].map(x=><option key={x} value={x}>{x}</option>)}</select></label>
-      {mode==="styled"?<TextField spec={decorationSpec} value={value} label={label+" style"} depth={depth+1} onChange={onChange}/>:null}
+      )}>{["unset","off","on","styled"].map(x=><option key={x} value={x}>{x}</option>)}</select></Field>
+      {mode==="styled"?<TextField spec={decorationSpec} value={value} label={label+" style"} depth={depth+1} helpPath={helpPath} onChange={onChange}/>:null}
     </div>;
   }
-  if(!shown)return <div className="aw-field-row aw-text-optional"><span>{label}</span>
+  if(!shown)return <div className="aw-field-row aw-text-optional"><div className="aw-field-label"><span>{readableLabel(label)}</span><ControlHelp label={readableLabel(label)} description={controlHelp(helpPath)}/></div>
     <button type="button" className="aw-text-button" onClick={()=>onChange(initial(spec,label))}>Add</button>
   </div>;
-  return <label className="aw-field aw-text-leaf"><span>{label}</span>
+  return <Field label={readableLabel(label)} help={controlHelp(helpPath)+(spec.kind==='number'?` Supported range: ${spec.min} to ${spec.max}.`:'')}>
     <span className="aw-field-row">
     {spec.kind==="boolean"?<input type="checkbox" aria-label={"Text "+label} checked={value===true} onChange={e=>onChange(e.target.checked)}/>:
       spec.kind==="font-weight"?<span className="aw-field-row">
@@ -128,10 +134,10 @@ function TextField({spec,value,label,onChange,depth=0}:{
           else onChange(e.target.value);}}/>}
     <button type="button" className="aw-text-button" title={"Remove "+label} aria-label={"Remove text "+label} onClick={()=>onChange(undefined)}>×</button>
     </span>
-  </label>;
+  </Field>;
 }
-export default function TextOptionsEditor({layer,onChange,onBounds,compact=false}:{
-  layer:TextLayer;onChange:(settings:TextSettings)=>void;onBounds?:(width:number,height:number)=>void;compact?:boolean;
+export default function TextOptionsEditor({layer,onChange,onBounds,compact=false,focus="all"}:{
+  layer:TextLayer;onChange:(settings:TextSettings)=>void;onBounds?:(width:number,height:number)=>void;compact?:boolean;focus?:LayerInspectorSection|"all";
 }){
   const [error,setError]=useState("");
   const [measureError,setMeasureError]=useState("");
@@ -168,15 +174,22 @@ export default function TextOptionsEditor({layer,onChange,onBounds,compact=false
     finally{if(revision===measurementRevision.current)setBusy(false);}
   }
   return <section className={"aw-text-editor"+(compact?" aw-text-editor-compact":"")} aria-label="Advanced typography editor">
-    <div className="aw-section-heading"><strong>Native Apexify.js typography</strong></div>
-    <p className="aw-value">Nested v6 API. Optional fields default to the pinned engine. Font paths are disabled for security. Browser font fallback is not a pixel parity guarantee.</p>
-    <TextField spec={textPropertiesSpec} value={settings.properties} label="Text properties" onChange={v=>edit("properties",v)}/>
-    <TextField spec={{kind:"array",max:32,item:textRunSpec}} value={settings.items} label="Text array items" onChange={v=>edit("items",v)}/>
-    <TextField spec={textGroupSpec} value={settings.group} label="Grouped text options" onChange={v=>edit("group",v)}/>
+    <p className="aw-muted aw-editor-intro">Enable only the overrides you need. Unset options use the base text style and renderer defaults.</p>
+    {Object.entries(object(textPropertiesSpec)).filter(([key])=>focus==="all"||TEXT_PROPERTY_SECTIONS[key]===focus).map(([key,spec])=><details className="aw-editor-section" key={key}>
+      <summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>{TEXT_PROPERTY_LABELS[key]??readableLabel(key)}</strong><span>{settings.properties?.[key as keyof typeof settings.properties]!==undefined?'Configured':'Optional'}</span></summary>
+      <p className="aw-editor-description">{controlHelp(key)}</p>
+      <TextField spec={spec} value={settings.properties?.[key as keyof typeof settings.properties]} label={key}
+        onChange={value=>{const props={...settings.properties} as Record<string,unknown>;if(value===undefined)delete props[key];else props[key]=value;edit("properties",props);}}/>
+    </details>)}
+    {(focus==="all"||focus==="advanced")&&<details className="aw-editor-section"><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>Text runs & groups</strong><span>Multi-item layout</span></summary>
+      <TextField spec={{kind:"array",max:32,item:textRunSpec}} value={settings.items} label="Text array items" onChange={v=>edit("items",v)}/>
+      <TextField spec={textGroupSpec} value={settings.group} label="Grouped text options" onChange={v=>edit("group",v)}/>
+    </details>}
     {error?<p role="alert" className="aw-error">{error}</p>:null}
-    <div className="aw-section-heading"><strong>Native text measurements</strong></div>
+    {(focus==="all"||focus==="advanced")&&<details className="aw-editor-section" open={focus==="advanced"}><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>Measure text</strong><span>Bounds & character metrics</span></summary>
+    <p className="aw-editor-description">Measure the current text with the native renderer. Apply the result to resize its selection box.</p>
     <button type="button" className="aw-text-button" onClick={()=>void measure()} disabled={busy}>
-      {busy?"Measuring…":"Measure with painter.measureText"}
+      {busy?"Measuring…":"Measure text"}
     </button>
     {measureError?<p role="alert" className="aw-error">{measureError}</p>:null}
     {metrics?<div className="aw-text-metrics" aria-live="polite">
@@ -189,13 +202,14 @@ export default function TextOptionsEditor({layer,onChange,onBounds,compact=false
       {onBounds?<button type="button" className="aw-text-button" onClick={()=>onBounds(
         Math.max(1,Math.min(2048,Math.ceil(Number(metrics.width)))),
         Math.max(1,Math.min(2048,Math.ceil(Number(metrics.height)))))}>Use measured selection bounds</button>:null}
-      {Array.isArray(metrics.lines)?<details><summary>Per-line measured data</summary><pre>{JSON.stringify(metrics.lines,null,2)}</pre></details>:null}
-      {Array.isArray(metrics.charPositions)?<details><summary>Character positions</summary><pre>{JSON.stringify(metrics.charPositions,null,2)}</pre></details>:null}
-      {itemMetrics?<details><summary>All {itemMetrics.length} text array measurements (before group transform)</summary>
+      {Array.isArray(metrics.lines)?<details><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Per-line measured data</summary><pre>{JSON.stringify(metrics.lines,null,2)}</pre></details>:null}
+      {Array.isArray(metrics.charPositions)?<details><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Character positions</summary><pre>{JSON.stringify(metrics.charPositions,null,2)}</pre></details>:null}
+      {itemMetrics?<details><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>All {itemMetrics.length} text array measurements (before group transform)</summary>
         {itemMetrics.map((item,index)=><p key={index}>Item {index+1}: {Number(item.width).toFixed(2)} × {Number(item.height).toFixed(2)} px</p>)}
         <pre>{JSON.stringify(itemMetrics,null,2)}</pre>
       </details>:null}
-      <details><summary>Complete native TextMetrics result</summary><pre>{JSON.stringify(metrics,null,2)}</pre></details>
+      <details><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Complete native TextMetrics result</summary><pre>{JSON.stringify(metrics,null,2)}</pre></details>
     </div>:null}
+    </details>}
   </section>;
 }

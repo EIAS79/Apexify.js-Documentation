@@ -1,5 +1,5 @@
 "use client";
-import { useRef, type PointerEvent } from "react";
+import { useRef, useEffect, useState, type PointerEvent } from "react";
 import {
   ArrowPathIcon,
   CursorArrowRaysIcon,
@@ -40,28 +40,22 @@ export default function VisualCanvas({
 }) {
   const artRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  function fitCanvas() {
+  const [fitWidth, setFitWidth] = useState(0);
+  useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    const style = getComputedStyle(el);
-    const width =
-      el.clientWidth -
-      parseFloat(style.paddingLeft) -
-      parseFloat(style.paddingRight);
-    const height =
-      el.clientHeight -
-      parseFloat(style.paddingTop) -
-      parseFloat(style.paddingBottom);
-    setZoom(
-      Math.max(
-        10,
-        Math.floor(
-          Math.min(1, height / ((width * document.height) / document.width)) *
-            100,
-        ),
-      ),
-    );
-  }
+    const measure = () => {
+      const style = getComputedStyle(el);
+      const width = el.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+      const height = el.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+      if (width > 0 && height > 0) setFitWidth(Math.min(width, height * document.width / document.height));
+    };
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    measure();
+    return () => observer.disconnect();
+  }, [document.width, document.height]);
+  function fitCanvas() { setZoom(100); }
   function startMove(
     event: PointerEvent<HTMLButtonElement>,
     layer: WorkspaceLayer,
@@ -120,7 +114,7 @@ export default function VisualCanvas({
           >
             <MinusIcon />
           </IconButton>
-          <span>{zoom}%</span>
+          <button type="button" aria-label="Fit canvas to window" onClick={fitCanvas}>{zoom === 100 ? "Fit" : zoom + "%"}</button>
           <IconButton
             label="Zoom in"
             onClick={() => setZoom(Math.min(300, zoom + 25))}
@@ -171,7 +165,7 @@ export default function VisualCanvas({
           el.addEventListener("pointercancel", end);
         }}
       >
-        <div className="aw-artboard-fit" style={{ width: `${zoom}%` }}>
+        <div className="aw-artboard-fit" style={{ width: fitWidth ? `${fitWidth * zoom / 100}px` : "100%" }}>
           <div
             ref={artRef}
             className="aw-artboard"

@@ -9,6 +9,7 @@ import {
 import type { PanelId } from "../model";
 export type DockTree =
   | { panel: PanelId }
+  | { id: string; tabs: PanelId[]; defaultPanel: PanelId }
   | {
       id: string;
       direction: "row" | "column";
@@ -22,50 +23,29 @@ export const DEFAULT_DOCK: DockTree = {
   children: [
     { panel: "tools" },
     {
-      id: "work",
-      direction: "column",
-      weights: [80, 20],
+      id: "work-v2",
+      direction: "row",
+      weights: [74, 26],
       children: [
         {
-          id: "upper",
-          direction: "row",
-          weights: [75, 25],
+          id: "center-v2",
+          direction: "column",
+          weights: [49, 36, 15],
           children: [
+            { panel: "visual" },
             {
-              id: "center",
-              direction: "column",
-              weights: [64, 36],
+              id: "editors-v2",
+              direction: "row",
+              weights: [53, 47],
               children: [
-                { panel: "visual" },
-                {
-                  id: "editorStack",
-                  direction: "column",
-                  weights: [75, 25],
-                  children: [
-                    {
-                      id: "editors",
-                      direction: "row",
-                      weights: [53, 47],
-                      children: [{ panel: "code" }, { panel: "graph" }],
-                    },
-                    { panel: "terminal" },
-                  ],
-                },
+                { id: "editor-tabs", tabs: ["code", "terminal"], defaultPanel: "code" },
+                { panel: "graph" },
               ],
             },
-            { panel: "inspector" },
+            { id: "result-tabs", tabs: ["queue", "preview", "output"], defaultPanel: "queue" },
           ],
         },
-        {
-          id: "bottom",
-          direction: "row",
-          weights: [53, 25, 22],
-          children: [
-            { panel: "queue" },
-            { panel: "preview" },
-            { panel: "output" },
-          ],
-        },
+        { panel: "inspector" },
       ],
     },
   ],
@@ -76,6 +56,7 @@ export function hasVisiblePanel(
 ): boolean {
   return "panel" in tree
     ? Boolean(visible[tree.panel])
+    : "tabs" in tree ? tree.tabs.some(id => visible[id])
     : tree.children.some((child) => hasVisiblePanel(child, visible));
 }
 export function DockLayout({
@@ -84,12 +65,14 @@ export function DockLayout({
   sizes,
   onResize,
   renderPanel,
+  activeTabs = {},
 }: {
   tree: DockTree;
   visible: Partial<Record<PanelId, boolean>>;
   sizes: Record<string, number[]>;
   onResize: (id: string, weights: number[]) => void;
-  renderPanel: (id: PanelId) => ReactNode;
+  renderPanel: (id: PanelId, tabs?: PanelId[]) => ReactNode;
+  activeTabs?: Record<string, PanelId>;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   if ("panel" in tree)
@@ -98,6 +81,16 @@ export function DockLayout({
         {renderPanel(tree.panel)}
       </div>
     );
+  if ("tabs" in tree) {
+    const tabs = tree.tabs.filter(id => visible[id]);
+    const active = tabs.includes(activeTabs[tree.id]) ? activeTabs[tree.id]
+      : tabs.includes(tree.defaultPanel) ? tree.defaultPanel : tabs[0];
+    return <div className="aw-dock-tab-group" data-group={tree.id}>
+      {tabs.map(id => <div key={id} className="aw-tab-page" data-panel={id} hidden={active !== id}>
+        {renderPanel(id, tabs)}
+      </div>)}
+    </div>;
+  }
   const children = tree.children
     .map((child, index) => ({ child, index }))
     .filter(({ child }) => hasVisiblePanel(child, visible));
@@ -198,6 +191,7 @@ export function DockLayout({
               sizes={sizes}
               onResize={onResize}
               renderPanel={renderPanel}
+              activeTabs={activeTabs}
             />
           </div>
         </Fragment>

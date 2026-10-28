@@ -50,16 +50,22 @@ test('CodeMirror labels editable area and enables keyboard scrolling',()=>{
 });
 test('CodeMirror gutter meets WCAG AA 4.5:1 small-text contrast',()=>{
  const css=read('features/apex-workspace/workspace.css');
- const rule=/\.aw-editor \.cm-gutters\s*\{([^}]+)\}/s.exec(css)?.[1];
+ const rule=[...css.matchAll(/\.aw-editor \.cm-gutters\s*\{([^}]+)\}/gs)].at(-1)?.[1];
  assert.ok(rule);
- const fg=/#a9c5e6/i.exec(rule)?.[0],bg=/#040b17/i.exec(rule)?.[0];
- assert.ok(fg&&bg);
+ assert.match(rule,/color:\s*var\(--text-secondary\)/);
+ assert.match(rule,/background:\s*var\(--bg-sunken\)/);
+ const palette=read('styles/frame-palette.css');
+ const themes=[palette.split('.frame-palette {')[1].split('}')[0],palette.split('.light .frame-palette {')[1].split('}')[0]];
  const lum=(h:string)=>{
   const v=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);
   return .2126*v[0]+.7152*v[1]+.0722*v[2];
  };
- const a=lum(fg),b=lum(bg),ratio=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
- assert.ok(ratio>=4.5,'Actual gutter contrast '+ratio.toFixed(2)+' must meet 4.5:1');
+ for(const theme of themes){
+  const fg=/--text-secondary:\s*(#[a-f\d]{6})/i.exec(theme)?.[1],bg=/--bg-sunken:\s*(#[a-f\d]{6})/i.exec(theme)?.[1];
+  assert.ok(fg&&bg);
+  const a=lum(fg),b=lum(bg),ratio=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+  assert.ok(ratio>=4.5,'Actual gutter contrast '+ratio.toFixed(2)+' must meet 4.5:1 in both themes');
+ }
 });
 test('S23 intentional engine migration preserves Image 329/Text 440 historical certification counts',()=>{
  const image=JSON.parse(read('docs/workspace/IMG01_STRICT_CERTIFICATION_LEDGER.json'));

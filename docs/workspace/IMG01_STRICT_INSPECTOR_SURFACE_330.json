@@ -2,9 +2,8 @@
   "enginePin": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
   "sourcePaths": 330,
   "summary": {
-    "CONDITIONAL_REACHABLE_CONTROL": 319,
-    "EXTERNAL_INSPECTOR_OR_SEMANTIC_CONTAINER_NOT_STATICALLY_VERIFIED": 9,
-    "UNMAPPED_OR_MISSING_INSPECTOR_CONTROL": 2
+    "CONDITIONAL_REACHABLE_CONTROL": 321,
+    "EXTERNAL_INSPECTOR_OR_SEMANTIC_CONTAINER_NOT_STATICALLY_VERIFIED": 9
   },
   "rows": [
     {
@@ -1244,12 +1243,14 @@
     {
       "id": "apexify.js::ApexPainter#createImage::images.shadow.borderRadius",
       "path": "images.shadow.borderRadius",
-      "status": "UNMAPPED_OR_MISSING_INSPECTOR_CONTROL",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
       "expectedLabels": [
         "Image shadow radius mode",
         "Image shadow radius"
       ],
-      "matchedLabels": [],
+      "matchedLabels": [
+        "Image shadow radius mode"
+      ],
       "evidenceId": "IMG01-INSPECTOR-SSR-images.shadow.borderRadius"
     },
     {
@@ -3489,12 +3490,14 @@
     {
       "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.borderRadius",
       "path": "options.groupTransform.shadow.borderRadius",
-      "status": "UNMAPPED_OR_MISSING_INSPECTOR_CONTROL",
+      "status": "CONDITIONAL_REACHABLE_CONTROL",
       "expectedLabels": [
         "Image group shadow radius mode",
         "Image group shadow radius"
       ],
-      "matchedLabels": [],
+      "matchedLabels": [
+        "Image group shadow radius mode"
+      ],
       "evidenceId": "IMG01-INSPECTOR-SSR-options.groupTransform.shadow.borderRadius"
     },
     {

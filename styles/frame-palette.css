@@ -1,0 +1,71 @@
+/* Frame palette shared by Workspace surfaces, including portalled help.
+   Charcoal surfaces and the bright yellow accent match the supplied homepage reference. */
+@font-face {
+  font-family: 'Frame Inter';
+  src: url('/fonts/inter-latin-wght-normal.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+.frame-palette {
+  --bg-base: #111111;
+  --bg-canvas: #191919;
+  --bg-raised: #202020;
+  --bg-elevated: #292929;
+  --bg-sunken: #141414;
+  --bg-overlay: #111111ed;
+  --border-subtle: #292929;
+  --border-default: #363636;
+  --border-strong: #51514b;
+  --border-accent: #f7ff00;
+  --text-primary: #f5f5f2;
+  --text-secondary: #bdbdb5;
+  --text-tertiary: #9b9b94;
+  --text-muted: #9b9b94;
+  --text-inverse: #141500;
+  --accent-iris: #f7ff00;
+  --accent-iris-soft: #faff66;
+  --accent-magenta: #c4b5ef;
+  --accent-amber: #f7ff00;
+  --success: #9ae381;
+  --danger: #f1a6ac;
+  --warning: #efd092;
+  --info: #f7ff00;
+  --ring: #f7ff0066;
+  --gradient-iris: linear-gradient(#f7ff00, #f7ff00);
+  --gradient-sunset: var(--gradient-iris);
+  --gradient-aurora: var(--gradient-iris);
+  --shadow-sm: 0 1px 2px #0002;
+  --shadow-lg: 0 16px 48px #0005;
+  color-scheme: dark;
+}
+.light .frame-palette {
+  --bg-base: #f4f5ed;
+  --bg-canvas: #fffef8;
+  --bg-raised: #fffef8;
+  --bg-elevated: #e6ebda;
+  --bg-sunken: #ebeee1;
+  --bg-overlay: #f4f5eded;
+  --border-subtle: #dbe0d1;
+  --border-default: #c9d0bc;
+  --border-strong: #a6b396;
+  --border-accent: #456500;
+  --text-primary: #202619;
+  --text-secondary: #4b5641;
+  --text-tertiary: #647054;
+  --text-muted: #647054;
+  --text-inverse: #fff;
+  --accent-iris: #456500;
+  --accent-iris-soft: #405d00;
+  --accent-magenta: #655095;
+  --accent-amber: #77520c;
+  --success: #386216;
+  --danger: #a33743;
+  --warning: #77520c;
+  --info: #456500;
+  --ring: #45650066;
+  --gradient-iris: linear-gradient(#456500, #456500);
+  --shadow-sm: 0 1px 2px #20261908;
+  --shadow-lg: 0 16px 48px #20261926;
+  color-scheme: light;
+}

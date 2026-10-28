@@ -56,7 +56,7 @@ const primary = customBg ? {customBg:{...customBg,source:imageUri(customBg.sourc
   : gradientBg ? {gradientBg}
   : legacyImageOverlay ? {customBg:{source:bg.image.startsWith('/workspace/assets/')
       ? resolve('public',bg.image.slice(1))
-      : bg.image.startsWith('asset:')?imageUri(bg.image):bg.image,fit:'cover'}}
+      : bg.image.startsWith('asset:')?imageUri(bg.image):bg.image,fit:bg.fit??'cover',...(bg.align===undefined?{}:{align:bg.align}),...(bg.opacity===undefined?{}:{opacity:bg.opacity})}}
   : bg.mode==='image' ? {transparentBase:true}
   : bg.mode==='gradient' ? {gradientBg:{type:'linear',endX:composition.width,
       colors:[{stop:0,color:bg.startColor},{stop:1,color:bg.endColor}]}}
@@ -74,7 +74,8 @@ const canvas = await painter.createCanvas({
 let output = canvas.buffer;
 if(bg.mode==='image'&&!customBg&&!gradientBg&&!patternBg&&!noiseBg){
   output=await painter.createImage({
-    source:imageSource(bg.image),x:0,y:0,width:composition.width,height:composition.height,fit:'cover',
+    source:imageSource(bg.image),x:0,y:0,width:composition.width,height:composition.height,fit:bg.fit??'cover',
+    ...(bg.align===undefined?{}:{align:bg.align}),...(bg.opacity===undefined?{}:{opacity:bg.opacity}),...(bg.blur===undefined?{}:{blur:bg.blur}),
   },output);
 }
 const visibleLayers=composition.layers.filter(layer=>layer.visible);

@@ -1,3 +1,4 @@
+import {validateBorderSelection,type BorderSelection} from './border-selection';
 /** Portable, whitelisted subset of the pinned public CanvasConfig; no native inputs or executable callbacks. */
 export const CanvasBlendModes=[
   'source-over','source-in','source-out','source-atop',
@@ -42,7 +43,7 @@ export type CanvasLayer = (
   |{type:'presetPattern';pattern:CanvasPattern;opacity?:number;blendMode?:CanvasBlendMode}
   |{type:'image';source:string;opacity?:number;fit?:CanvasImageFit;align?:CanvasImageAlign;blendMode?:CanvasBlendMode}
   |{type:'pattern';source:string;repeat?:'repeat'|'repeat-x'|'repeat-y'|'no-repeat';opacity?:number;blendMode?:CanvasBlendMode}) & {nodeId?:string};
-export type CanvasBorderSide='all'|'top'|'bottom'|'left'|'right'|'top-left'|'top-right'|'bottom-left'|'bottom-right';
+export type CanvasBorderSide=BorderSelection;
 export interface CanvasStroke {
   color?:string;gradient?:CanvasGradient;width?:number;position?:number;
   blur?:number;opacity?:number;borderRadius?:number|'circular';
@@ -263,7 +264,6 @@ function layer(value:unknown):CanvasLayer {
   }
   return fail('unsupported background-layer type or unsafe native media source');
 }
-const canvasBorders=['all','top','bottom','left','right','top-left','top-right','bottom-left','bottom-right'] as const;
 function radius(value:unknown,label:string):number|'circular' {
   return value==='circular'?'circular':numeric(value,label,0,1024);
 }
@@ -276,8 +276,8 @@ export function validateCanvasStroke(value:unknown):CanvasStroke{
     ...(x.gradient===undefined?{}:{gradient:validateCanvasGradient(x.gradient)}),
     ...numbers(x,{width:[0,200],position:[-200,200],blur:[0,100],opacity:[0,1]}),
     ...(x.borderRadius===undefined?{}:{borderRadius:radius(x.borderRadius,'stroke border radius')}),
-    ...(x.borderPosition===undefined?{}:{borderPosition:choice(x.borderPosition,canvasBorders,'stroke border position')}),
-    ...(x.roundedCorners===undefined?{}:{roundedCorners:choice(x.roundedCorners,canvasBorders,'stroke rounded corners')}),
+    ...(x.borderPosition===undefined?{}:{borderPosition:validateBorderSelection(x.borderPosition,'stroke border position')}),
+    ...(x.roundedCorners===undefined?{}:{roundedCorners:validateBorderSelection(x.roundedCorners,'stroke rounded corners')}),
     ...(x.style===undefined?{}:{style:choice(x.style,['solid','dashed','dotted','groove','ridge','double'] as const,'stroke style')})
   };
 }
@@ -290,8 +290,8 @@ export function validateCanvasShadow(value:unknown):CanvasShadow{
     ...(x.gradient===undefined?{}:{gradient:validateCanvasGradient(x.gradient)}),
     ...numbers(x,{offsetX:[-512,512],offsetY:[-512,512],blur:[0,100],opacity:[0,1]}),
     ...(x.borderRadius===undefined?{}:{borderRadius:radius(x.borderRadius,'shadow border radius')}),
-    ...(x.roundedCorners===undefined?{}:{roundedCorners:choice(x.roundedCorners,canvasBorders,'shadow rounded corners')}),
-    ...(x.borderPosition===undefined?{}:{borderPosition:choice(x.borderPosition,canvasBorders,'shadow border position')})
+    ...(x.roundedCorners===undefined?{}:{roundedCorners:validateBorderSelection(x.roundedCorners,'shadow rounded corners')}),
+    ...(x.borderPosition===undefined?{}:{borderPosition:validateBorderSelection(x.borderPosition,'shadow border position')})
   };
 }
 export function validateCanvasExtras(value:unknown):CanvasExtras {
@@ -312,7 +312,7 @@ export function validateCanvasExtras(value:unknown):CanvasExtras {
     if(new Set(nodeIds).size!==nodeIds.length)fail('duplicate background-layer node IDs');
   }
   if(v.borderRadius!==undefined)out.borderRadius=v.borderRadius==='circular'?'circular':numeric(v.borderRadius,'border radius',0,1024);
-  if(v.borderPosition!==undefined)out.borderPosition=choice(v.borderPosition,canvasBorders,'border position');
+  if(v.borderPosition!==undefined)out.borderPosition=validateBorderSelection(v.borderPosition,'border position');
   if(v.zoom!==undefined){const z=object(v.zoom,'zoom');keys(z,['scale','centerX','centerY']);out.zoom={...numbers(z,{scale:[0.05,16],centerX:[-8192,8192],centerY:[-8192,8192]})};}
   if(v.stroke!==undefined)out.stroke=validateCanvasStroke(v.stroke);
   if(v.shadow!==undefined)out.shadow=validateCanvasShadow(v.shadow);

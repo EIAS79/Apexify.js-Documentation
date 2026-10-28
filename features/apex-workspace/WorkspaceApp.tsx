@@ -15,6 +15,7 @@ import {
   QueueListIcon,
   Squares2X2Icon,
   SunIcon,
+  MoonIcon,
   XMarkIcon,
   PhotoIcon,
   AdjustmentsHorizontalIcon,
@@ -57,6 +58,7 @@ import {
   type LogEntry,
 } from "./components/Results";
 import "./workspace.css";
+import {useTheme} from '@/components/ThemeProvider';
 
 let idCounter = 0;
 function workspaceId() {
@@ -77,7 +79,7 @@ const DEFAULT_VISIBLE: Record<PanelId, boolean> = {
   queue: true,
   preview: true,
   output: true,
-  terminal: false,
+  terminal: true,
 };
 interface HistoryState {
   past: WorkspaceDocument[];
@@ -132,6 +134,7 @@ const capabilityNotes: Record<
 };
 
 export default function WorkspaceApp() {
+  const {theme,toggleTheme}=useTheme();
   const [history, setHistory] = useState<HistoryState>(() => ({
     past: [],
     present: createHeroDocument(),
@@ -140,12 +143,18 @@ export default function WorkspaceApp() {
   const document = history.present;
   const [ready, setReady] = useState(false);
   const [visible, setVisible] = useState(DEFAULT_VISIBLE);
+  const [activeTabs, setActiveTabs] = useState<Record<string, PanelId>>({"editor-tabs":"code","result-tabs":"queue"});
   const [sizes, setSizes] = useState<Record<string, number[]>>({});
   const [maximized, setMaximized] = useState<PanelId | null>(null);
   const [mobilePanel, setMobilePanel] = useState<PanelId>("visual");
   const [selected, setSelected] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState("canvas");
+  const [layersRequest, setLayersRequest] = useState(0);
   const [inspectorTab, setInspectorTab] = useState("Properties");
+  const selectedKind=document.layers.find(layer=>layer.id===selected)?.kind;
+  useEffect(()=>{
+    if(inspectorTab==='Properties')setActiveTool(selectedKind??'canvas');
+  },[selected,selectedKind,inspectorTab]);
   const [panelMenu, setPanelMenu] = useState(false);
   const [search, setSearch] = useState("");
   const [commandMenu, setCommandMenu] = useState(false);
@@ -231,12 +240,13 @@ export default function WorkspaceApp() {
         setSourceDirty(true);
       }
       const layout = JSON.parse(localStorage.getItem(LAYOUT_KEY) ?? "null");
-      if (layout?.version === 1) {
+      if (layout?.version === 2) {
         const flags = { ...DEFAULT_VISIBLE };
         for (const id of ALL_PANELS)
           if (typeof layout.visible?.[id] === "boolean")
             flags[id] = layout.visible[id];
         setVisible(flags);
+        if(layout.activeTabs) setActiveTabs({"editor-tabs":layout.activeTabs["editor-tabs"]==="terminal"?"terminal":"code", "result-tabs":["queue","preview","output"].includes(layout.activeTabs["result-tabs"])?layout.activeTabs["result-tabs"]:"queue"});
         if (layout.sizes && typeof layout.sizes === "object") {
           const safe: Record<string, number[]> = {};
           for (const [key, value] of Object.entries(layout.sizes))
@@ -295,12 +305,12 @@ export default function WorkspaceApp() {
     try {
       localStorage.setItem(
         LAYOUT_KEY,
-        JSON.stringify({ version: 1, visible, sizes }),
+        JSON.stringify({ version: 2, visible, sizes, activeTabs }),
       );
     } catch {
       /* Document save reports storage failures separately. */
     }
-  }, [ready, visible, sizes]);
+  }, [ready, visible, sizes, activeTabs]);
   useEffect(() => {
     if (!ready) return;
     const timer = setTimeout(() => {
@@ -480,14 +490,15 @@ export default function WorkspaceApp() {
   }
   function resetLayout() {
     setVisible(DEFAULT_VISIBLE);
+    setActiveTabs({"editor-tabs":"code","result-tabs":"queue"});
     setSizes({});
     setMaximized(null);
     setMobilePanel("visual");
     setPanelMenu(false);
   }
   function openPanel(id: PanelId) {
-    if (id === "terminal" && !visible.terminal)
-      setSizes((old) => ({ ...old, center: [55, 45], editorStack: [55, 45] }));
+    if (["code","terminal"].includes(id)) setActiveTabs(old=>({...old,"editor-tabs":id}));
+    if (["queue","preview","output"].includes(id)) setActiveTabs(old=>({...old,"result-tabs":id}));
     setVisible((v) => ({ ...v, [id]: true }));
     setMobilePanel(id);
     setMaximized(null);
@@ -521,6 +532,7 @@ export default function WorkspaceApp() {
       },
     ]);
     setVisible((v) => ({ ...v, queue: true }));
+    setActiveTabs(old=>({...old,"result-tabs":"queue"}));
     log(`Queued ${document.name}.`);
   }
   useEffect(() => {
@@ -656,6 +668,7 @@ export default function WorkspaceApp() {
       openPanel("inspector");
       setInspectorTab(tool === "assets" ? "Assets" : "Presets");
     } else if (tool === "layers") {
+      setLayersRequest(value=>value+1);
       openPanel("inspector");
       setInspectorTab("Properties");
     } else if (tool === "files") openPanel("output");
@@ -757,13 +770,29 @@ export default function WorkspaceApp() {
     () => ALL_PANELS.filter((id) => visible[id]),
     [visible],
   );
-  function renderPanel(id: PanelId) {
+  function renderPanel(id: PanelId, tabs?: PanelId[]) {
     const Icon = icons[id];
     const title = PANEL_TITLES[id];
     return (
       <Panel
         title={title}
         icon={Icon}
+        tabPanelId={tabs ? "aw-dock-page-"+id : undefined}
+        tabs={tabs ? <div className="aw-window-tabs" role="tablist" aria-label={tabs.includes("code")||tabs.includes("terminal")?"Editor panels":"Output panels"}>
+          {tabs.map((tabId,index)=>{
+            const TabIcon=icons[tabId];
+            return <button key={tabId} type="button" role="tab" id={id===tabId?"aw-dock-page-"+tabId+"-tab":"aw-dock-"+id+"-to-"+tabId}
+              aria-selected={id===tabId} aria-controls={"aw-dock-page-"+tabId} tabIndex={id===tabId?0:-1}
+              onClick={()=>openPanel(tabId)}
+              onKeyDown={event=>{
+                if(!["ArrowLeft","ArrowRight","Home","End"].includes(event.key))return;
+                event.preventDefault();
+                const next=event.key==="Home"?0:event.key==="End"?tabs.length-1:(index+(event.key==="ArrowRight"?1:-1)+tabs.length)%tabs.length;
+                openPanel(tabs[next]);
+                requestAnimationFrame(()=>window.document.getElementById("aw-dock-page-"+tabs[next]+"-tab")?.focus());
+              }}><TabIcon/><span>{PANEL_TITLES[tabId]}</span></button>;
+          })}
+        </div> : undefined}
         onClose={() => closePanel(id)}
         onMaximize={() => setMaximized(maximized === id ? null : id)}
         className={`aw-panel-${id}`}
@@ -819,6 +848,7 @@ export default function WorkspaceApp() {
           />
         ) : id === "inspector" ? (
           <Inspector
+            layersRequest={layersRequest}
             document={document}
             selected={selected}
             onDocument={(patch) => {
@@ -919,9 +949,10 @@ export default function WorkspaceApp() {
           <Queue
             jobs={jobs}
             onCancel={cancelJob}
-            onSelect={(url) =>
-              setSelectedJobId(jobs.find((job) => job.url === url)?.id ?? null)
-            }
+            onSelect={(url) => {
+              setSelectedJobId(jobs.find((job) => job.url === url)?.id ?? null);
+              openPanel("preview");
+            }}
             onRender={enqueue}
           />
         ) : id === "preview" ? (
@@ -949,21 +980,18 @@ export default function WorkspaceApp() {
   }
   return (
     <main
-      className={`aw-app${contrast ? " aw-contrast" : ""}`}
+      className={`aw-app frame-palette${contrast ? " aw-contrast" : ""}`}
       aria-label="Apexify creative workspace"
       aria-busy={!ready}
     >
       <header className="aw-topbar">
         <a className="aw-brand" href="/" aria-label="Apexify home">
-          <img src="/workspace/assets/apex-mark.webp" alt="" />
-          <span>
-            Apexify<span className="aw-brand-js">.js</span>
-          </span>
+          <img src="/brand/apexify-lockup-v2.avif" width={145} height={48} alt="Apexify.js"/>
         </a>
         <nav className="aw-topnav" aria-label="Main navigation">
           <a href="/">Home</a>
           <a href="/docs/getting-started">Docs</a>
-          <a href="/api-reference">API</a>
+          <a href="/docs/api">API</a>
           <a href="/gallery">Gallery</a>
           <a href="/workspace" aria-current="page">
             Workspace
@@ -978,17 +1006,21 @@ export default function WorkspaceApp() {
           <kbd>⌘K</kbd>
         </button>
         <div className="aw-topbar-actions">
+          <IconButton label={`Switch to ${theme==='dark'?'light':'dark'} theme`} onClick={toggleTheme}>
+            {theme==='dark'?<SunIcon/>:<MoonIcon/>}
+          </IconButton>
           <IconButton
             label="Increase interface contrast"
             active={contrast}
             onClick={() => setContrast(!contrast)}
           >
-            <SunIcon />
+            <AdjustmentsHorizontalIcon />
           </IconButton>
           <div className="aw-panels-wrapper">
             <button
               className={`aw-button${panelMenu ? " is-active" : ""}`}
               aria-expanded={panelMenu}
+              aria-label="Panels"
               aria-controls="aw-panels-menu"
               onClick={() => setPanelMenu(!panelMenu)}
             >
@@ -1094,6 +1126,7 @@ export default function WorkspaceApp() {
         ) : hasVisiblePanel(DEFAULT_DOCK, visible) ? (
           <DockLayout
             tree={DEFAULT_DOCK}
+            activeTabs={activeTabs}
             visible={visible}
             sizes={sizes}
             onResize={(id, weights) =>

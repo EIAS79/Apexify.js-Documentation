@@ -75,6 +75,10 @@ export interface WorkspaceDocument {
     endColor: string;
     image: string;
     transparent: boolean;
+    fit?: 'cover'|'contain'|'fill';
+    align?: 'center'|'top'|'bottom'|'left'|'right'|'top-left'|'top-right'|'bottom-left'|'bottom-right';
+    opacity?: number;
+    blur?: number;
   };
   layers: WorkspaceLayer[];
   canvasExtras?: CanvasExtras;
@@ -269,6 +273,10 @@ export function validateDocument(value: unknown): WorkspaceDocument {
   // A tighter authoring limit also leaves storage headroom for source drafts and UI metadata.
   if(JSON.stringify(d).length>3_000_000)throw new Error('Workspace project exceeds the 3 MB durable JSON budget.');
   const canvasExtras=validateCanvasExtras(d.canvasExtras);
+  if(b.fit!==undefined&&!['cover','contain','fill'].includes(String(b.fit)))throw Error('Unsupported background image fit');
+  if(b.align!==undefined&&!['center','top','bottom','left','right','top-left','top-right','bottom-left','bottom-right'].includes(String(b.align)))throw Error('Unsupported background image alignment');
+  if(b.mode==='image'&&Number(b.blur)>0&&(canvasExtras.patternBg||canvasExtras.noiseBg)&&!canvasExtras.customBg&&!canvasExtras.gradientBg)
+    throw Error('Remove background image blur before adding pattern or noise overlays.');
   const imageGroups=validateImageGroups(d.imageGroups,assets);
   if(canvasExtras.customBg){
     const resolved=resolveImageReference(canvasExtras.customBg.source,assets);
@@ -378,6 +386,10 @@ export function validateDocument(value: unknown): WorkspaceDocument {
       endColor: color(b.endColor),
       image: imageSource(b.image),
       transparent: bool(b.transparent),
+      ...(b.fit===undefined?{}:{fit:b.fit as WorkspaceDocument['background']['fit']}),
+      ...(b.align===undefined?{}:{align:b.align as WorkspaceDocument['background']['align']}),
+      ...(b.opacity===undefined?{}:{opacity:num(b.opacity,'Background image opacity',0,1)}),
+      ...(b.blur===undefined?{}:{blur:num(b.blur,'Background image blur',0,100)}),
     },
     layers,
     ...(d.imageGroups===undefined?{}:{imageGroups}),

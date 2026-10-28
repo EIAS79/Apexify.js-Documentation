@@ -2,6 +2,8 @@
 import dynamic from "next/dynamic";
 import { javascript } from "@codemirror/lang-javascript";
 import { CheckIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import {useTheme} from '@/components/ThemeProvider';
+import ControlHelp from './ControlHelp';
 const Editor = dynamic(() => import("@uiw/react-codemirror"), {
   ssr: false,
   loading: () => (
@@ -24,6 +26,7 @@ export default function CodeEditor({
   dirty: boolean;
   error: string | null;
 }) {
+  const {theme}=useTheme();
   return (
     <div className="aw-code">
       <div className="aw-code-toolbar">
@@ -31,6 +34,7 @@ export default function CodeEditor({
           {dirty ? "Unsynchronized edits" : "Synced with Visual & Graph"}
         </span>
         <span className="aw-code-language">TypeScript</span>
+        <ControlHelp label="Live code" description="Visual edits generate Apexify.js code here. Edit composition data and choose Apply code to synchronize supported changes with Visual and Graph. Custom program edits remain preserved; they are not executed as arbitrary code by this editor."/>
         <button
           className="aw-button aw-small"
           onClick={onApply}
@@ -56,7 +60,7 @@ export default function CodeEditor({
             view.contentDOM.setAttribute("aria-label", "TypeScript code editor");
             view.scrollDOM.setAttribute("tabindex", "0");
           }}
-          theme="dark"
+          theme={theme}
           height="100%"
           extensions={extensions}
           basicSetup={{

@@ -1,3 +1,4 @@
+import {validateBorderSelection} from './border-selection';
 import type { ImageProperties, GroupTransformOptions } from 'apexify.js';
 import { validateCanvasGradient, validateCanvasShadow, validateCanvasStroke, CanvasBlendModes } from './canvas-options';
 import { ASSET_REFERENCE, resolveImageReference, type WorkspaceImageAsset } from './asset-store';
@@ -139,7 +140,7 @@ function validateOptions(v:unknown,assets:readonly WorkspaceImageAsset[],group:b
   for(const key of ['blur','filterIntensity'])if(a[key]!==undefined)finite(a[key],key,0,50);
   if(a.blendMode!==undefined)choice(a.blendMode,IMAGE_COMPOSITES,'blendMode');
   if(a.borderRadius!==undefined&&a.borderRadius!=='circular')finite(a.borderRadius,'borderRadius',0,2048);
-  if(a.borderPosition!==undefined)choice(a.borderPosition,['all','top','bottom','left','right','top-left','top-right','bottom-left','bottom-right'],'borderPosition');
+  if(a.borderPosition!==undefined)a.borderPosition=validateBorderSelection(a.borderPosition,'borderPosition');
   if(a.filterOrder!==undefined)choice(a.filterOrder,['pre','post'],'filterOrder');
   if(a.filters!==undefined){
     if(!Array.isArray(a.filters)||a.filters.length>8)throw Error('At most eight filters');
