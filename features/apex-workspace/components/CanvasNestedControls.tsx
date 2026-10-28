@@ -81,16 +81,18 @@ export function PatternControls({pattern,onChange,assets,id}:{
   </div>
  </fieldset>;
 }
-export function GradientControls({gradient,onChange,id,disableRepeat=false}:{
+export function GradientControls({gradient,onChange,id,disableRepeat=false,section="all"}:{
  gradient:CanvasGradient;onChange:(g:CanvasGradient)=>void;id:string;disableRepeat?:boolean;
+ section?:"all"|"stops"|"geometry"|"tiling"|"details";
 }){
+ const show=(key:"stops"|"geometry"|"tiling"|"details")=>section==="all"||section===key;
  const edit=(patch:Partial<CanvasGradient>)=>onChange({...gradient,...patch});
  const number=(key:keyof CanvasGradient,label:string,defaultValue=0,min=-8192,max=8192,step=1)=>
   <NumberField key={String(key)} label={id+" "+label} value={(gradient[key] as number|undefined)??defaultValue}
     min={min} max={max} step={step} onChange={n=>edit({[key]:n})}/>;
  return <fieldset aria-label={id+" gradient properties"} className="aw-canvas-properties">
   <legend>{gradient.type} gradient</legend>
-  <Field label="Gradient type"><select aria-label={id+" gradient type"} value={gradient.type}
+  {show("geometry")&&<Field label="Gradient type"><select aria-label={id+" gradient type"} value={gradient.type}
    onChange={e=>{
      const type=e.target.value as GradientKind;
      if(type===gradient.type)return;
@@ -105,8 +107,9 @@ export function GradientControls({gradient,onChange,id,disableRepeat=false}:{
          ...(_repeat?{repeat:_repeat}:{})});
    }}>
    {(["linear","radial","conic"] as const).map(v=><option key={v} value={v}>{v}</option>)}
-  </select></Field>
-  <div aria-label={id+" stops"}>
+  </select></Field>}
+  {show("stops")&&<div aria-label={id+" stops"}>
+   <div className="aw-gradient-preview" aria-label={id+" gradient preview"} style={{background:`linear-gradient(90deg, ${gradient.colors.map(item=>`${item.color} ${Math.round(item.stop*100)}%`).join(", ")})`}}/>
    {gradient.colors.map((stop,i)=><div className="aw-field-row" key={i}>
     <NumberField label={id+" stop "+(i+1)} value={stop.stop} min={0} max={1} step={0.01}
      onChange={value=>{
@@ -144,9 +147,9 @@ export function GradientControls({gradient,onChange,id,disableRepeat=false}:{
       }
       edit({colors:[...ordered,{stop:at,color:"#ffffff"}].sort((a,b)=>a.stop-b.stop)});
     }}>Add gradient stop</button>
-  </div>
-  <div className="aw-field-row">
-   {gradient.type==="conic"?<>
+  </div>}
+  {(show("geometry")||show("tiling")||show("details"))&&<div className="aw-field-row">
+   {show("geometry")&&(gradient.type==="conic"?<>
     {number("centerX","center X")}{number("centerY","center Y")}
     {number("startAngle","start angle",0,-360,360)}
     <p className="aw-canvas-note">S22 native conic start angle is in degrees, clockwise from the native zero-angle orientation.</p>
@@ -155,10 +158,10 @@ export function GradientControls({gradient,onChange,id,disableRepeat=false}:{
     {number("endX","end X",500)}{number("endY","end Y")}
     {gradient.type==="radial"?<>{number("startRadius","start radius",0,0,4096)}
       {number("endRadius","end radius",200,0,4096)}</>:null}
-   </>}
-   {number("rotate","rotation",0,-360,360)}
-   {number("pivotX","pivot X")}{number("pivotY","pivot Y")}
-   {gradient.type!=="conic"?<Field label="Gradient repeat">
+   </>)}
+   {show("details")&&<>{number("rotate","rotation",0,-360,360)}
+   {number("pivotX","pivot X")}{number("pivotY","pivot Y")}</>}
+   {show("tiling")&&gradient.type!=="conic"?<Field label="Gradient repeat">
     <select aria-label={id+" gradient repeat"} disabled={disableRepeat}
      title={disableRepeat?"Repeat editing is disabled by the caller":undefined}
      value={gradient.repeat??"no-repeat"}
@@ -168,7 +171,7 @@ export function GradientControls({gradient,onChange,id,disableRepeat=false}:{
     {disableRepeat?<span className="aw-canvas-note">Repeat editing is disabled by this editor.</span>:
       gradient.repeat==="reflect"?<span className="aw-canvas-note">Reflect mirrors the native gradient period; choose short gradient geometry to make the effect visible.</span>:null}
    </Field>:null}
-  </div>
+  </div>}
  </fieldset>;
 }
 
