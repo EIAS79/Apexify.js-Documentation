@@ -2416,15 +2416,8 @@
 /* Preserve the Canvas Studio v2 layout and typed graph, using Frame tokens. */
 
 
-/* Focused Canvas authoring categories; full state remains in the canonical CanvasExtras model. */
+/* Canvas options now render only their owning section; never hide them with stale IDs. */
 .aw-canvas-advanced[data-canvas-focus] .aw-canvas-jump {display:none}
-.aw-canvas-advanced[data-canvas-focus="styling"] > .aw-canvas-section:not(#aw-canvas-fundamentals):not(#aw-canvas-gradients):not(#aw-canvas-patterns),
-.aw-canvas-advanced[data-canvas-focus="effects"] > .aw-canvas-section:not(#aw-canvas-effects),
-.aw-canvas-advanced[data-canvas-focus="advanced"] > .aw-canvas-section:not(#aw-canvas-images),
-.aw-canvas-advanced[data-canvas-focus="layers"] > .aw-canvas-section:not(#aw-canvas-layers) {display:none}
-.aw-canvas-advanced[data-canvas-focus="styling"] > button:last-of-type,
-.aw-canvas-advanced[data-canvas-focus="effects"] > button:last-of-type,
-.aw-canvas-advanced[data-canvas-focus="layers"] > button:last-of-type {display:none}
 /* The advanced technical inputs open as a palette; the node stage gets the primary space. */
 .aw-graph-toolbar {position:relative;z-index:4;height:auto;min-height:46px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:7px 11px;background:var(--bg-canvas);border-bottom:1px solid var(--border-default)}
 .aw-graph-inputs {position:relative;flex:0 0 auto}
