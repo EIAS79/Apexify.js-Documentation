@@ -70,6 +70,7 @@ export default function Inspector({
   const activeLayerSection=layerSections.find(([key])=>key===layerSection)!;
   const bg = document.background;
   const imageBg=document.canvasExtras?.customBg;
+  const baseMode=imageBg?"image":document.canvasExtras?.gradientBg?"gradient":bg.mode;
   const backgroundSource=imageBg?.source??bg.image;
   const updateImageBackground=(patch:{fit?:'cover'|'contain'|'fill';align?:NonNullable<typeof bg.align>;opacity?:number})=>{
     if(imageBg)onDocument({canvasExtras:{...document.canvasExtras,customBg:{...imageBg,...patch}}});
@@ -271,8 +272,8 @@ export default function Inspector({
                   {(["color", "gradient", "image"] as const).map((mode) => (
                     <button
                       key={mode}
-                      aria-pressed={bg.mode === mode}
-                      className={bg.mode === mode ? "selected" : ""}
+                      aria-pressed={baseMode === mode}
+                      className={baseMode === mode ? "selected" : ""}
                       onClick={() => changeBaseMode(mode)}
                     >
                       {mode === "image" ? (
@@ -286,7 +287,7 @@ export default function Inspector({
                     </button>
                   ))}
                 </div>
-                {bg.mode === "color" ? (
+                {baseMode === "color" ? (
                   <Field label="Color">
                     <input
                       type="color"
@@ -294,7 +295,7 @@ export default function Inspector({
                       onChange={(e) => background({ color: e.target.value })}
                     />
                   </Field>
-                ) : bg.mode === "gradient" ? (
+                ) : baseMode === "gradient" ? (
                   <p className="aw-canvas-note">Edit the gradient below. Colors, stops, geometry and repetition use one native gradient configuration.</p>
                 ) : (
                   <div className="aw-background-image">
@@ -304,7 +305,7 @@ export default function Inspector({
                     </div>
                   </div>
                 )}
-                {bg.mode==='image'&&<div className="aw-image-background-controls">
+                {baseMode==="image"&&<div className="aw-image-background-controls">
                   <div className="aw-field-row">
                     <Field label="Fit" help="Contain shows the entire image inside the canvas. Cover fills the canvas and can crop its edges. Fill stretches the image to the canvas size.">
                       <select aria-label="Background image fit" value={imageBg?.fit??bg.fit??'cover'} disabled={imageBg?.inherit}
@@ -331,12 +332,12 @@ export default function Inspector({
                       <output>{bg.blur??0} px</output></div>
                   </Field>}
                 </div>}
-                {bg.mode==='color'&&<Field label="Transparent base">
+                {baseMode==="color"&&<Field label="Transparent base">
                   <input
                     className="aw-switch"
                     type="checkbox"
                     checked={bg.transparent}
-                    disabled={bg.mode !== "color"}
+                    disabled={baseMode !== "color"}
                     onChange={(e) =>
                       background({ transparent: e.target.checked })
                     }
@@ -346,7 +347,7 @@ export default function Inspector({
                 </>}
                 {(
                   <CanvasOptionsEditor focus={canvasCategory==="background"
-                      ?canvasBackgroundView==="base"?(bg.mode==="gradient"?"gradient":bg.mode==="image"?"image":"none")
+                      ?canvasBackgroundView==="base"?(baseMode==="gradient"?"gradient":baseMode==="image"?"image":"none")
                         :canvasBackgroundView
                       :canvasCategory}
                     legacyGradientColors={{start:bg.startColor,end:bg.endColor}}
