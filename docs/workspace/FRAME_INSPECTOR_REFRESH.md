@@ -1,37 +1,31 @@
-# Workspace Frame theme and inspector refresh
+# Balanced Workspace implementation
 
-Scope: UI/UX for existing canvas, text, and image authoring. The engine pin, render routes, project schema, code reconciliation, and image processing behavior are unchanged.
+The user selected concept 1 after requesting a redesign of the existing multi-window workspace. This implementation keeps the current project, native editors, and canonical homepage logo. It does not introduce a separate application.
 
 ## Result
 
-- Current Frame identity: canonical homepage/docs wordmark, charcoal surfaces, lime accents, matching light theme, and Frame Inter typography. Workspace and its portalled help share one scoped palette; the code editor follows the site theme preference.
-- Four default panels prioritize Tools, Visual Canvas, Inspector, and Code. The inspector has more width. All nine panels still close, reopen, maximize, and resize. Saved layouts remain intact; **Panels → Reset layout** selects the new default.
-- Design, Presets, and Assets use a single inspector view selector. Canvas preserves the six accessible categories and typed React Flow graph merged in PR #170; the extra jump-navigation row is removed. The graph now follows the Frame palette and site theme. Typography is grouped by font, layout, paint, placement, effects, curve, runs/groups, and measurement.
-- Shared fields provide click/touch and keyboard info buttons. Help describes effects, units, bounds, and relevant limitations; nested typography retains the parent context. Cards escape clipped panel content, reposition during scrolling/resizing, close with Escape/outside interaction, and return focus on Escape.
-- Canvas, Text, and Image are the primary creation tools. Planned editors are under More Tools and labeled Planned. Existing Shape and Chart remain available without expansion. Selected-layer kind now updates the active creation tool.
-- Image controls use readable labels and asset dimensions instead of presenting content hashes as the primary identifier.
+- Charcoal `#191919` panels, `#111111` base, bright `#F7FF00` selected/primary states, and the homepage AVIF wordmark. Old blue/purple chrome and magenta scrollbars no longer leak into Workspace or React Flow. The existing light theme remains available.
+- Canvas occupies the upper center; Code and Terminal share an editor tab group beside Visual Graph. Queue, Preview, and Export share the bottom tab group. The right inspector spans the full workspace height. Tab content remains mounted when inactive. Selecting a queued image opens its Preview tab.
+- Canvas opens fitted to the entire composition and recomputes its fit when panels resize. Select, drag, pan, zoom, maximize, close, and restore remain available.
+- Properties, Presets, and Assets form the top inspector tabs. Canvas has four keyboard-accessible categories: Layout, Background, Effects, Advanced. Related gradients, background layers, patterns, native image controls, and effects are grouped within them.
+- Fit, Alignment, Image Opacity, and Image Blur are visible in the main image-background view. Validated optional background fields preserve these values through generated source, project import/export, and the canonical v2 projection. The native server and generated program apply the same public image options. Base-image blur plus pattern/noise overlays is explicitly rejected because the native primary-background path has different blur semantics.
+- Shared info buttons explain effects and bounds, open outside clipped windows, reposition on scroll, support touch/keyboard, and return focus after Escape. Text and Image retain their existing advanced grouped controls and schemas.
+- The typed graph from #170 remains real and editable. Its initial viewport shows the Background → Canvas → Output path. Detailed node controls open inside the graph window; nodes use the existing icon library and palette.
+- Layout storage is version 2. Earlier geometry resets once to this selected arrangement; saved compositions and source drafts remain intact. All nine panel types remain available through Panels.
+- The existing Next development preview accepts the preview service's flags and buffers/compresses large static development assets. Production still uses the normal Next build/start commands.
 
 ## Verification
 
-- `npm run typecheck` passed.
-- 106 focused tests passed: text/canvas/image native rendering and code parity, image inspector mapping, model/domain/panel contracts, the docs batch regression test, and all 60 Canvas regression tests used by PR #170. The batch test now uses TypeScript's public diagnostics API rather than an untyped internal property.
-- Chromium interaction check covers theme colors and wordmark, default layout, all six Canvas categories and typed graph, help/focus/Escape, canvas-to-source download, text layout and native measurements, image upload/fit, theme switching, panel reopening, and the 390px mobile inspector. Real render and measurement endpoints are used.
-- Refreshed image inspector mapping reports 321 conditionally reachable controls and 9 semantic/external containers that static SSR does not verify. This is a control-reachability check, not a new claim of complete runtime parity.
-- Production compilation and TypeScript validation succeeded before integration with PR #170. The integrated tree is separately checked with TypeScript, native tests, and browser interaction. The full site's prerender remains blocked at `/` by `[DOC-7] DOC-4 and DOC-5 package identities disagree`. The docs search generator also reports `[doc6] Gallery coverage mismatch`. Generated docs/API data from diagnostic attempts is excluded from this change.
+- `npm run typecheck`: passed.
+- 117 focused Node tests: passed. These cover native Text/Canvas/Image rendering, generated program byte parity, image inspector reachability, graph transactions, project migrations, contracts, accessible gutter contrast in both themes, and grouped dock visibility/state.
+- New background tests demonstrate actual pixel changes for Fit, Alignment, Opacity, and Blur, plus an image with procedural overlays. Every case matches generated Node output byte for byte.
+- Cloud browser: native PNG rendering, canvas width → generated source → 1200×720 decoded PNG, Undo, text content/font editing and native text measurement, terminal commands, grouped tab switching, queue-thumbnail → Preview selection, all four Canvas categories, live background fit/blur controls, and desktop/mobile field help.
+- A 390×844 CSS iframe viewport verified mobile inspector navigation, controls, and help bounds (left 12, right 296, top 521, bottom 691). This is responsive desktop-Chromium coverage, not physical-device testing.
+- The HTTP preview cannot import image files because browser Web Crypto is unavailable outside a secure context. The UI now explains the HTTPS/localhost requirement instead of exposing an undefined `digest` error. Import validation and native rendering are covered by the focused tests; a fresh end-to-end HTTPS upload remains a release follow-up.
+- Standalone browser scripts were updated to the new navigation but not executed in this iteration; browser checks used the cloud browser.
 
-Run the browser check against an existing server:
+## Design QA and limitations
 
-```sh
-WORKSPACE_URL=http://127.0.0.1:4173 CHROME_PATH=/path/to/chrome \
-  node tests/workspace/browser-frame-inspector.cjs
-```
+See root `design-qa.md` and `docs/design/workspace/balanced/`. The selected mock contains invented project text, code, graph nodes, and crop behavior. The implementation preserves the real Hero composition, its actual program and typed graph, and the complete artboard.
 
-`WORKSPACE_TEST_START_SERVER=1` starts and closes an in-process Next development server. `PLAYWRIGHT_MODULE` can point to an external Playwright installation. On hosts that truncate large development JavaScript responses, `WORKSPACE_TEST_LOCAL_ASSETS=1` delivers the exact `.next/static` files through browser request fulfillment. It does not mock render/measurement APIs or alter application source. This option was required in the verification host, which intermittently served a 327,680-byte fragment of a 6,090,595-byte development chunk.
-
-## Screenshots
-
-- [Desktop, dark](../design/workspace/frame-refresh/desktop-dark.png)
-- [Desktop, light](../design/workspace/frame-refresh/desktop-light.png)
-- [Mobile inspector](../design/workspace/frame-refresh/mobile-inspector.png)
-
-This refresh does not implement path/component editors, GIF/audio/video workflows, arbitrary code execution, or certify the entire Workspace production program.
+Full-site production acceptance remains outside this UI pass. Earlier full-site compilation/type validation succeeded, but prerender was blocked by DOC-4/DOC-5 package-identity disagreement and search generation reported Gallery coverage mismatch. No production deployment or merge is claimed. Path, component, audio, video, and GIF editors remain unimplemented.

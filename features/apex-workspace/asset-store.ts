@@ -88,6 +88,8 @@ export async function verifyBrowserImageAssets(records:readonly WorkspaceImageAs
   }
 }
 export async function importImageAsset(file:File):Promise<WorkspaceImageAsset> {
+  if(!globalThis.crypto?.subtle)
+    fail('image uploads require HTTPS or localhost so the browser can verify image content');
   if(file.size<16||file.size>MAX_IMAGE_ASSET_BYTES||!types.includes(file.type as typeof types[number]))
     fail('select a PNG, JPEG or WebP no larger than 2 MB');
   const raw=new Uint8Array(await file.arrayBuffer());

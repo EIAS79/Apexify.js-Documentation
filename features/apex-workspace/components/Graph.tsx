@@ -143,6 +143,9 @@ export default function Graph({
         onConnect={(source,target)=>applyConnection('connect',source,target)}
         onDisconnect={target=>applyConnection('disconnect',undefined,target)}/>
       {wiringError?<p role="alert" className="aw-graph-wiring-error">{wiringError}</p>:null}
+      <details className="aw-graph-control-menu">
+        <summary>Node controls</summary>
+        <div className="aw-graph-control-popover">
       <details className="aw-graph-wiring" aria-label="Typed canvas graph wiring">
         <summary>Connect / disconnect typed node ports</summary>
         <p className="aw-muted">Graph ports are derived from the saved canvas and SHA-256 assets; connections update the same project as Visual and Code.</p>
@@ -337,6 +340,8 @@ export default function Graph({
           onChange={transform=>onDocument({...document,imageGroups:(document.imageGroups??[]).map(g=>g.id===imageGroup.id?{...g,transform}:g)})}/>}
         </details>;
       })()}
+        </div>
+      </details>
       <div className="aw-graph-caption">
         Shared composition · typed nodes: {graph.nodes.length} · connected ports: {graph.edges.length}
         {(document.canvasExtras?.bgLayers??[]).map((layer,index)=>

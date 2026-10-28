@@ -1,4 +1,5 @@
 "use client";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import {useEffect,useRef,useState} from "react";
 import type {WorkspaceLayer} from "../model";
 import {
@@ -175,16 +176,16 @@ export default function TextOptionsEditor({layer,onChange,onBounds,compact=false
     <div className="aw-section-heading"><strong>Advanced typography</strong></div>
     <p className="aw-muted">Open a group, then enable the options you need. Unset options use the renderer’s defaults.</p>
     {Object.entries(object(textPropertiesSpec)).map(([key,spec])=><details className="aw-editor-section" key={key}>
-      <summary><strong>{readableLabel(key)}</strong><span>{settings.properties?.[key as keyof typeof settings.properties]!==undefined?'Configured':'Optional'}</span></summary>
+      <summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>{readableLabel(key)}</strong><span>{settings.properties?.[key as keyof typeof settings.properties]!==undefined?'Configured':'Optional'}</span></summary>
       <TextField spec={spec} value={settings.properties?.[key as keyof typeof settings.properties]} label={key}
         onChange={value=>{const props={...settings.properties} as Record<string,unknown>;if(value===undefined)delete props[key];else props[key]=value;edit("properties",props);}}/>
     </details>)}
-    <details className="aw-editor-section"><summary><strong>Text runs & groups</strong><span>Multi-item layout</span></summary>
+    <details className="aw-editor-section"><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>Text runs & groups</strong><span>Multi-item layout</span></summary>
       <TextField spec={{kind:"array",max:32,item:textRunSpec}} value={settings.items} label="Text array items" onChange={v=>edit("items",v)}/>
       <TextField spec={textGroupSpec} value={settings.group} label="Grouped text options" onChange={v=>edit("group",v)}/>
     </details>
     {error?<p role="alert" className="aw-error">{error}</p>:null}
-    <details className="aw-editor-section"><summary><strong>Measure text</strong><span>Bounds & character metrics</span></summary>
+    <details className="aw-editor-section"><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>Measure text</strong><span>Bounds & character metrics</span></summary>
     <button type="button" className="aw-text-button" onClick={()=>void measure()} disabled={busy}>
       {busy?"Measuring…":"Measure text"}
     </button>
@@ -199,13 +200,13 @@ export default function TextOptionsEditor({layer,onChange,onBounds,compact=false
       {onBounds?<button type="button" className="aw-text-button" onClick={()=>onBounds(
         Math.max(1,Math.min(2048,Math.ceil(Number(metrics.width)))),
         Math.max(1,Math.min(2048,Math.ceil(Number(metrics.height)))))}>Use measured selection bounds</button>:null}
-      {Array.isArray(metrics.lines)?<details><summary>Per-line measured data</summary><pre>{JSON.stringify(metrics.lines,null,2)}</pre></details>:null}
-      {Array.isArray(metrics.charPositions)?<details><summary>Character positions</summary><pre>{JSON.stringify(metrics.charPositions,null,2)}</pre></details>:null}
-      {itemMetrics?<details><summary>All {itemMetrics.length} text array measurements (before group transform)</summary>
+      {Array.isArray(metrics.lines)?<details><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Per-line measured data</summary><pre>{JSON.stringify(metrics.lines,null,2)}</pre></details>:null}
+      {Array.isArray(metrics.charPositions)?<details><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Character positions</summary><pre>{JSON.stringify(metrics.charPositions,null,2)}</pre></details>:null}
+      {itemMetrics?<details><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>All {itemMetrics.length} text array measurements (before group transform)</summary>
         {itemMetrics.map((item,index)=><p key={index}>Item {index+1}: {Number(item.width).toFixed(2)} × {Number(item.height).toFixed(2)} px</p>)}
         <pre>{JSON.stringify(itemMetrics,null,2)}</pre>
       </details>:null}
-      <details><summary>Complete native TextMetrics result</summary><pre>{JSON.stringify(metrics,null,2)}</pre></details>
+      <details><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Complete native TextMetrics result</summary><pre>{JSON.stringify(metrics,null,2)}</pre></details>
     </div>:null}
     </details>
   </section>;

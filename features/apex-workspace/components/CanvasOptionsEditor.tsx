@@ -1,4 +1,5 @@
 "use client";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import type {CanvasExtras,CanvasGradient,CanvasLayer,CanvasPattern,GradientKind} from "../canvas-options";
 import {validateCanvasExtras,CanvasBlendModes,CanvasImageAlignModes,type CanvasBlendMode,type CanvasImageAlign} from "../canvas-options";
 import {importImageAsset,type WorkspaceImageAsset} from '../asset-store';
@@ -8,7 +9,7 @@ import {StrokeControls,ShadowControls} from "./CanvasEffectsEditor";
 import {CanvasFiltersEditor} from './CanvasFiltersEditor';
 const starterGradient=(type:GradientKind):CanvasGradient=>({type,colors:[{stop:0,color:'#221160'},{stop:1,color:'#006ca8'}]});
 const starterPattern:CanvasPattern={type:'grid',color:'#56dbf9',secondaryColor:'#131b30',size:24,spacing:24,opacity:0.4};
-export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onError,canvasWidth=500,canvasHeight=500,focus='all'}:{value?:CanvasExtras;focus?:'all'|'styling'|'effects'|'advanced'|'layers';onChange:(options:CanvasExtras)=>void;canvasWidth?:number;canvasHeight?:number;
+export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onError,canvasWidth=500,canvasHeight=500,focus='all'}:{value?:CanvasExtras;focus?:'all'|'layout'|'background'|'styling'|'effects'|'advanced'|'layers';onChange:(options:CanvasExtras)=>void;canvasWidth?:number;canvasHeight?:number;
   assets:readonly WorkspaceImageAsset[];onAsset:(record:WorkspaceImageAsset,placement:'custom'|'layer'|'pattern')=>void;
   onError:(message:string)=>void;}){
   const options=value??{};
@@ -49,10 +50,11 @@ export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onErr
     update({bgLayers:tagged});
   }
   return <section className="aw-canvas-advanced" data-canvas-focus={focus} aria-label="Advanced canvas authoring">
-    <div className="aw-section-heading"><strong>Advanced canvas</strong></div>
+    {focus==='all'&&<div className="aw-section-heading"><strong>Advanced canvas</strong></div>}
     {focus==='all'&&<p className="aw-muted">Open a section to edit. Use the info icons for guidance; changes sync with code and the rendered canvas.</p>}
-    <details id="aw-canvas-fundamentals" className="aw-canvas-section" open>
-      <summary><strong>Fundamentals</strong><span>Geometry · opacity · zoom · corners</span></summary>
+    {["all", "layout", "styling"].includes(focus)&&<>
+    <details id="aw-canvas-fundamentals" className="aw-canvas-section" open={focus==='all'}>
+      <summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>Fundamentals</strong><span>Geometry · opacity · zoom · corners</span></summary>
     <div className="aw-section-heading"><strong>Canvas fundamentals · geometry</strong></div>
     <div className="aw-field-row">
       <NumberField label="Canvas X" value={options.x??0} onChange={x=>update({x})}/>
@@ -87,52 +89,10 @@ export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onErr
     </div>
     <p className="aw-muted">Zoom centers default to the canvas midpoint; changing the center affects painted pixels only when zoom scale differs from 1.</p>
     </details>
-    <details id="aw-canvas-gradients" className="aw-canvas-section" open={focus!=='all'}>
-      <summary><strong>Gradients</strong><span>Linear · radial · conic · stops · pivots</span></summary>
-<div className="aw-section-heading"><strong>Gradient background · native v6</strong></div>
-    <Field label="Gradient variant">
-      <select aria-label="Canvas gradient type" value={gradient?.type??'none'} onChange={e=>{
-        const t=e.target.value as GradientKind|'none';
-        update({gradientBg:t==='none'?undefined:{...starterGradient(t),colors:gradient?.colors??starterGradient(t).colors},
-          ...(t==='none'?{}:{customBg:undefined})});
-      }}>
-        <option value="none">Default background</option>
-        <option value="linear">Linear</option><option value="radial">Radial</option><option value="conic">Conic</option>
-      </select>
-    </Field>
-    {gradient?<GradientControls gradient={gradient} onChange={setGradient} id="Root" />:null}
-    </details>
-    <details id="aw-canvas-patterns" className="aw-canvas-section" open={focus!=='all'}>
-      <summary><strong>Patterns</strong><span>13 types · paint · noise · repeat caveats</span></summary>
-    <div className="aw-section-heading"><strong>Procedural background</strong></div>
-    <Field label="Pattern">
-      <select aria-label="Canvas pattern type" value={options.patternBg?.type??'none'} onChange={e=>{
-        if(e.target.value==='custom'&&!assets.length){onError('Import an image to create a custom pattern');return;}
-        const source=assets[0]?.id;
-        const current=options.patternBg??starterPattern;
-        if(e.target.value==='none'){update({patternBg:undefined});return;}
-        const kind=e.target.value as CanvasPattern['type'];
-
-        const {customPatternImage:_asset,gradient:_paint,color:_color,secondaryColor:_secondary,...previous}=current;
-        update({patternBg:kind==='custom'
-          ?{...previous,type:'custom',customPatternImage:current.customPatternImage??source}
-          :{...previous,type:kind,
-            ...(_paint?{gradient:_paint}:{color:_color??starterPattern.color,secondaryColor:_secondary??starterPattern.secondaryColor})}
-        });
-      }}>
-        <option value="none">Disabled</option>
-        {(['grid','dots','diagonal','stripes','waves','crosses','hexagons','checkerboard','diamonds','triangles','stars','polka','custom'] as const).map(t=><option value={t} key={t}>{t}</option>)}
-      </select>
-    </Field>
-    {options.patternBg?<PatternControls id="Root" pattern={options.patternBg} assets={assets}
-      onChange={patternBg=>update({patternBg})}/>:null}
-    <Field label="Noise">
-      <input type="checkbox" className="aw-switch" checked={options.noiseBg!==undefined} onChange={e=>update({noiseBg:e.target.checked?{intensity:0.08}:undefined})}/>
-    </Field>
-    {options.noiseBg?<NumberField label="Noise intensity" value={options.noiseBg.intensity??0.05} min={0} max={1} step={0.02} onChange={intensity=>update({noiseBg:{intensity}})}/>:null}
-    </details>
-    <details id="aw-canvas-layers" className="aw-canvas-section" open={focus!=='all'}>
-      <summary><strong>Background layers</strong><span>6 layer types · reorder · compositing</span></summary>
+    </>}
+    {["all", "background", "layers"].includes(focus)&&<>
+    <details id="aw-canvas-layers" className="aw-canvas-section" open={focus==='effects'||focus==='advanced'}>
+      <summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>Background layers</strong><span>6 layer types · reorder · compositing</span></summary>
     <div className="aw-section-heading"><strong>Ordered background layers</strong></div>
     {backgroundLayers.map((layer,index)=><fieldset aria-label={"Background layer "+(index+1)} key={index} className="aw-canvas-properties">
       <legend>{index+1}. {layer.type}</legend>
@@ -212,14 +172,66 @@ export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onErr
       </button>
     </div>
     </details>
-    <details id="aw-canvas-effects" className="aw-canvas-section" open={focus!=='all'}>
-      <summary><strong>Strokes & shadows</strong><span>Styles · radius · gradients · offsets</span></summary>
+    </>}
+    {["all", "background", "styling"].includes(focus)&&<>
+    <details id="aw-canvas-patterns" className="aw-canvas-section" open={focus==='effects'||focus==='advanced'}>
+      <summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>Pattern &amp; noise</strong><span>13 types · paint · noise · repeat caveats</span></summary>
+    <div className="aw-section-heading"><strong>Procedural background</strong></div>
+    <Field label="Pattern">
+      <select aria-label="Canvas pattern type" value={options.patternBg?.type??'none'} onChange={e=>{
+        if(e.target.value==='custom'&&!assets.length){onError('Import an image to create a custom pattern');return;}
+        const source=assets[0]?.id;
+        const current=options.patternBg??starterPattern;
+        if(e.target.value==='none'){update({patternBg:undefined});return;}
+        const kind=e.target.value as CanvasPattern['type'];
+
+        const {customPatternImage:_asset,gradient:_paint,color:_color,secondaryColor:_secondary,...previous}=current;
+        update({patternBg:kind==='custom'
+          ?{...previous,type:'custom',customPatternImage:current.customPatternImage??source}
+          :{...previous,type:kind,
+            ...(_paint?{gradient:_paint}:{color:_color??starterPattern.color,secondaryColor:_secondary??starterPattern.secondaryColor})}
+        });
+      }}>
+        <option value="none">Disabled</option>
+        {(['grid','dots','diagonal','stripes','waves','crosses','hexagons','checkerboard','diamonds','triangles','stars','polka','custom'] as const).map(t=><option value={t} key={t}>{t}</option>)}
+      </select>
+    </Field>
+    {options.patternBg?<PatternControls id="Root" pattern={options.patternBg} assets={assets}
+      onChange={patternBg=>update({patternBg})}/>:null}
+    <Field label="Noise">
+      <input type="checkbox" className="aw-switch" checked={options.noiseBg!==undefined} onChange={e=>update({noiseBg:e.target.checked?{intensity:0.08}:undefined})}/>
+    </Field>
+    {options.noiseBg?<NumberField label="Noise intensity" value={options.noiseBg.intensity??0.05} min={0} max={1} step={0.02} onChange={intensity=>update({noiseBg:{intensity}})}/>:null}
+    </details>
+    </>}
+    {["all", "background", "styling"].includes(focus)&&<>
+    <details id="aw-canvas-gradients" className="aw-canvas-section" open={focus==='effects'||focus==='advanced'}>
+      <summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>Advanced gradients</strong><span>Linear · radial · conic · stops · pivots</span></summary>
+<div className="aw-section-heading"><strong>Gradient background · native v6</strong></div>
+    <Field label="Gradient variant">
+      <select aria-label="Canvas gradient type" value={gradient?.type??'none'} onChange={e=>{
+        const t=e.target.value as GradientKind|'none';
+        update({gradientBg:t==='none'?undefined:{...starterGradient(t),colors:gradient?.colors??starterGradient(t).colors},
+          ...(t==='none'?{}:{customBg:undefined})});
+      }}>
+        <option value="none">Default background</option>
+        <option value="linear">Linear</option><option value="radial">Radial</option><option value="conic">Conic</option>
+      </select>
+    </Field>
+    {gradient?<GradientControls gradient={gradient} onChange={setGradient} id="Root" />:null}
+    </details>
+    </>}
+    {["all", "effects"].includes(focus)&&<>
+    <details id="aw-canvas-effects" className="aw-canvas-section" open={focus==='effects'||focus==='advanced'}>
+      <summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>Strokes & shadows</strong><span>Styles · radius · gradients · offsets</span></summary>
     <div className="aw-section-heading"><strong>Stroke, shadow and borders</strong></div>
     <StrokeControls id="Canvas" value={options.stroke} onChange={stroke=>update({stroke})}/>
     <ShadowControls id="Canvas" ownerRadius={options.borderRadius??0} value={options.shadow} onChange={shadow=>update({shadow})}/>
     </details>
-    <details id="aw-canvas-images" className="aw-canvas-section" open={focus!=='all'}>
-      <summary><strong>Verified images</strong><span>Import · select · fit · alignment</span></summary>
+    </>}
+    {["all", "background", "advanced"].includes(focus)&&<>
+    <details id="aw-canvas-images" className="aw-canvas-section" open={focus==='effects'||focus==='advanced'}>
+      <summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>Image controls</strong><span>Import · fit · alignment</span></summary>
     <div className="aw-section-heading"><strong>Verified local images</strong></div>
     <p className="aw-muted">Only local PNG/JPEG/WebP files, verified by content hash and decoded pixels. No remote URLs, arbitrary paths or live video.</p>
     <Field label="Import local image as canvas background">
@@ -287,7 +299,8 @@ export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onErr
         update({customBg:undefined})}>Remove image background</button>
     </div>:null}
     </details>
-    <button className="aw-text-button" type="button" onClick={()=>onChange({})}>Reset advanced canvas options</button>
-    <p className="aw-muted">Apexify.js v6 pinned API · whitelisted static CanvasConfig subset. Video-frame extraction and external asset backgrounds are not enabled.</p>
+    </>}
+    {focus==='advanced'&&<button className="aw-text-button" type="button" onClick={()=>onChange({})}>Reset canvas effects and advanced options</button>}
+    {focus==='all'&&<p className="aw-muted">Changes sync with Code and Visual Graph.</p>}
   </section>;
 }

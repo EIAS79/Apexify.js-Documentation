@@ -42,24 +42,24 @@ async function run() {
     const inspector = desktop.locator('.aw-inspector');
     await page.locator('.aw-render-image').first().waitFor({state:'visible'});
     assert.match(await page.locator('.aw-brand img').getAttribute('src'), /apexify-lockup-v2.avif/);
-    assert.equal(await page.locator('.aw-app').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(17, 18, 16)');
-    assert.equal(await desktop.locator('.aw-panel').count(), 4);
+    assert.equal(await page.locator('.aw-app').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(17, 17, 17)');
+    assert.equal(await desktop.locator('.aw-panel:visible').count(), 6);
+    assert.equal(await desktop.getByRole('tab',{name:'Code',exact:true}).getAttribute('aria-selected'),'true');
+    assert.equal(await desktop.getByRole('tab',{name:'Render Queue',exact:true}).getAttribute('aria-selected'),'true');
 
     console.log('Theme and default layout verified');
-    assert.deepEqual(await inspector.getByRole('tab').allTextContents(),['Setup','Background','Styling','Effects','Advanced','Layers']);
-    const categoryChecks=[
+    assert.deepEqual(await inspector.getByRole('tablist',{name:'Canvas property categories'}).getByRole('tab').allTextContents(),['Layout','Background','Effects','Advanced']);
+    for(const [name,control] of [
+      ['Layout',inspector.getByRole('spinbutton',{name:'Width',exact:true})],
       ['Background',inspector.locator('.aw-segmented')],
-      ['Styling',inspector.getByLabel('Canvas gradient type',{exact:true})],
       ['Effects',inspector.getByLabel('Canvas stroke enabled',{exact:true})],
       ['Advanced',inspector.getByLabel('Import canvas background image',{exact:true})],
-      ['Layers',inspector.getByRole('button',{name:'Add color layer',exact:true})],
-    ];
-    for(const [name,control] of categoryChecks){
+    ]) {
       const tab=inspector.getByRole('tab',{name,exact:true});
       await tab.click();await control.waitFor({state:'visible'});
       assert.equal(await tab.getAttribute('aria-selected'),'true');
     }
-    await inspector.getByRole('tab',{name:'Setup',exact:true}).click();
+    await inspector.getByRole('tab',{name:'Layout',exact:true}).click();
 
     const help = inspector.getByRole('button', {name:'About Width', exact:true});
     await help.click();
@@ -70,7 +70,8 @@ async function run() {
     assert.equal(await help.evaluate(el => el === document.activeElement), true);
 
     console.log('Help verified');
-    await inspector.getByRole('tab',{name:'Styling',exact:true}).click();
+    await inspector.getByRole('tab',{name:'Background',exact:true}).click();
+    await inspector.locator('#aw-canvas-gradients > summary').click();
     await inspector.getByLabel('Canvas gradient type').selectOption('linear');
     // CodeMirror virtualizes off-screen lines; inspect the actual source download.
     const readSource = async () => {
@@ -97,7 +98,7 @@ async function run() {
     assert.match(await measure.locator('.aw-text-metrics').innerText(), /Width: [1-9]/);
 
     console.log('Text verified');
-    await inspector.getByLabel('Inspector view',{exact:true}).selectOption('Assets');
+    await inspector.getByRole('tab',{name:'Assets',exact:true}).click();
     await inspector.locator('.aw-assets input[type=file]').setInputFiles(path.join(process.cwd(),'public/workspace/assets/crystal-lake.webp'));
     await inspector.getByLabel('Image fit',{exact:true}).waitFor();
     const oldPreview=await desktop.locator('.aw-render-image').getAttribute('src');
@@ -133,7 +134,7 @@ async function run() {
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     assert.deepEqual(errors, []);
 
-    console.log('PASS: Frame palette, logo, focused layout, accessible help, canvas/code sync, text layout/measurements, image import/fit, themes, panel recovery, and 390px inspector.');
+    console.log('PASS: Balanced layout, logo, grouped tabs, accessible help, canvas/code sync, text layout/measurements, image import/fit, themes, panel recovery, and 390px inspector.');
   } finally {
     await browser?.close();
     server?.closeAllConnections();

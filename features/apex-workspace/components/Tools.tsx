@@ -53,9 +53,9 @@ const groups: { title?: string; tools: Tool[] }[] = [
 ];
 const toolHelp:Record<string,string>={
   canvas:"Select the canvas to edit output size, background, gradients, patterns, and effects.",
-  text:"Add an editable text layer, then adjust typography and effects in Design.",
-  image:"Open Assets to import a PNG, JPEG, or WebP image, then edit its appearance in Design.",
-  layers:"Open Design to select, reorder, hide, and edit layers.",
+  text:"Add an editable text layer, then adjust typography and effects in Properties.",
+  image:"Open Assets to import a PNG, JPEG, or WebP image, then edit its appearance in Properties.",
+  layers:"Open Properties to select, reorder, hide, and edit layers.",
   assets:"Import images and select existing image layers.",
   presets:"Load an editable composition. Undo restores the previous composition.",
   open:"Import a previously exported Workspace project JSON file.",

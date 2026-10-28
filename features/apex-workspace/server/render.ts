@@ -49,7 +49,10 @@ export async function renderWorkspaceDocument(
         y: 0,
         width: document.width,
         height: document.height,
-        fit: "cover",
+        fit: bg.fit ?? "cover",
+        ...(bg.align===undefined?{}:{align:bg.align}),
+        ...(bg.opacity===undefined?{}:{opacity:bg.opacity}),
+        ...(bg.blur===undefined?{}:{blur:bg.blur}),
       },
       output,
     );

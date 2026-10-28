@@ -63,11 +63,11 @@ async function main(){
   await sleep(850);
   const start=await evaluate("({tabs:[...document.querySelectorAll('.aw-property-tabs button')].map(x=>x.textContent.trim()),nodes:document.querySelectorAll('.react-flow__node').length,ports:document.querySelectorAll('.react-flow__handle').length,minimap:!!document.querySelector('.react-flow__minimap'),width:Math.round(document.querySelector('.aw-inspector').getBoundingClientRect().width)})");
   console.log("SETUP",JSON.stringify(start));
-  assert.deepEqual(start.tabs,["Setup","Background","Styling","Effects","Advanced","Layers"]);
+  assert.deepEqual(start.tabs,["Layout","Background","Effects","Advanced"]);
   assert(start.nodes>=3&&start.ports>=3&&start.minimap,"Interactive typed graph incomplete");
   const report={start,categories:{},graph:{}};
   await screenshot("01-setup");
-  for(const [name,expected] of [["Background","background"],["Styling","aw-canvas-fundamentals"],["Effects","aw-canvas-effects"],["Advanced","aw-canvas-images"],["Layers","aw-canvas-layers"]]){
+  for(const [name,expected] of [["Layout","aw-canvas-fundamentals"],["Background","background"],["Effects","aw-canvas-effects"],["Advanced","aw-canvas-images"]]){
     await tabClick(name);await sleep(150);
     const state=await evaluate("({selected:document.querySelector('.aw-property-tabs [aria-selected=true]')?.textContent.trim(),sections:[...document.querySelectorAll('.aw-canvas-advanced>.aw-canvas-section')].filter(x=>x.getClientRects().length&&getComputedStyle(x).display!=='none').map(x=>x.id),base:!!document.querySelector('.aw-segmented'),fieldWidths:[...document.querySelectorAll('.aw-canvas-advanced .aw-field')].filter(x=>x.getClientRects().length).map(x=>Math.round(x.getBoundingClientRect().width)).filter(Boolean).slice(0,20)})");
     report.categories[name]=state;console.log("CATEGORY "+name,JSON.stringify(state));
@@ -82,8 +82,8 @@ async function main(){
     }
     await screenshot("02-"+name.toLowerCase());
   }
-  await tabClick("Setup");
-  const setup=await evaluate("({inputs:[...document.querySelectorAll('#aw-canvas-category-panel input')].map(x=>({type:x.type,width:Math.round(x.getBoundingClientRect().width)})),scroll:document.querySelector('.aw-property-tabs').scrollWidth,client:document.querySelector('.aw-property-tabs').clientWidth})");
+  await tabClick("Layout");
+  const setup=await evaluate("({inputs:[...document.querySelectorAll('[data-canvas-category-panel] input')].map(x=>({type:x.type,width:Math.round(x.getBoundingClientRect().width)})),scroll:document.querySelector('.aw-property-tabs').scrollWidth,client:document.querySelector('.aw-property-tabs').clientWidth})");
   console.log("SETUP_FIELDS",JSON.stringify(setup));
   assert(setup.inputs.length>=3,"Canvas dimensions/name fields missing");
   assert(setup.scroll<=setup.client+3,"Canvas subtabs clipped");

@@ -51,7 +51,7 @@ export function makeAssetCanvasConfig(doc:WorkspaceDocument,bundledArtwork?:Buff
   };
   const primary=customBg
     ? {customBg:{...customBg,source:resolveImageReference(customBg.source,doc.assets??[])}}
-    : gradientBg ? {gradientBg} : legacyImageOverlay ? {customBg:{source:legacyImage(),fit:'cover' as const}} :
+    : gradientBg ? {gradientBg} : legacyImageOverlay ? {customBg:{source:legacyImage(),fit:bg.fit??'cover',...(bg.align===undefined?{}:{align:bg.align}),...(bg.opacity===undefined?{}:{opacity:bg.opacity})}} :
       bg.mode==='image'?{transparentBase:true} :
       bg.mode==='gradient'?{gradientBg:{type:'linear' as const,endX:doc.width,
         colors:[{stop:0,color:bg.startColor},{stop:1,color:bg.endColor}]}} :

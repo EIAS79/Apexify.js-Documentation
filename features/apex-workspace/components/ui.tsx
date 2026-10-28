@@ -40,6 +40,8 @@ export function Panel({
   onClose,
   onMaximize,
   className = "",
+  tabs,
+  tabPanelId,
 }: {
   title: string;
   icon?: IconType;
@@ -48,14 +50,18 @@ export function Panel({
   onClose: () => void;
   onMaximize?: () => void;
   className?: string;
+  tabs?: ReactNode;
+  tabPanelId?: string;
 }) {
   return (
-    <section className={`aw-panel ${className}`} aria-label={`${title} panel`}>
+    <section className={`aw-panel ${className}`} aria-label={`${title} panel`}
+      id={tabPanelId} role={tabPanelId ? "tabpanel" : undefined}
+      aria-labelledby={tabPanelId ? tabPanelId + "-tab" : undefined}>
       <header className="aw-panel-header">
-        <div className="aw-panel-title">
+        {tabs ?? <div className="aw-panel-title">
           {Icon ? <Icon /> : null}
           <span>{title}</span>
-        </div>
+        </div>}
         <div className="aw-panel-actions">
           {actions}
           {onMaximize ? (

@@ -6,15 +6,17 @@ The new App Router page is `/workspace`. Its files live in `app/workspace`, `app
 
 ## Current behavior
 
-- Workspace follows the current Frame homepage/documentation palette and canonical wordmark. The site theme preference also controls Workspace and its code editor.
-- New layouts focus on Tools, Visual Canvas, Inspector, and Code. All other panels remain available through **Panels**. Existing saved layouts are preserved; **Panels → Reset layout** applies the new arrangement.
-- The Inspector view selector switches between Design, Presets, and Assets. Canvas retains the six accessible categories and typed graph from PR #170, with no extra jump-navigation row. Typography uses collapsible groups. Image options retain grouped, collapsible controls.
+- Workspace uses the canonical homepage wordmark, charcoal surfaces, and the bright `#F7FF00` accent from the supplied homepage reference. The site theme preference also controls Workspace and its code editor.
+- The selected Balanced Workspace layout places Canvas above Code/Terminal and Visual Graph, with Render Queue/Preview/Output & Export in a bottom tab group. Tools stay left; Properties stays right. All nine panels remain closeable, reopenable, resizable, and maximizable. Inactive tabs stay mounted to preserve editor state.
+- Layout metadata is version 2. Old v1 geometry resets to the selected layout; composition data and source drafts are untouched. **Panels → Reset layout** restores this arrangement later.
+- Properties/Presets/Assets use one tab strip. Canvas uses Layout/Background/Effects/Advanced, with native gradient, pattern, image, and ordered-layer controls grouped inside those categories. Typography and image options use collapsible groups.
+- Background image Fit, Alignment, Opacity, and Blur are visible directly in Background. They use validated optional background fields, native rendering, generated code, and the v1/v2 projection. Blur must be zero when combining the base image with pattern/noise overlays. Imported custom-background controls retain their existing native semantics.
 - Info buttons explain controls, units, effects, and limits. Help supports click/touch, Escape, keyboard focus, and narrow screens; cards appear outside clipped panel content.
 - The Create group prioritizes Canvas, Text, and Image. Other tools are under More Tools; editors not implemented are marked Planned. This refresh does not implement media, path, or component editors.
 
-- Nine independent panels: tools, visual canvas, properties, code, graph, terminal, render queue, preview, and output/export. Close, reopen, maximize, reset, and resize them. Hidden branches disappear from the split tree and adjacent windows reclaim the space. The header can restore panels even when every panel is closed.
+- Nine managed panels, including two tab groups: tools, visual canvas, properties, code, graph, terminal, render queue, preview, and output/export. Close, reopen, maximize, reset, and resize them. Hidden branches disappear from the split tree and adjacent windows reclaim the space. The header can restore panels even when every panel is closed.
 - One versioned composition drives visual selection and dragging, the inspector, generated code, the graph, live renders, and render jobs. History supports undo/redo. Project, layout, and unsynchronized code drafts persist locally; JSON project downloads provide a portable backup.
-- Canvas backgrounds support color, gradient, and uploaded/bundled images. Text, rectangle/circle shapes, image layers, bar charts, and pie charts have real Apexify rendering. PNG/JPEG/WebP image upload is limited to 4 MB per file.
+- Canvas backgrounds support color, gradient, and uploaded/bundled images. Text, rectangle/circle shapes, image layers, bar charts, and pie charts have real Apexify rendering. PNG/JPEG/WebP image upload is limited to 2 MB per file.
 - CodeMirror edits the generated Node program. Editing its JSON `composition` literal and applying it updates all views. Edits outside that supported program are retained and downloadable, but cannot be applied or executed on the server. This is an explicit synchronization boundary.
 - The graph represents the actual ordered composition. Its nodes select the corresponding layers; Run Graph submits a real render. It is a derived composition graph, not an arbitrary node-program editor.
 - Render Queue snapshots compositions and runs jobs sequentially, with real completion, duration, output size, cancellation, and errors. Selecting an older job changes Preview and Export while preserving the live canvas. Live preview uses the same Node renderer.
@@ -51,3 +53,9 @@ Browser checks covered rendering, canonical code edits, visual-to-code updates, 
 
 See the workspace entry in the root `design-qa.md` and `docs/design/workspace` for reference comparisons and browser evidence. Generated crystal artwork and the transparent header mark are implementation assets inspired by the supplied image.
 
+
+## Selected layout verification (2026-10-28)
+
+TypeScript and 117 focused tests passed, including native background-control pixel changes, generated-program byte parity, project migration, dock-group visibility/state, and dark/light gutter contrast. Cloud-browser checks covered native rendering, text measurement, canvas-to-code edits, tabs, field help, both desktop and a 390×844 CSS viewport. See the current root `design-qa.md` for evidence and the HTTP-preview image-upload limitation. Browser scripts were updated for the new tab organization; this iteration used the cloud browser instead of executing those standalone browser scripts.
+
+This change remains in a draft PR. It is not a deployment or complete Workspace runtime-parity certification; full-site release checks still depend on the existing documentation generation issues.

@@ -9,6 +9,7 @@ import "@xyflow/react/dist/style.css";
 import type { WorkspaceDocument } from "../model";
 import { canvasGraphPortId, type CanvasGraph, type CanvasGraphPortType } from "../canvas-graph";
 
+import { ArrowUpRightIcon, Square2StackIcon, PhotoIcon, SparklesIcon, ChatBubbleBottomCenterTextIcon, AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
 import {useTheme} from '@/components/ThemeProvider';
 
 type PortView = { id: string; type: CanvasGraphPortType };
@@ -26,9 +27,12 @@ const tones: Record<CanvasGraphPortType, string> = {
 const nodeTypes = { studio: FlowCard };
 
 function FlowCard({data,selected}:NodeProps<StudioNode>) {
+  const Icon = data.kind==='output'?ArrowUpRightIcon:data.kind==='canvas'?Square2StackIcon:
+    data.kind==='image'||data.kind==='image-layer'?PhotoIcon:data.kind==='effect'?SparklesIcon:
+    data.kind==='text'?ChatBubbleBottomCenterTextIcon:AdjustmentsHorizontalIcon;
   return <div className={"aw-flow-card aw-flow-kind-"+data.kind+(selected?" is-selected":"")+(data.dimmed?" is-dimmed":"")}>
     <div className="aw-flow-card-header">
-      <span className="aw-flow-card-icon" aria-hidden="true">{data.kind==="output"?"↗":data.kind==="canvas"?"▣":data.kind==="image"?"▧":data.kind==="effect"?"✦":"◇"}</span>
+      <span className="aw-flow-card-icon" aria-hidden="true"><Icon/></span>
       <span className="aw-flow-card-title">{data.label}</span>
       <span className="aw-flow-kind-label">{data.kind}</span>
     </div>
@@ -54,7 +58,6 @@ function FlowCard({data,selected}:NodeProps<StudioNode>) {
 }
 
 function generate(graph:CanvasGraph, document:WorkspaceDocument,preview:string|null): {nodes:StudioNode[];edges:Edge[]} {
-  const map = new Map(graph.nodes.map(node=>[node.id,node]));
   const rank = new Map(graph.nodes.map(node=>[node.id,0]));
   for(let i=0;i<graph.nodes.length;i++) {
     for(const edge of graph.edges) rank.set(edge.to,Math.max(rank.get(edge.to)??0,(rank.get(edge.from)??0)+1));
@@ -69,7 +72,7 @@ function generate(graph:CanvasGraph, document:WorkspaceDocument,preview:string|n
     const index=(byRank.get(level)??[]).indexOf(node.id);
     const related=graph.ports.filter(port=>port.nodeId===node.id);
     return {
-      id:node.id,type:"studio",position:{x:35+level*315,y:42+index*190},
+      id:node.id,type:"studio",position:{x:20+level*220,y:20+index*235},
       draggable:true,
       data:{
         label:node.name, kind:node.kind,
@@ -87,7 +90,7 @@ function generate(graph:CanvasGraph, document:WorkspaceDocument,preview:string|n
   const visualY=Math.max(42,...nodes.map(n=>n.position.y))+195;
   nonImageLayers.forEach((layer,i)=>{
     const id="visual:layer:"+layer.id;
-    nodes.push({id,type:"studio",position:{x:350,y:visualY+i*150},data:{
+    nodes.push({id,type:"studio",position:{x:20+(i%3)*220,y:visualY+Math.floor(i/3)*150},data:{
       label:layer.name,kind:layer.kind,detail:"Composition layer • "+(layer.visible?"visible":"hidden"),
       inputs:[],outputs:[],dimmed:!layer.visible
     }});
@@ -145,8 +148,8 @@ export default function CanvasGraphFlow({graph,document,selected,preview,onSelec
       isValidConnection={isValidConnection}
       onEdgeDoubleClick={(_event,edge)=>{if(edge.targetHandle)onDisconnect(edge.targetHandle);}}
       nodesConnectable edgesFocusable panOnDrag zoomOnScroll zoomOnPinch
-      defaultViewport={{x:-430,y:15,zoom:.8}} minZoom={.25} maxZoom={2}
-      colorMode={theme} proOptions={{hideAttribution:true}}
+      fitView fitViewOptions={{nodes:[{id:'canvas:background'},{id:'canvas:root'},{id:'canvas:output'}],padding:0.15,minZoom:0.25,maxZoom:0.8}} minZoom={.15} maxZoom={2}
+      colorMode={theme}
     >
       <Background variant={BackgroundVariant.Dots} gap={22} size={1} color="var(--border-default)"/>
       <Controls showInteractive={false} position="bottom-left"/>
