@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useId } from "react";
+import { useState, useEffect, useId, useRef } from "react";
 import {
   ChevronDownIcon,
   EyeIcon,
@@ -11,6 +11,7 @@ import {
   PhotoIcon,
   SwatchIcon,
   SparklesIcon,
+  Squares2X2Icon,
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 import type { WorkspaceDocument, WorkspaceLayer } from "../model";
@@ -20,6 +21,7 @@ import { Field, NumberField, IconButton } from "./ui";
 import { UploadImage, type LayerPatch } from "./Tools";
 import CanvasOptionsEditor from "./CanvasOptionsEditor";
 import type {WorkspaceImageAsset} from '../asset-store';
+import type {CanvasGradient,CanvasCustomBg} from '../canvas-options';
 import {importImageAsset,resolveImageReference} from '../asset-store';
 import {IMAGE_SHAPES} from '../image-options';
 import ImageOptionsEditor,{GroupTransformEditor} from './ImageOptionsEditor';
@@ -80,12 +82,29 @@ export default function Inspector({
     ["advanced","Advanced","Image processing and rendering details"],
   ] as const;
   const [canvasCategory,setCanvasCategory] = useState<typeof canvasCategories[number][0]>("background");
+  const [canvasBackgroundView,setCanvasBackgroundView]=useState<"base"|"layers"|"overlays">("base");
+  const gradientDraft=useRef<CanvasGradient|undefined>(undefined);
+  const imageDraft=useRef<CanvasCustomBg|undefined>(undefined);
   const [showLayers, setShowLayers] = useState(true);
   useEffect(()=>{
     if(layersRequest){setCanvasCategory('layout');setShowLayers(true);}
   },[layersRequest]);
   const background = (patch: Partial<WorkspaceDocument["background"]>) =>
     onDocument({ background: { ...bg, ...patch } });
+  const changeBaseMode=(mode:WorkspaceDocument["background"]["mode"])=>{
+    const extras=document.canvasExtras??{};
+    if(extras.gradientBg)gradientDraft.current=extras.gradientBg;
+    if(extras.customBg)imageDraft.current=extras.customBg;
+    const next={...extras,gradientBg:undefined,customBg:undefined};
+    if(mode==="gradient"){
+      next.gradientBg=gradientDraft.current??{type:"linear",endX:document.width,
+        colors:[{stop:0,color:bg.startColor},{stop:1,color:bg.endColor}]};
+    }else if(mode==="image"){
+      next.customBg=imageDraft.current;
+    }
+    onDocument({background:{...bg,mode},canvasExtras:next});
+    setCanvasBackgroundView("base");
+  };
   return (
     <div className="aw-inspector">
       <div className="aw-inspector-navigation">
@@ -234,14 +253,27 @@ export default function Inspector({
                   />
                 </Field>
                 </>}
-                {canvasCategory==="background" && <>
+                {canvasCategory==="background"&&<>
+                <div className="aw-canvas-icon-nav aw-background-scope-nav" role="tablist" aria-label="Background editing scope">
+                  {([{id:"base",label:"Base",icon:SwatchIcon},{id:"layers",label:"Layers",icon:Squares2X2Icon},{id:"overlays",label:"Overlays",icon:SparklesIcon}] as const).map(({id,label,icon:Icon},index)=>
+                    <button key={id} type="button" role="tab" aria-selected={canvasBackgroundView===id} tabIndex={canvasBackgroundView===id?0:-1}
+                      className={canvasBackgroundView===id?"selected":""}
+                      onClick={()=>setCanvasBackgroundView(id)} onKeyDown={event=>{
+                        if(!["ArrowLeft","ArrowRight","Home","End"].includes(event.key))return;
+                        event.preventDefault();const sections=["base","layers","overlays"] as const;
+                        const next=event.key==="Home"?0:event.key==="End"?2:(index+(event.key==="ArrowRight"?1:-1)+3)%3;
+                        setCanvasBackgroundView(sections[next]);
+                        event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus();
+                      }}><Icon aria-hidden="true"/><span>{label}</span></button>)}
+                </div>
+                {canvasBackgroundView==="base"&&<>
                 <div className="aw-segmented">
                   {(["color", "gradient", "image"] as const).map((mode) => (
                     <button
                       key={mode}
                       aria-pressed={bg.mode === mode}
                       className={bg.mode === mode ? "selected" : ""}
-                      onClick={() => background({ mode })}
+                      onClick={() => changeBaseMode(mode)}
                     >
                       {mode === "image" ? (
                         <PhotoIcon />
@@ -263,34 +295,7 @@ export default function Inspector({
                     />
                   </Field>
                 ) : bg.mode === "gradient" ? (
-                  <>
-                    <div
-                      className="aw-gradient-preview"
-                      style={{
-                        background: `linear-gradient(100deg,${bg.startColor},${bg.endColor})`,
-                      }}
-                    />
-                    <div className="aw-field-row">
-                      <Field label="Start">
-                        <input
-                          type="color"
-                          value={bg.startColor}
-                          onChange={(e) =>
-                            background({ startColor: e.target.value })
-                          }
-                        />
-                      </Field>
-                      <Field label="End">
-                        <input
-                          type="color"
-                          value={bg.endColor}
-                          onChange={(e) =>
-                            background({ endColor: e.target.value })
-                          }
-                        />
-                      </Field>
-                    </div>
-                  </>
+                  <p className="aw-canvas-note">Edit the gradient below. Colors, stops, geometry and repetition use one native gradient configuration.</p>
                 ) : (
                   <div className="aw-background-image">
                     <img src={backgroundSource.startsWith('asset:')?resolveImageReference(backgroundSource,document.assets??[]):backgroundSource} alt="Canvas background" />
@@ -325,12 +330,13 @@ export default function Inspector({
                       value={Math.round((imageBg?.opacity??bg.opacity??1)*100)} onChange={e=>updateImageBackground({opacity:Number(e.target.value)/100})}/>
                       <output>{Math.round((imageBg?.opacity??bg.opacity??1)*100)}%</output></div>
                   </Field>
-                  <Field label={imageBg?'Canvas blur':'Image blur'} help={imageBg?'Softens the native canvas background before foreground layers are drawn.':'Softens the background image in output pixels. Foreground text and images stay sharp. Set blur to zero before combining pattern or noise overlays.'}>
+                  {!imageBg&&<Field label="Image blur" help="Softens the legacy background image without changing foreground layers. For imported native backgrounds use Effects → Composition to change Canvas-wide blur.">
                     <div className="aw-slider-value"><input aria-label="Background image blur" type="range" min={0} max={100} step={1}
-                      disabled={!imageBg&&!!(document.canvasExtras?.patternBg||document.canvasExtras?.noiseBg)}
-                      value={imageBg?document.canvasExtras?.blur??0:bg.blur??0} onChange={e=>imageBg?onDocument({canvasExtras:{...document.canvasExtras,blur:Number(e.target.value)}}):background({blur:Number(e.target.value)})}/>
-                      <output>{imageBg?document.canvasExtras?.blur??0:bg.blur??0} px</output></div>
-                  </Field>
+                      disabled={!!(document.canvasExtras?.patternBg||document.canvasExtras?.noiseBg)}
+                      value={bg.blur??0} onChange={e=>background({blur:Number(e.target.value)})}/>
+                      <output>{bg.blur??0} px</output></div>
+                  </Field>}
+          </Field>
                 </div>}
                 {bg.mode==='color'&&<Field label="Transparent base">
                   <input
@@ -344,14 +350,13 @@ export default function Inspector({
                   />
                 </Field>}
                 </>}
-                {canvasCategory==="effects" && <div className="aw-field-row">
-                  <NumberField label="Canvas opacity" value={document.canvasExtras?.opacity??1} min={0} max={1} step={0.05}
-                    onChange={opacity=>onDocument({canvasExtras:{...document.canvasExtras,opacity}})}/>
-                  <NumberField label="Canvas blur" value={document.canvasExtras?.blur??0} min={0} max={100}
-                    onChange={blur=>onDocument({canvasExtras:{...document.canvasExtras,blur}})}/>
-                </div>}
+                </>}
                 {(
-                  <CanvasOptionsEditor focus={canvasCategory}
+                  <CanvasOptionsEditor focus={canvasCategory==="background"
+                      ?canvasBackgroundView==="base"?(bg.mode==="gradient"?"gradient":bg.mode==="image"?"image":"none")
+                        :canvasBackgroundView
+                      :canvasCategory}
+                    legacyGradientColors={{start:bg.startColor,end:bg.endColor}}
                     value={document.canvasExtras} canvasWidth={document.width} canvasHeight={document.height}
                     assets={document.assets??[]} onAsset={onCanvasAsset} onError={onError}
                     onChange={canvasExtras=>onDocument({canvasExtras})} />
