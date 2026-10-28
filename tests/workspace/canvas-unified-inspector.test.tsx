@@ -11,7 +11,7 @@ const gradients=readFileSync("features/apex-workspace/components/CanvasNestedCon
 const styles=readFileSync("features/apex-workspace/workspace.css","utf8");
 
 test("Canvas has one gradient editor and no duplicate legacy Start/End form",()=>{
-  assert.match(inspector,/bg\.mode === "gradient"/);
+  assert.match(inspector,/baseMode === "gradient"/);
   assert.match(inspector,/Edit the gradient below/);
   assert.doesNotMatch(inspector,/label="Start"/);
   assert.doesNotMatch(inspector,/label="End"/);
