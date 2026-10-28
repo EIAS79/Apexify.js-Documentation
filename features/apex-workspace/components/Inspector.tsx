@@ -21,7 +21,7 @@ import { Field, NumberField, IconButton } from "./ui";
 import { UploadImage, type LayerPatch } from "./Tools";
 import CanvasOptionsEditor from "./CanvasOptionsEditor";
 import type {WorkspaceImageAsset} from '../asset-store';
-import type {CanvasGradient,CanvasCustomBg} from '../canvas-options';
+import type {CanvasGradient,CanvasCustomBg,CanvasExtras} from '../canvas-options';
 import {importImageAsset,resolveImageReference} from '../asset-store';
 import {IMAGE_SHAPES} from '../image-options';
 import ImageOptionsEditor,{GroupTransformEditor} from './ImageOptionsEditor';
@@ -95,7 +95,7 @@ export default function Inspector({
     const extras=document.canvasExtras??{};
     if(extras.gradientBg)gradientDraft.current=extras.gradientBg;
     if(extras.customBg)imageDraft.current=extras.customBg;
-    const next={...extras,gradientBg:undefined,customBg:undefined};
+    const next:CanvasExtras={...extras,gradientBg:undefined,customBg:undefined};
     if(mode==="gradient"){
       next.gradientBg=gradientDraft.current??{type:"linear",endX:document.width,
         colors:[{stop:0,color:bg.startColor},{stop:1,color:bg.endColor}]};
@@ -300,13 +300,7 @@ export default function Inspector({
                   <div className="aw-background-image">
                     <img src={backgroundSource.startsWith('asset:')?resolveImageReference(backgroundSource,document.assets??[]):backgroundSource} alt="Canvas background" />
                     <div className="aw-background-source"><strong>{backgroundSource==='/workspace/assets/crystal-lake.webp'?'Crystal lake':'Imported image'}</strong><span>Canvas artwork</span>
-                    <UploadImage
-                      onUpload={(source,_name,asset)=>imageBg?onCanvasAsset(asset,'custom'):onDocument({background:{...bg,image:source},
-                        assets:document.assets?.some(a=>a.id===asset.id)?document.assets:[...(document.assets??[]),asset]})}
-                      onError={onError}
-                    >
-                      Replace image
-                    </UploadImage>
+                    <span className="aw-canvas-note">Use the Source controls below to replace or import this image.</span>
                     </div>
                   </div>
                 )}
@@ -336,7 +330,6 @@ export default function Inspector({
                       value={bg.blur??0} onChange={e=>background({blur:Number(e.target.value)})}/>
                       <output>{bg.blur??0} px</output></div>
                   </Field>}
-          </Field>
                 </div>}
                 {bg.mode==='color'&&<Field label="Transparent base">
                   <input
