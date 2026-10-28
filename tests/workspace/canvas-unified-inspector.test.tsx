@@ -8,6 +8,7 @@ import {generateSource,parseSource} from "../../features/apex-workspace/codegen"
 const inspector=readFileSync("features/apex-workspace/components/Inspector.tsx","utf8");
 const canvas=readFileSync("features/apex-workspace/components/CanvasOptionsEditor.tsx","utf8");
 const gradients=readFileSync("features/apex-workspace/components/CanvasNestedControls.tsx","utf8");
+const styles=readFileSync("features/apex-workspace/workspace.css","utf8");
 
 test("Canvas has one gradient editor and no duplicate legacy Start/End form",()=>{
   assert.match(inspector,/bg\.mode === "gradient"/);
@@ -32,6 +33,12 @@ test("focused gradient views still have all native controls",()=>{
   for(const name of ["stops","geometry","tiling","details"])assert.match(gradients,new RegExp('show\\("'+name+'"\\)'));
   for(const name of ["startX","endX","startRadius","endRadius","centerX","centerY","startAngle","pivotX","pivotY","rotate","repeat"])assert.match(gradients,new RegExp(name));
   assert.match(gradients,/gradient\.colors\.length>=12/);
+});
+test("legacy CSS cannot hide the reorganized Effects and Advanced tabs",()=>{
+  assert.doesNotMatch(styles,/data-canvas-focus="effects"\\] > \\.aw-canvas-section:not/);
+  assert.doesNotMatch(styles,/data-canvas-focus="advanced"\\] > \\.aw-canvas-section:not/);
+  assert.match(canvas,/aria-label="Canvas-wide effects"/);
+  assert.match(canvas,/Resolved Canvas options/);
 });
 test("advanced native gradient survives validation and Visual/Code round-trip",()=>{
   const base=createHeroDocument();
