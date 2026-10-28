@@ -180,24 +180,10 @@ export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onErr
     <details id="aw-canvas-patterns" className="aw-canvas-section" open={focus==="overlays"}>
       <summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>Pattern &amp; noise</strong><span>13 types · paint · noise · repeat caveats</span></summary>
     <div className="aw-section-heading"><strong>Procedural background</strong></div>
-    <Field label="Pattern">
-      <select aria-label="Canvas pattern type" value={options.patternBg?.type??'none'} onChange={e=>{
-        if(e.target.value==='custom'&&!assets.length){onError('Import an image to create a custom pattern');return;}
-        const source=assets[0]?.id;
-        const current=options.patternBg??starterPattern;
-        if(e.target.value==='none'){update({patternBg:undefined});return;}
-        const kind=e.target.value as CanvasPattern['type'];
-
-        const {customPatternImage:_asset,gradient:_paint,color:_color,secondaryColor:_secondary,...previous}=current;
-        update({patternBg:kind==='custom'
-          ?{...previous,type:'custom',customPatternImage:current.customPatternImage??source}
-          :{...previous,type:kind,
-            ...(_paint?{gradient:_paint}:{color:_color??starterPattern.color,secondaryColor:_secondary??starterPattern.secondaryColor})}
-        });
-      }}>
-        <option value="none">Disabled</option>
-        {(['grid','dots','diagonal','stripes','waves','crosses','hexagons','checkerboard','diamonds','triangles','stars','polka','custom'] as const).map(t=><option value={t} key={t}>{t}</option>)}
-      </select>
+    <Field label="Enable procedural pattern">
+      <input type="checkbox" className="aw-switch" aria-label="Enable Canvas pattern"
+        checked={!!options.patternBg}
+        onChange={event=>update({patternBg:event.target.checked?starterPattern:undefined})}/>
     </Field>
     {options.patternBg?<PatternControls id="Root" pattern={options.patternBg} assets={assets}
       onChange={patternBg=>update({patternBg})}/>:null}
