@@ -28,6 +28,9 @@ test("Canvas tab and icon navigation assigns options to single editing scopes",(
   assert.match(canvas,/focus==="advanced"/);
   assert.doesNotMatch(inspector,/canvasCategory==="effects" && <div className="aw-field-row"/);
   assert.doesNotMatch(canvas,/Reset canvas effects and advanced options/);
+  assert.match(canvas,/Enable Canvas pattern/);
+  assert.doesNotMatch(canvas,/<Field label="Pattern">/);
+  assert.match(canvas,/<PatternControls id="Root"/);
 });
 test("focused gradient views still have all native controls",()=>{
   for(const name of ["stops","geometry","tiling","details"])assert.match(gradients,new RegExp('show\\("'+name+'"\\)'));
