@@ -21,7 +21,7 @@ const descriptions: Record<string, string> = {
   inherit: 'Uses the source image’s original pixel dimensions. Fit and alignment are ignored while enabled.',
   blendMode: 'Controls how this paint combines with pixels beneath it. Root canvas blends may have no visible effect without a destination.',
   borderRadius: 'Rounds corners in pixels. Circular uses the renderer’s circular radius mode.',
-  borderPosition: 'Chooses which edges or corners receive the border treatment.',
+  borderPosition: 'Select one or more edges for a stroke, or one or more corners for clipping and rounding. Combinations are saved together and passed to the native renderer.',
   gradient: 'Blends colors across linear, radial, or conic geometry. Each stop places a color between 0 and 1.',
   type: 'Chooses the variant. Available controls change to match that variant.',
   colors: 'Ordered gradient color stops. Keep positions ascending from 0 to 1.',

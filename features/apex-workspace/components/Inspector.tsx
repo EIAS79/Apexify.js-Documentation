@@ -23,6 +23,7 @@ import type {WorkspaceImageAsset} from '../asset-store';
 import {importImageAsset,resolveImageReference} from '../asset-store';
 import {IMAGE_SHAPES} from '../image-options';
 import ImageOptionsEditor,{GroupTransformEditor} from './ImageOptionsEditor';
+import ImageFilePicker from './ImageFilePicker';
 export default function Inspector({
   document,
   layersRequest = 0,
@@ -78,7 +79,8 @@ export default function Inspector({
     onDocument({ background: { ...bg, ...patch } });
   return (
     <div className="aw-inspector">
-      <div className="aw-inspector-navigation" role="tablist" aria-label="Inspector view">
+      <div className="aw-inspector-navigation">
+        <div className="aw-inspector-view-tabs" role="tablist" aria-label="Inspector view">
         {["Properties","Presets","Assets"].map((name,index)=><button key={name} type="button" role="tab"
           id={inspectorId+"-view-"+name} aria-controls={inspectorId+"-view-panel"}
           aria-selected={tab===name} tabIndex={tab===name?0:-1}
@@ -90,6 +92,10 @@ export default function Inspector({
             setTab(names[next]);
             event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('button')[next]?.focus();
           }}>{name}</button>)}
+        </div>
+        <select className="aw-inspector-view-select" aria-label="Inspector view" value={tab} onChange={event=>setTab(event.target.value)}>
+          {["Properties","Presets","Assets"].map(name=><option key={name} value={name}>{name}</option>)}
+        </select>
       </div>
       {tab === "Properties" && !layer && (
         <div className="aw-property-nav" aria-label="Canvas properties navigation">
@@ -116,9 +122,14 @@ export default function Inspector({
                 }}>{label}</button>
             ))}
           </nav>
+          <label className="aw-canvas-category-select"><span>Section</span>
+            <select aria-label="Canvas section" value={canvasCategory} onChange={event=>setCanvasCategory(event.target.value as typeof canvasCategory)}>
+              {canvasCategories.map(([id,label])=><option key={id} value={id}>{label}</option>)}
+            </select>
+          </label>
         </div>
       )}
-      <div id={inspectorId+"-view-panel"} role="tabpanel" aria-labelledby={inspectorId+"-view-"+tab} className={"aw-inspector-scroll" + (tab === "Properties" && !layer ? " aw-inspector-canvas-scroll" : "")} key={tab+":"+(layer?.id??"canvas")}>
+      <div id={inspectorId+"-view-panel"} role="tabpanel" aria-labelledby={inspectorId+"-view-"+tab} className={"aw-inspector-scroll" + (tab === "Properties" && !layer ? " aw-inspector-canvas-scroll" : "")} key={tab+":"+(layer?.id??"canvas:"+canvasCategory)}>
 
         {(layer||tab!=="Properties")&&<div className="aw-inspector-context"><span>{tab==="Properties"?layer?.kind:tab}</span><p>{tab==="Properties"?"Edit this layer. Select Canvas to return to the background.":tab==="Assets"?"Import an image, then select it to edit its appearance.":"Start from an editable composition."}</p></div>}
         {tab === "Presets" ? (
@@ -335,12 +346,10 @@ export default function Inspector({
                     onChange={canvasExtras=>onDocument({canvasExtras})} />
                 )}
                 {canvasCategory==="advanced" && <>
-                <Field label="Renderer">
-                  <span className="aw-value">Apexify.js · Node v6</span>
-                </Field>
-                <Field label="Pixel ratio">
-                  <span className="aw-value">1× · Native output</span>
-                </Field>
+                <dl className="aw-renderer-details" aria-label="Rendering information">
+                  <div><dt>Renderer</dt><dd>Apexify.js · Node v6</dd></div>
+                  <div><dt>Pixel ratio</dt><dd>1× · Native output</dd></div>
+                </dl>
                 </>}
               </div>
             ) : (
@@ -554,12 +563,11 @@ export default function Inspector({
                         {(document.assets??[]).map((asset,index)=><option key={asset.id} value={asset.id}>Image {index+1} · {asset.width} × {asset.height} · {asset.mime.replace('image/','').toUpperCase()}</option>)}
                       </select>
                     </Field>
-                    <Field label="Import replacement image"><input type="file" aria-label="Upload verified image source" accept="image/png,image/jpeg,image/webp"
-                      onChange={async e=>{const input=e.currentTarget,file=input.files?.[0];input.value='';if(!file)return;
-                        try{const asset=await importImageAsset(file);
+                    <Field label="Import replacement image"><ImageFilePicker label="Upload verified image source"
+                      onError={onError} onFile={async file=>{const asset=await importImageAsset(file);
                           onDocument({assets:document.assets?.some(a=>a.id===asset.id)?document.assets:[...(document.assets??[]),asset],
                             layers:document.layers.map(l=>l.id===layer.id?{...l,source:asset.id}:l) as WorkspaceLayer[]});
-                        }catch(err){onError(err instanceof Error?err.message:'Image import failed')}}}/></Field>
+                      }}/></Field>
                   </>}
                   <ImageOptionsEditor options={layer.imageOptions??{}} width={layer.width} height={layer.height} isShape={layer.kind==='shape'} shapeType={layer.kind==='shape'?layer.shape:undefined}
                     assets={document.assets??[]} onError={onError}

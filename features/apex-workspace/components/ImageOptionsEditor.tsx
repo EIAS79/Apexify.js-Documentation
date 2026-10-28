@@ -5,6 +5,8 @@ import type {ImageEditorOptions} from '../image-options';
 import type {WorkspaceImageAsset} from '../asset-store';
 import {importImageAsset} from '../asset-store';
 import {IMAGE_FILTERS,IMAGE_FILTER_FIELDS,IMAGE_DISTORTIONS,IMAGE_FITS,IMAGE_ALIGNS,IMAGE_COMPOSITES,IMAGE_EDGES,IMAGE_INTERPOLATIONS} from '../image-options';
+import BorderMultiSelect from './BorderMultiSelect';
+import ImageFilePicker from './ImageFilePicker';
 import {Field,NumberField} from './ui';
 import {GradientControls} from './CanvasNestedControls';
 import {StrokeControls,ShadowControls} from './CanvasEffectsEditor';
@@ -57,10 +59,8 @@ function LocalAsset({label,value,assets,onChange,onAsset,onError}:{label:string;
  <Field label={label+' image'}><select aria-label={label+' SHA-256 source'} value={value} onChange={e=>onChange(e.target.value)}>
    {assets.map((a,i)=><option key={a.id} value={a.id}>Image {i+1} · {a.width} × {a.height} · {a.mime.replace('image/','').toUpperCase()}</option>)}
  </select></Field>
- <Field label={'Import verified '+label}><input type="file" aria-label={'Import verified '+label} accept="image/png,image/jpeg,image/webp" onChange={async e=>{
- const input=e.currentTarget,file=input.files?.[0];input.value='';if(!file)return;
- try{const asset=await importImageAsset(file);onAsset(asset);}catch(err){onError(err instanceof Error?err.message:'Image upload failed');}
- }}/></Field><small>Import a PNG, JPEG, or WebP image. It is saved with your project.</small></fieldset>;
+ <Field label={'Import '+label}><ImageFilePicker label={'Import verified '+label}
+   onFile={async file=>onAsset(await importImageAsset(file))} onError={onError}/></Field></fieldset>;
 }
 function FilterList({filters,onChange}:{filters:NonNullable<ImageEditorOptions['filters']>;onChange:(v:NonNullable<ImageEditorOptions['filters']>)=>void}){
  const list=filters as unknown as Array<Record<string,unknown>>;
@@ -143,7 +143,7 @@ export default function ImageOptionsEditor({options,onChange,assets,onAsset,onEr
  <Enum label="Composite / blend mode" value={options.blendMode??'source-over'} options={IMAGE_COMPOSITES} onChange={v=>edit({blendMode:v as GlobalCompositeOperation})}/>
  <Toggle label="Circular border radius" checked={options.borderRadius==='circular'} onChange={v=>edit({borderRadius:v?'circular':0})}/>
  {options.borderRadius!=='circular'&&<Num label="Border radius" value={options.borderRadius??0} min={0} max={2048} onChange={borderRadius=>edit({borderRadius})}/>}
- <Enum label="Border position" value={options.borderPosition??'all'} options={['all','top','bottom','left','right','top-left','top-right','bottom-left','bottom-right']} onChange={borderPosition=>edit({borderPosition})}/>
+ <BorderMultiSelect label="Image rounded corners" ariaLabel="Border position" kind="corners" value={options.borderPosition??'all'} onChange={borderPosition=>edit({borderPosition})}/>
  </details>
  {isShape&&<details open><summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/>Procedural shape parameters</summary>
  <Toggle label="Shape fill" checked={options.shape?.fill??true} onChange={fill=>edit({shape:{...options.shape,fill}})}/>
@@ -209,7 +209,7 @@ export function GroupTransformEditor({value,onChange,assets,onAsset,onError,widt
  <Enum label="Group compositing" value={value.blendMode??'source-over'} options={IMAGE_COMPOSITES} onChange={blendMode=>edit({blendMode:blendMode as GlobalCompositeOperation})}/>
  <Toggle label="Circular group radius" checked={value.borderRadius==='circular'} onChange={checked=>edit({borderRadius:checked?'circular':0})}/>
  {value.borderRadius!=='circular'&&<Num label="Group border radius" value={value.borderRadius??0} min={0} max={2048} onChange={borderRadius=>edit({borderRadius})}/>}
- <Enum label="Group border position" value={value.borderPosition??'all'} options={['all','top','bottom','left','right','top-left','top-right','bottom-left','bottom-right']} onChange={borderPosition=>edit({borderPosition:borderPosition as GroupTransformOptions['borderPosition']})}/>
+ <BorderMultiSelect label="Group rounded corners" ariaLabel="Group border position" kind="corners" value={value.borderPosition??'all'} onChange={borderPosition=>edit({borderPosition})}/>
  <StrokeControls id="Image group" value={value.stroke as CanvasStroke|undefined} onChange={stroke=>edit({stroke})}/>
   {value.stroke&&!value.stroke.gradient&&<HexColor label="Image group stroke color hex" value={value.stroke.color??'#000000'} onChange={color=>edit({stroke:{...value.stroke,color}})}/>}
  <ShadowControls id="Image group" value={value.shadow as CanvasShadow|undefined} onChange={shadow=>edit({shadow})}/>

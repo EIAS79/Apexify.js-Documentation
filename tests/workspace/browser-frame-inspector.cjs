@@ -53,7 +53,7 @@ async function run() {
       ['Layout',inspector.getByRole('spinbutton',{name:'Width',exact:true})],
       ['Background',inspector.locator('.aw-segmented')],
       ['Effects',inspector.getByLabel('Canvas stroke enabled',{exact:true})],
-      ['Advanced',inspector.getByLabel('Import canvas background image',{exact:true})],
+      ['Advanced',inspector.getByRole('button',{name:'Import canvas background image — choose file',exact:true})],
     ]) {
       const tab=inspector.getByRole('tab',{name,exact:true});
       await tab.click();await control.waitFor({state:'visible'});

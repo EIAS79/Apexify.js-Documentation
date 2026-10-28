@@ -3,6 +3,8 @@ import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import type {CanvasExtras,CanvasGradient,CanvasLayer,CanvasPattern,GradientKind} from "../canvas-options";
 import {validateCanvasExtras,CanvasBlendModes,CanvasImageAlignModes,type CanvasBlendMode,type CanvasImageAlign} from "../canvas-options";
 import {importImageAsset,type WorkspaceImageAsset} from '../asset-store';
+import BorderMultiSelect from './BorderMultiSelect';
+import ImageFilePicker from './ImageFilePicker';
 import {Field,NumberField} from "./ui";
 import {PatternControls,GradientControls,createGradient,createPattern} from "./CanvasNestedControls";
 import {StrokeControls,ShadowControls} from "./CanvasEffectsEditor";
@@ -73,10 +75,8 @@ export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onErr
       <NumberField label="Border radius" value={typeof options.borderRadius==='number'?options.borderRadius:0} min={0} max={1024} onChange={borderRadius=>update({borderRadius})}/>
     </div>
     <div className="aw-field-row">
-      <Field label="Canvas border position"><select aria-label="Canvas border position"
-        value={options.borderPosition??"all"} onChange={e=>update({borderPosition:e.target.value as NonNullable<CanvasExtras["borderPosition"]>})}>
-        {(["all","top","bottom","left","right","top-left","top-right","bottom-left","bottom-right"] as const).map(v=><option key={v} value={v}>{v}</option>)}
-      </select></Field>
+      <BorderMultiSelect label="Canvas rounded corners" ariaLabel="Canvas border position" kind="corners"
+        value={options.borderPosition??'all'} onChange={borderPosition=>update({borderPosition})}/>
       <Field label="Canvas radius mode"><select aria-label="Canvas border radius mode"
         value={options.borderRadius==="circular"?"circular":"numeric"}
         onChange={e=>update({borderRadius:e.target.value==="circular"?"circular":0})}>
@@ -226,42 +226,26 @@ export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onErr
       <summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>Strokes & shadows</strong><span>Styles · radius · gradients · offsets</span></summary>
     <div className="aw-section-heading"><strong>Stroke, shadow and borders</strong></div>
     <StrokeControls id="Canvas" value={options.stroke} onChange={stroke=>update({stroke})}/>
-    <ShadowControls id="Canvas" ownerRadius={options.borderRadius??0} value={options.shadow} onChange={shadow=>update({shadow})}/>
+    <ShadowControls id="Canvas" ownerRadius={options.borderRadius??0} ownerCorners={options.borderPosition??'all'} value={options.shadow} onChange={shadow=>update({shadow})}/>
     </details>
     </>}
     {["all", "background", "advanced"].includes(focus)&&<>
     <details id="aw-canvas-images" className="aw-canvas-section" open={focus==='effects'||focus==='advanced'}>
       <summary><ChevronRightIcon className="aw-disclosure-icon" aria-hidden="true"/><strong>Image controls</strong><span>Import · fit · alignment</span></summary>
-    <div className="aw-section-heading"><strong>Verified local images</strong></div>
-    <p className="aw-muted">Only local PNG/JPEG/WebP files, verified by content hash and decoded pixels. No remote URLs, arbitrary paths or live video.</p>
-    <Field label="Import local image as canvas background">
-      <input aria-label="Import canvas background image" type="file" accept="image/png,image/jpeg,image/webp"
-        onChange={async event=>{
-          const file=event.currentTarget.files?.[0];event.currentTarget.value='';
-          if(!file)return;
-          try{onAsset(await importImageAsset(file),'custom');}
-          catch(error){onError(error instanceof Error?error.message:'Invalid canvas image.');}
-        }}/>
-    </Field>
-    <Field label="Import image into ordered background layers">
-      <input aria-label="Import canvas image background layer" type="file" accept="image/png,image/jpeg,image/webp"
-        disabled={backgroundLayers.length>=12}
-        onChange={async event=>{
-          const file=event.currentTarget.files?.[0];event.currentTarget.value='';
-          if(!file)return;
-          try{onAsset(await importImageAsset(file),'layer');}
-          catch(error){onError(error instanceof Error?error.message:'Invalid canvas image.');}
-        }}/>
-    </Field>
-    <Field label="Import verified repeating pattern image">
-      <input aria-label="Import canvas pattern image" type="file" accept="image/png,image/jpeg,image/webp"
-        onChange={async event=>{
-          const file=event.currentTarget.files?.[0];event.currentTarget.value='';
-          if(!file)return;
-          try{onAsset(await importImageAsset(file),'pattern');}
-          catch(e){onError(e instanceof Error?e.message:'Pattern image validation failed');}
-        }}/>
-    </Field>
+    <p className="aw-import-intro">Choose how to use your image. Imports are saved with this project.</p>
+    <div className="aw-canvas-imports">
+      <Field label="Canvas background" help="Use an image as the primary canvas background. Adjust its fit and alignment after importing.">
+        <ImageFilePicker label="Import canvas background image" onFile={async file=>onAsset(await importImageAsset(file),'custom')} onError={onError}/>
+      </Field>
+      <Field label="Background layer" help="Add an image to the ordered background stack. Reorder and blend it with other backgrounds.">
+        <ImageFilePicker label="Import canvas image background layer" buttonLabel="Add image layer" disabled={backgroundLayers.length>=12}
+          onFile={async file=>onAsset(await importImageAsset(file),'layer')} onError={onError}/>
+      </Field>
+      <Field label="Repeating pattern" help="Use an image as a repeating tile. Adjust repeat, size, and spacing in Pattern & noise.">
+        <ImageFilePicker label="Import canvas pattern image" buttonLabel="Choose pattern image"
+          onFile={async file=>onAsset(await importImageAsset(file),'pattern')} onError={onError}/>
+      </Field>
+    </div>
     {assets.length?<Field label="Use existing verified asset">
       <select aria-label="Select an existing canvas asset" value="" onChange={event=>{
         const source=event.target.value;if(!source)return;

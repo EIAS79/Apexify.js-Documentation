@@ -256,7 +256,7 @@ export default function Graph({
             customBg:{...document.canvasExtras!.customBg!,filters}}))}/>:null}
         <StrokeControls id="Graph" value={document.canvasExtras?.stroke}
           onChange={value=>onCanvas(editCanvasGraph(document,{op:'stroke',value:value??null}))}/>
-        <ShadowControls id="Graph" ownerRadius={document.canvasExtras?.borderRadius??0} value={document.canvasExtras?.shadow}
+        <ShadowControls id="Graph" ownerRadius={document.canvasExtras?.borderRadius??0} ownerCorners={document.canvasExtras?.borderPosition??'all'} value={document.canvasExtras?.shadow}
           onChange={value=>onCanvas(editCanvasGraph(document,{op:'shadow',value:value??null}))}/>
         {(document.canvasExtras?.bgLayers??[]).map((layer,index)=><details key={index}>
           <summary>Ordered layer {index+1}: {layer.type}</summary>
