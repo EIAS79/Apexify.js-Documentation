@@ -1,71 +1,44 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {createElement} from "react";
-import {renderToStaticMarkup} from "react-dom/server";
-import CanvasOptionsEditor from "../../features/apex-workspace/components/CanvasOptionsEditor";
-import {GradientControls} from "../../features/apex-workspace/components/CanvasNestedControls";
-import type {CanvasGradient,CanvasExtras} from "../../features/apex-workspace/canvas-options";
+import {readFileSync} from "node:fs";
+import {validateCanvasExtras,validateCanvasGradient} from "../../features/apex-workspace/canvas-options";
+import {createHeroDocument,validateDocument} from "../../features/apex-workspace/model";
+import {generateSource,parseSource} from "../../features/apex-workspace/codegen";
 
-const gradient:CanvasGradient={
-  type:"linear",endX:160,colors:[{stop:0,color:"#221160"},{stop:0.5,color:"#ffffff"},{stop:1,color:"#006ca8"}],
-};
-const props={
-  assets:[],
-  canvasWidth:160,
-  canvasHeight:112,
-  onChange:(_value:CanvasExtras)=>{},
-  onAsset:()=>{},
-  onError:(_error:string)=>{},
-};
-const show=(focus:"gradient"|"image"|"layout"|"effects"|"advanced"|"layers"|"overlays",value:CanvasExtras={})=>
-  renderToStaticMarkup(createElement(CanvasOptionsEditor,{...props,focus,value,legacyGradientColors:{start:"#f7d5ff",end:"#006ca8"}}));
+const inspector=readFileSync("features/apex-workspace/components/Inspector.tsx","utf8");
+const canvas=readFileSync("features/apex-workspace/components/CanvasOptionsEditor.tsx","utf8");
+const gradients=readFileSync("features/apex-workspace/components/CanvasNestedControls.tsx","utf8");
 
-test("root gradient renders one focused Stops surface, not basic and advanced duplicates",()=>{
-  const html=show("gradient",{gradientBg:gradient});
-  assert.match(html,/Gradient editor sections/);
-  assert.match(html,/Colors &amp; stops/);
-  assert.match(html,/Root stop 1/);
-  assert.match(html,/Root stop 2/);
-  assert.match(html,/Root stop 3/);
-  assert.doesNotMatch(html,/Advanced gradients/);
-  assert.doesNotMatch(html,/Root start X/);
-  assert.doesNotMatch(html,/Canvas opacity/);
-  assert.doesNotMatch(html,/Background layers/);
+test("Canvas has one gradient editor and no duplicate legacy Start/End form",()=>{
+  assert.match(inspector,/bg\.mode === "gradient"/);
+  assert.match(inspector,/Edit the gradient below/);
+  assert.doesNotMatch(inspector,/label="Start"/);
+  assert.doesNotMatch(inspector,/label="End"/);
+  assert.doesNotMatch(canvas,/Advanced gradients/);
+  assert.match(canvas,/Unified gradient editor/);
+  assert.match(canvas,/Gradient editor sections/);
+  assert.match(canvas,/section=\{focus==="all"\?"all":gradientView\}/);
 });
-test("legacy two-color gradient is displayed from fallback without a second editor",()=>{
-  const html=show("gradient");
-  assert.match(html,/#f7d5ff/);
-  assert.match(html,/Root stop 1/);
-  assert.doesNotMatch(html,/Root end X/);
+test("Canvas tab and icon navigation assigns options to single editing scopes",()=>{
+  for(const name of ["layout","background","effects","advanced"])assert.match(inspector,new RegExp('\\["'+name+'","'));
+  for(const name of ["base","layers","overlays"])assert.match(inspector,new RegExp('id:"'+name+'"'));
+  for(const name of ["stops","geometry","tiling","details"])assert.match(canvas,new RegExp('id:"'+name+'"'));
+  assert.match(canvas,/focus==="effects"/);
+  assert.match(canvas,/focus==="advanced"/);
+  assert.doesNotMatch(inspector,/canvasCategory==="effects" && <div className="aw-field-row"/);
+  assert.doesNotMatch(canvas,/Reset canvas effects and advanced options/);
 });
-test("specialized scopes never expose unrelated Canvas fields",()=>{
-  assert.match(show("layout"),/Canvas X/);
-  assert.doesNotMatch(show("layout"),/Canvas opacity/);
-  assert.match(show("effects"),/Canvas opacity/);
-  assert.doesNotMatch(show("effects"),/Root stop 1/);
-  assert.match(show("advanced",{rotation:11}),/Resolved Canvas options/);
-  assert.doesNotMatch(show("advanced",{rotation:11}),/Canvas root blend mode/);
-  assert.match(show("overlays"),/Pattern &amp; noise/);
-  assert.doesNotMatch(show("overlays"),/Gradient editor sections/);
-  assert.match(show("layers"),/Background layers/);
-  assert.doesNotMatch(show("layers"),/Canvas opacity/);
+test("focused gradient views still have all native controls",()=>{
+  for(const name of ["stops","geometry","tiling","details"])assert.match(gradients,new RegExp('show\\("'+name+'"\\)'));
+  for(const name of ["startX","endX","startRadius","endRadius","centerX","centerY","startAngle","pivotX","pivotY","rotate","repeat"])assert.match(gradients,new RegExp(name));
+  assert.match(gradients,/gradient\.colors\.length>=12/);
 });
-test("image source section does not duplicate main image fit/align/opacity controls",()=>{
-  const html=show("image",{customBg:{source:"asset:"+"a".repeat(64),fit:"cover",align:"center",opacity:0.5}});
-  assert.match(html,/Imported image intrinsic dimensions/);
-  assert.doesNotMatch(html,/Imported background fit/);
-  assert.doesNotMatch(html,/Imported background alignment/);
-  assert.doesNotMatch(html,/Canvas opacity/);
-});
-test("shared gradient primitive remains fully accessible outside the focused root editor",()=>{
-  const html=renderToStaticMarkup(createElement(GradientControls,{id:"Layer 1",gradient,onChange:()=>{}}));
-  assert.match(html,/Layer 1 stop 1/);
-  assert.match(html,/Layer 1 start X/);
-  assert.match(html,/Layer 1 gradient repeat/);
-});
-test("focused gradient Geometry shows variant and coordinates without stop duplication",()=>{
-  const html=renderToStaticMarkup(createElement(GradientControls,{id:"Root",gradient,onChange:()=>{},section:"geometry"}));
-  assert.match(html,/Root gradient type/);
-  assert.match(html,/Root start X/);
-  assert.doesNotMatch(html,/Root stop 1/);
+test("advanced native gradient survives validation and Visual/Code round-trip",()=>{
+  const base=createHeroDocument();
+  const value=validateCanvasGradient({type:"linear",startX:4,endX:base.width,rotate:18,pivotX:30,pivotY:12,
+    repeat:"reflect",colors:[{stop:0,color:"#221160"},{stop:0.5,color:"#f7d5ff"},{stop:1,color:"#006ca8"}]});
+  const extras=validateCanvasExtras({...base.canvasExtras,gradientBg:value,customBg:undefined});
+  const next=validateDocument({...base,background:{...base.background,mode:"gradient"},canvasExtras:extras});
+  assert.deepEqual(parseSource(generateSource(next)),next);
+  assert.deepEqual(next.canvasExtras?.gradientBg,value);
 });
