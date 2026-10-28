@@ -144,7 +144,7 @@ export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onErr
           onChange={e=>setLayers(backgroundLayers.map((l,j)=>j===index?{...layer,source:e.target.value}:l))}>
           {assets.map(asset=><option key={asset.id} value={asset.id}>{asset.sha256.slice(0,12)}</option>)}
         </select></Field>
-        {focus==="all"&&<Field label="Image fit"><select aria-label={"Layer "+(index+1)+" fit"} value={layer.fit??'fill'}
+        <Field label="Image fit"><select aria-label={"Layer "+(index+1)+" fit"} value={layer.fit??'fill'}
           onChange={e=>setLayers(backgroundLayers.map((l,j)=>j===index?{...layer,fit:e.target.value as 'cover'|'contain'|'fill'}:l))}>
           {(['cover','contain','fill'] as const).map(v=><option key={v} value={v}>{v}</option>)}
         </select></Field>
