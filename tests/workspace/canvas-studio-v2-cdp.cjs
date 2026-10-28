@@ -67,12 +67,13 @@ async function main(){
   assert(start.nodes>=3&&start.ports>=3&&start.minimap,"Interactive typed graph incomplete");
   const report={start,categories:{},graph:{}};
   await screenshot("01-setup");
-  for(const [name,expected] of [["Layout","aw-canvas-fundamentals"],["Background","background"],["Effects","aw-canvas-effects"],["Advanced","aw-canvas-images"]]){
+  for(const [name,expected] of [["Layout","Canvas layout options"],["Background","background"],["Effects","Canvas-wide effects"],["Advanced","advanced"]]){
     await tabClick(name);await sleep(150);
-    const state=await evaluate("({selected:document.querySelector('.aw-property-tabs [aria-selected=true]')?.textContent.trim(),sections:[...document.querySelectorAll('.aw-canvas-advanced>.aw-canvas-section')].filter(x=>x.getClientRects().length&&getComputedStyle(x).display!=='none').map(x=>x.id),base:!!document.querySelector('.aw-segmented'),fieldWidths:[...document.querySelectorAll('.aw-canvas-advanced .aw-field')].filter(x=>x.getClientRects().length).map(x=>Math.round(x.getBoundingClientRect().width)).filter(Boolean).slice(0,20)})");
+    const state=await evaluate("({selected:document.querySelector('.aw-property-tabs [aria-selected=true]')?.textContent.trim(),sections:[...document.querySelectorAll('.aw-canvas-advanced>.aw-canvas-section')].filter(x=>x.getClientRects().length&&getComputedStyle(x).display!=='none').map(x=>x.getAttribute('aria-label')||x.id||'advanced'),base:!!document.querySelector('.aw-segmented'),fieldWidths:[...document.querySelectorAll('.aw-canvas-advanced .aw-field')].filter(x=>x.getClientRects().length).map(x=>Math.round(x.getBoundingClientRect().width)).filter(Boolean).slice(0,20)})");
     report.categories[name]=state;console.log("CATEGORY "+name,JSON.stringify(state));
     assert.equal(state.selected,name);
     if(expected==="background")assert(state.base,"Background base controls missing");
+    else if(expected==="advanced")assert(await evaluate("!!document.querySelector('.aw-canvas-options-readout')"),"Missing read-only advanced configuration");
     else assert(state.sections.includes(expected),"Missing active controls: "+expected);
     assert(!state.fieldWidths.some(w=>w<65),"Collapsed field in "+name);
     if(name==="Effects"){
@@ -90,7 +91,13 @@ async function main(){
   await tabClick("Background");
   assert(await evaluate("(() => {const b=[...document.querySelectorAll('.aw-segmented button')].find(x=>x.textContent.toLowerCase().includes('gradient'));if(!b)return false;b.click();return true;})()"),"Missing gradient background button");
   await retry(()=>evaluate("document.querySelector('.aw-segmented button.selected')?.textContent.trim().toLowerCase()==='gradient'"),12000);
-  report.backgroundEdit="color/gradient visual control changed successfully";
+  const gradientUI=await evaluate("({navigation:!!document.querySelector('[aria-label=\\\"Gradient editor sections\\\"]'),stopFields:[...document.querySelectorAll('[aria-label^=\\\"Root stop color\\\"]')].length,legacyStart:[...document.querySelectorAll('.aw-field')].filter(x=>x.textContent?.trim()==='Start').length,duplicateAdvance:document.body.innerText.includes('Advanced gradients')})");
+  assert(gradientUI.navigation,"Unified gradient navigation must be visible");
+  assert(gradientUI.stopFields>=2,"Native gradient stop editor must be reachable");
+  assert.equal(gradientUI.legacyStart,0,"Legacy parallel Start field must not appear");
+  assert.equal(gradientUI.duplicateAdvance,false,"No duplicate Advanced gradients accordion");
+  report.gradientUI=gradientUI;
+    report.backgroundEdit="color/gradient visual control changed successfully";
   await screenshot("07-background-edit");
   const graph=await evaluate("({ids:[...document.querySelectorAll('.react-flow__node')].map(x=>x.getAttribute('data-id')),edges:document.querySelectorAll('.react-flow__edge').length,ports:document.querySelectorAll('.react-flow__handle').length})");
   console.log("GRAPH",JSON.stringify(graph));assert(graph.ids.includes("canvas:root")&&graph.ids.includes("canvas:output")&&graph.edges>=2);
